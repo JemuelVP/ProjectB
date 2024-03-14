@@ -1,4 +1,4 @@
-class Chair
+public class Chair
 {
     public int Id;
     public string Name;
