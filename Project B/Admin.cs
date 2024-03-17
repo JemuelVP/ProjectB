@@ -21,13 +21,10 @@ public class Admin {
             string? storedPassword = reader["Password"].ToString();
             if (name == storedName && password == storedPassword)
             {
-                Console.WriteLine("Succesvol ingelogd");
                 LoggedIn = true;
+                return;
             }
-            else 
-            {
-                Console.WriteLine("Verkeerde gegevens ingevuld probeer het opnieuw");
-            }
+            Console.WriteLine("Verkeerde gegevens ingevuld probeer het opnieuw");
         }
         connection.Close();
     }
