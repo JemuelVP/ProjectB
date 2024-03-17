@@ -1,15 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore;
-await using var db = new DataBaseConnection();
-
-Console.WriteLine($"DataBase path; {db.DbPath}");
-Console.WriteLine("Queryinh for films");
-
-var results =
-    from film in db.Films
-    where film.ID == 1
-    select film;
-
-await foreach(var film in results.AsAsyncEnumerable())
+﻿using (var db = new DataBaseConnection())
 {
-    Console.WriteLine($"Id: {film.ID}, Title: {film.Title}, Year: {film.Year}, Description: {film.Description}, Author: {film.Authors}, Category: {film.Categories}, Age: {film.Age}, DurationInMin: {film.DurationInMin}");
+    Console.WriteLine("Querying for films");
+
+    var results = db.Films.Add(new Film{
+        Title = "SpiderMan",
+        Year = 2024,
+        Price = 120,
+        Description = "THE BOMB",
+        Authors = "ARAB AND VALPOORT",
+        Categories = "ACTION",
+        Directors = "VALPOORT AND ARAB",
+        Age = 36,
+        DurationInMin = 120
+    });
+    db.SaveChanges();
+    Console.WriteLine(results);
 }
