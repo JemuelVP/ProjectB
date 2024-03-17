@@ -1,27 +1,14 @@
 class Film
 {
-    public string Title;
-    public int Year;
-    public int Price;
-    public string Description;
-    public List<string> Author;
-    public List<string> Category;
-    public List<string> Director;
-    public int Age;
-    public int DurationInMin;
-
-
-    public Film(string title, int year, int price, string description,List<string> author, List<string> category, List<string> director, int age, int durationInMin)
-    {
-        Title = title;
-        Year = year;
-        Price = price;
-        Description = description;
-        Author = author;
-        Category = category;
-        Director = director;
-        Age = age;
-        DurationInMin = durationInMin;
-    }
-
+    public int ID { get; set; }
+    public required string Title { get; set; }
+    public required int Year { get; set; }
+    public required int Price { get; set; }
+    public required string Description { get; set; }
+    public required string Authors { get; set; }
+    public required string Categories { get; set; }
+    public required string Directors { get; set; }
+    public required int Age { get; set; }
+    public required int DurationInMin { get; set; }
+    
 }
