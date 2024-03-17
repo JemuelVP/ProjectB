@@ -8,7 +8,7 @@ public class Admin {
     public bool LoggedIn = false;
 
     public void Login(string name, string password) {
-        string connectionString = "Data Source=mydatabase.sqlite;Version=3;";
+        string connectionString = "Data Source=movie.sqlite;Version=3;";
         using SQLiteConnection connection = new SQLiteConnection(connectionString);
         connection.Open();
         string selectQuery = "SELECT * FROM Admin";
