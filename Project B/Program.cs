@@ -2,12 +2,21 @@
 
 Admin admin = new Admin();
 
-admin.Login("admin", "123");
+Console.WriteLine("Voer je naam in");
 
-if (admin.LoggedIn == true) {
-    Console.WriteLine("hallo");
-}
+string? name = Console.ReadLine();
 
-else {
-    Console.WriteLine("niet ingelogd");
-}
+Console.WriteLine("Voer je wachtwoord in");
+
+string? password = Console.ReadLine();
+
+admin.Login(name, password);
+
+// if (admin.LoggedIn == true)
+// {
+//     Console.WriteLine("Succesvol ingelogd");
+// }
+// else if (name != name["Naam"])
+// {
+//     Console.WriteLine("niet ingelogd");
+// }

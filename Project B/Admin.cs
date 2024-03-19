@@ -26,9 +26,21 @@ public class Admin
             if (name == storedName && password == storedPassword)
             {
                 LoggedIn = true;
+                Console.WriteLine("Succesvol ingelogd");
                 return;
             }
-            Console.WriteLine("Verkeerde gegevens ingevuld probeer het opnieuw");
+            else if (name != storedName)
+            {
+                Console.WriteLine("Naam is verkeerd probeer het opnieuw");
+            }
+            else if (password != storedPassword)
+            {
+                System.Console.WriteLine("Wachtwoord is verkeerd probeer het opniewu");
+            }
+            else
+            {
+                Console.WriteLine("Verkeerde gegevens ingevuld probeer het opnieuw");
+            }
         }
         connection.Close();
     }
