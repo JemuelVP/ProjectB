@@ -13,7 +13,7 @@ public class CinemaHall
     {
         for (int i = 0; i < numberOfSeats; i++)
         {
-            Chairs.Add(new Chair(id, name, price));
+            Chairs.Add(new Chair(i, name, price));
         }
     }
 }
