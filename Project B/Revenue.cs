@@ -1,21 +1,15 @@
 class Revenue
 {
-    public List<Chair> SoldTickets;
-
-    public Revenue(List<Chair> soldTickets)
+    public double TotalRevenue(List<Chair> chairs)
     {
-        SoldTickets = soldTickets;
-    }
-
-    public double TotalRevenue()
-    {
-        totalRevenue = 0.0;
-
-        foreach (Chair chair in SoldTickets)
+        double totalRevenue = 0.0;
+        foreach (Chair chair in chairs)
         {
-            totalRevenue += chair.Price; 
-        }
-        
+            if (chair.Sold)
+            {
+                totalRevenue += chair.Price; 
+            }
+        }    
         return totalRevenue;
     }
 }
