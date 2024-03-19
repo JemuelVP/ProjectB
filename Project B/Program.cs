@@ -4,11 +4,12 @@ Admin admin = new Admin();
 
 admin.Login("admin", "123");
 
-if (admin.LoggedIn == true) {
+if (admin.LoggedIn == true)
+{
     Console.WriteLine("hallo");
 }
-
-else {
+else
+{
     Console.WriteLine("niet ingelogd");
 }
 
@@ -26,3 +27,20 @@ film.DisplayMovieInfo(movieTitle);
 
 // // Print a message indicating successful data insertion
 // Console.WriteLine("Data inserted successfully.");
+=======
+// test Revenue class
+
+// CinemaHall1 Cinemahall1 = new CinemaHall1(1);
+// List<int> idsToSell = new List<int> {1,2,3,4,5};
+// foreach (Chair chair in Cinemahall1.Chairs)
+// {
+//     if (idsToSell.Contains(chair.Id))
+//     {
+//         chair.Sold = true;
+//     }
+// }
+
+// Revenue revenue = new Revenue();
+// double totalrev = revenue.TotalRevenue(Cinemahall1.Chairs);
+// Console.WriteLine(totalrev);
+
