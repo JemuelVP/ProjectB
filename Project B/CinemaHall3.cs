@@ -1,6 +1,6 @@
 class CinemaHall3 : CinemaHall 
 {
-    public CinemaHall1(int id) : base(id, 500)
+    public CinemaHall3(int id) : base(id, 500)
     {
         FillChairs();
     }
