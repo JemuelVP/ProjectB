@@ -9,4 +9,13 @@ public class CinemaHall
         numberOfSeats = numberofseats;
         Chairs = new List<Chair>();
     }
+    public virtual void FillChairs()
+    {
+        for (int i = 0; i < numberOfSeats; i++)
+        {
+            Chairs.Add(new Chair());
+        }
+    }
 }
+// this is the baseclass CinemaHall, it contains a list of chairs, numberOfSeats is the amount of seats
+// it has three deriven classes.
