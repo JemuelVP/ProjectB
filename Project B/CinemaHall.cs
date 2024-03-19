@@ -9,11 +9,11 @@ public class CinemaHall
         numberOfSeats = numberofseats;
         Chairs = new List<Chair>();
     }
-    public virtual void FillChairs()
+    public virtual void FillChairs(int id, string name, double price)
     {
         for (int i = 0; i < numberOfSeats; i++)
         {
-            Chairs.Add(new Chair());
+            Chairs.Add(new Chair(id, name, price));
         }
     }
 }
