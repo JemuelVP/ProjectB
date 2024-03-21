@@ -60,7 +60,7 @@ class Film
                 {
                     if(reader.HasRows)
                     {
-                        Console.WriteLine("Movies: ");
+                        Console.WriteLine("Films: ");
                         while (reader.Read())
                         {
                             string? title = reader["Title"].ToString();

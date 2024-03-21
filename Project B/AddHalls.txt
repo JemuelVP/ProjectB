@@ -29,5 +29,5 @@
     IN Program.cs
 
     CinemaHall3 hall = new CinemaHall3(3);
-    hall.AddHall("Zaal 3", 500, 0);
+    hall.AddHall("Zaal 3", 500);
     Console.WriteLine("Data inserted successfully.");
