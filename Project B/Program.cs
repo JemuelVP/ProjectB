@@ -2,7 +2,17 @@
 
 Admin admin = new Admin();
 
-admin.Login("admin", "123");
+Console.WriteLine("Voer je naam in");
+
+
+string? name = Console.ReadLine();
+
+Console.WriteLine("Voer je wachtwoord in");
+
+string? password = Console.ReadLine();
+
+admin.Login(name, password);
+
 
 if (admin.LoggedIn == true)
 {
@@ -27,7 +37,6 @@ film.DisplayMovieInfo(movieTitle);
 
 // // Print a message indicating successful data insertion
 // Console.WriteLine("Data inserted successfully.");
-=======
 // test Revenue class
 
 // CinemaHall1 Cinemahall1 = new CinemaHall1(1);
@@ -43,4 +52,5 @@ film.DisplayMovieInfo(movieTitle);
 // Revenue revenue = new Revenue();
 // double totalrev = revenue.TotalRevenue(Cinemahall1.Chairs);
 // Console.WriteLine(totalrev);
+
 
