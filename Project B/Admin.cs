@@ -6,7 +6,7 @@ public class Admin
     public string? Password;
     public bool LoggedIn = false;
 
-    public void Login(string name, string password)
+    public void Login(string? name, string? password)
     {
         string connectionString = "Data Source=movie.sqlite;Version=3;";
         //Making an connection with the database
@@ -18,7 +18,7 @@ public class Admin
         //Execute SQL Query
         using SQLiteDataReader reader = selectCommand.ExecuteReader();
         // Check if there is data to read
-        if (reader.Read())
+        while (reader.Read() && !LoggedIn)
         {
             // Get name and password from the database
             string? storedName = reader["Name"].ToString();
@@ -26,9 +26,16 @@ public class Admin
             if (name == storedName && password == storedPassword)
             {
                 LoggedIn = true;
-                return;
+                Console.WriteLine("Succesvol ingelogd");
             }
-            Console.WriteLine("Verkeerde gegevens ingevuld probeer het opnieuw");
+            while (name != storedName && password != storedPassword)
+            {
+                Console.WriteLine("Verkeerde gegevens ingevuld probeer het opnieuw");
+                Console.WriteLine("Voer je naam in:");
+                name = Console.ReadLine();
+                Console.WriteLine("Voer je wachtwoord in:");
+                password = Console.ReadLine();
+            }
         }
         connection.Close();
     }
