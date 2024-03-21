@@ -1,6 +1,8 @@
 ﻿DatabaseConnection.CreateDatabase();
 
 Admin admin = new Admin();
+Film film = new Film();
+
 
 admin.Login("admin", "123");
 
@@ -13,12 +15,12 @@ else
     Console.WriteLine("niet ingelogd");
 }
 
-Film film = new Film();
 
+// Film Overview
 film.DisplayMovieTitle();
 
 Console.Write("Enter the title of the movie: ");
-string movieTitle = Console.ReadLine();
+string? movieTitle = Console.ReadLine();
 
 film.DisplayMovieInfo(movieTitle);
 
@@ -27,7 +29,7 @@ film.DisplayMovieInfo(movieTitle);
 
 // // Print a message indicating successful data insertion
 // Console.WriteLine("Data inserted successfully.");
-=======
+
 // test Revenue class
 
 // CinemaHall1 Cinemahall1 = new CinemaHall1(1);
@@ -43,4 +45,3 @@ film.DisplayMovieInfo(movieTitle);
 // Revenue revenue = new Revenue();
 // double totalrev = revenue.TotalRevenue(Cinemahall1.Chairs);
 // Console.WriteLine(totalrev);
-

@@ -63,7 +63,7 @@ class Film
                         Console.WriteLine("Movies: ");
                         while (reader.Read())
                         {
-                            string title = reader["Title"].ToString();
+                            string? title = reader["Title"].ToString();
                             int year = Convert.ToInt32(reader["Year"]);
                             System.Console.WriteLine($"{title}, {year}");
                         }
@@ -73,7 +73,7 @@ class Film
         }
     }
 
-    public void DisplayMovieInfo(string movieTitle)
+    public void DisplayMovieInfo(string? movieTitle)
     {
         string connectionString = "Data Source=movie.sqlite;Version=3;";
 
