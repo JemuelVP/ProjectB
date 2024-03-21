@@ -4,7 +4,17 @@ Admin admin = new Admin();
 Film film = new Film();
 
 
-admin.Login("admin", "123");
+Console.WriteLine("Voer je naam in");
+
+
+string? name = Console.ReadLine();
+
+Console.WriteLine("Voer je wachtwoord in");
+
+string? password = Console.ReadLine();
+
+admin.Login(name, password);
+
 
 if (admin.LoggedIn == true)
 {
