@@ -7,10 +7,9 @@ class Revenue
         {
             if (chair.Sold)
             {
-                totalRevenue += chair.Price; 
+                totalRevenue += chair.Price;
             }
-        }    
+        }
         return totalRevenue;
     }
 }
-//
