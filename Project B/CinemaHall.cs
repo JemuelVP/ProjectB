@@ -10,14 +10,23 @@ public class CinemaHall
         numberOfSeats = numberofseats;
         Chairs = new List<Chair>();
     }
-
-    public virtual void FillChairs(int id, string name, double price)
+    public void FillChairs(Dictionary<string, int> chairArrangement)
     {
-        for (int i = 0; i < numberOfSeats; i++)
+        foreach (KeyValuePair<string, int> chair in chairArrangement)
         {
-            Chairs.Add(new Chair(i, name, price));
+            AddChairs(chair.Key, chair.Value);
+        }
+    }
+    public void AddChairs(string chairType, int amountChairs)
+    {
+        for (int i = 0; i < amountChairs; i++)
+        {
+            if (Chairs.Count < numberOfSeats)
+            {
+                Chairs.Add(new Chair(Chairs.Count, chairType, 0.0)); // chairs.count keeps track of current chair id & adds respective price
+            }
         }
     }
 }
-// this is the baseclass CinemaHall, it contains a list of chairs, numberOfSeats is the amount of seats
-// it has three deriven classes.
+// this is the baseclass CinemaHall, AddChairs() it adds chairs of every type (standard, extraleg, loveseat)
+// FillChairs() adds the chairs to a dictionary, int amountChairs is the maximum chairs of the specific type to be added
