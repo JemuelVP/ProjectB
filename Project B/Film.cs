@@ -12,39 +12,40 @@ class Film
     public int Age { get; set; }
     public int DurationInMin { get; set; }
 
-    // Method to insert movie data into the database
-    // public void OverviewMovies(string title, int year, int price, string description, string authors, string categories, string directors, int age, int durationInMin)
-    // {
-    //     // Connection string to connect to the SQLite database
-    //     string connectionString = "Data Source=movie.sqlite;Version=3;";
+    //Method to insert movie data into the database
+    public void OverviewMovies(string title, int year, int price, string description, string authors, string categories, string directors, int age, int durationInMin)
+    {
+        // Connection string to connect to the SQLite database
+        string connectionString = "Data Source=movie.sqlite;Version=3;";
 
-    //     // Using statement ensures the connection is closed properly after use
-    //     using (SQLiteConnection connection = new SQLiteConnection(connectionString))
-    //     {
-    //         connection.Open();
+        // Using statement ensures the connection is closed properly after use
+        using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+        {
+            connection.Open();
 
-    //         // SQL query to insert data into the Movie table
-    //         string insertQuery = "INSERT INTO Movie (Title, Year, Price, Description, Authors, Categories, Directors, Age, DurationInMin) " +
-    //                              "VALUES (@Title, @Year, @Price, @Description, @Authors, @Categories, @Directors, @Age, @DurationInMin)";
-    //         // Using the '@' symbol before the "" so you can include the '' without escaping them
-    //         // Using statement ensures the command is disposed properly after use
-    //         using (SQLiteCommand insertCommand = new SQLiteCommand(insertQuery, connection))
-    //         {
-    //             insertCommand.Parameters.AddWithValue("@Title", title);
-    //             insertCommand.Parameters.AddWithValue("@Year", year);
-    //             insertCommand.Parameters.AddWithValue("@Price", price);
-    //             insertCommand.Parameters.AddWithValue("@Description", description);
-    //             insertCommand.Parameters.AddWithValue("@Authors", authors);
-    //             insertCommand.Parameters.AddWithValue("@Categories", categories);
-    //             insertCommand.Parameters.AddWithValue("@Directors", directors);
-    //             insertCommand.Parameters.AddWithValue("@Age", age);
-    //             insertCommand.Parameters.AddWithValue("@DurationInMin", durationInMin);
+            // SQL query to insert data into the Movie table
+            string insertQuery = "INSERT INTO Movie (Title, Year, Price, Description, Authors, Categories, Directors, Age, DurationInMin) " +
+                                 "VALUES (@Title, @Year, @Price, @Description, @Authors, @Categories, @Directors, @Age, @DurationInMin)";
+            // Using the '@' symbol before the "" so you can include the '' without escaping them
+            // Using statement ensures the command is disposed properly after use
+            using (SQLiteCommand insertCommand = new SQLiteCommand(insertQuery, connection))
+            {
+                insertCommand.Parameters.AddWithValue("@Title", title);
+                insertCommand.Parameters.AddWithValue("@Year", year);
+                insertCommand.Parameters.AddWithValue("@Price", price);
+                insertCommand.Parameters.AddWithValue("@Description", description);
+                insertCommand.Parameters.AddWithValue("@Authors", authors);
+                insertCommand.Parameters.AddWithValue("@Categories", categories);
+                insertCommand.Parameters.AddWithValue("@Directors", directors);
+                insertCommand.Parameters.AddWithValue("@Age", age);
+                insertCommand.Parameters.AddWithValue("@DurationInMin", durationInMin);
 
-    //             // Execute the command to insert data into the database
-    //             insertCommand.ExecuteNonQuery();
-    //         }
-    //     }
-    // }
+                // Execute the command to insert data into the database
+                insertCommand.ExecuteNonQuery();
+            }
+        }
+    }
+    
     public void DisplayMovieTitle()
     {
         string connectionString = "Data Source=movie.sqlite;Version=3;";

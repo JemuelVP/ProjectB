@@ -1,5 +1,21 @@
 ﻿DatabaseConnection.CreateDatabase();
 
+
+CinemaHall3 hall = new CinemaHall3(3);
+hall.AddHall("Zaal 3", 500);
+Console.WriteLine("Data inserted successfully.");
+
+//checkt of de schedule overview correct update naar de databse
+hall.OverviewSchedules(1, 1, 1, 0, new DateTime(2024,12,12), new DateTime(2024,12,13));
+hall.OverviewSchedules(2, 1, 3, 0, new DateTime(2019,12,3), new DateTime(2020,12,30));
+
+hall.OverviewTickets(1,"sude", 1, 2, "loveseat", 30, 1);
+hall.OverviewTickets(2, "twee", 1, 3, "extralegroom", 27.5,1 );
+hall.OverviewTickets(3, "drie", 2, 4, "loveseat", 30, 2);
+
+hall.CountTicketsPerFilm();
+
+
 Admin admin = new Admin();
 Film film = new Film();
 
