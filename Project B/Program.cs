@@ -1,57 +1,78 @@
-﻿DatabaseConnection.CreateDatabase();
-
-Admin admin = new Admin();
+﻿using Spectre.Console;
 Film film = new Film();
-
-
-Console.WriteLine("Voer je naam in");
-
-
-string? name = Console.ReadLine();
-
-Console.WriteLine("Voer je wachtwoord in");
-
-string? password = Console.ReadLine();
-
-admin.Login(name, password);
-
-
-if (admin.LoggedIn == true)
+Admin admin = new Admin();
+bool active = true;
+Console.WriteLine("Welkom bij YourEyes");
+while (active)
 {
-    Console.WriteLine("hallo");
+    var MainMenuOption = AnsiConsole.Prompt(new SelectionPrompt<MainMenuOptions>().Title("Bent u een admin of een klant").AddChoices(
+    MainMenuOptions.Admin,
+    MainMenuOptions.Customer));
+
+    switch (MainMenuOption)
+    {
+        case MainMenuOptions.Admin:
+            Console.WriteLine("Voer je naam in");
+            string? name = Console.ReadLine();
+            Console.WriteLine("Voer je wachtwoord in");
+            string? password = Console.ReadLine();
+            admin.Login(name, password);
+            if (admin.LoggedIn == true)
+            {
+                Console.WriteLine("hallo");
+            }
+            else
+            {
+                Console.WriteLine("niet ingelogd");
+            }
+            break;
+        case MainMenuOptions.Customer:
+            var ReservationMenuOption = AnsiConsole.Prompt(new SelectionPrompt<MoviesMenuOptions>().Title("Beschikbare films").AddChoices(
+            MoviesMenuOptions.OverviewMovies));
+            switch (ReservationMenuOption)
+            {
+                case MoviesMenuOptions.OverviewMovies:
+                    var films = Film.GetAllMovies();
+                    string[] movieInfoArray = films
+                                    .Select(book => $"Title: {book.Title}, Year: {book.Year}")
+                                    .ToArray();
+                    var overviewMenu = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Kies een film").AddChoices(movieInfoArray));
+                    // Split the string by ','
+                    string[] parts = overviewMenu.Split(',');
+
+                    // Extract title and year
+                    string title = parts[0].Split(':')[1].Trim();
+                    int year = int.Parse(parts[1].Split(':')[1].Trim());
+                    var selectedMovie = Film.GetMovieByTitleAndYear(title, year);
+                    if (selectedMovie == null)
+                    {
+                        break;
+                    }
+                    selectedMovie.Display(selectedMovie);
+                    Console.ReadKey();
+                    break;
+            }
+
+            break;
+
+    }
 }
-else
+
+public enum MainMenuOptions
 {
-    Console.WriteLine("niet ingelogd");
+    Admin,
+    Customer
 }
 
+public enum MoviesMenuOptions
+{
+    OverviewMovies,
+}
 
-// Film Overview
-film.DisplayMovieTitle();
+public enum ReservationMenuOption
+{
+    MakeReservation,
+    Back
 
-Console.Write("Enter the title of the movie: ");
-string? movieTitle = Console.ReadLine();
+}
 
-film.DisplayMovieInfo(movieTitle);
-
-// Call the OverviewMovies method to insert movie data into the database
-// film.OverviewMovies("Batman", 2002, 200, "THE BOMB", "VALPOORT AND ARAB", "ACTION", "VALPOORT AND ARAB", 36, 120);
-
-// // Print a message indicating successful data insertion
-// Console.WriteLine("Data inserted successfully.");
-
-// test Revenue class
-
-// CinemaHall1 Cinemahall1 = new CinemaHall1(1);
-// List<int> idsToSell = new List<int> {1,2,3,4,5};
-// foreach (Chair chair in Cinemahall1.Chairs)
-// {
-//     if (idsToSell.Contains(chair.Id))
-//     {
-//         chair.Sold = true;
-//     }
-// }
-
-// Revenue revenue = new Revenue();
-// double totalrev = revenue.TotalRevenue(Cinemahall1.Chairs);
-// Console.WriteLine(totalrev);
