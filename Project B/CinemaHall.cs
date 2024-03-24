@@ -76,7 +76,7 @@ public class CinemaHall
         
 
     }
-    
+
     //Method to insert Schedule data into the database
     public void OverviewSchedules(int id, int movie_id, int hall_id, int soldseats, DateTime startdate, DateTime enddate)
     {
@@ -110,7 +110,7 @@ public class CinemaHall
     }
     
     
-    //Method to insert ticket data into the database
+    //Method to insert ticket data into the Ticket database
     public void OverviewTickets(int id, string username, int schedule_id, int seatnumber, string seattype,double price, int movie_id)
     {
         string connectionString = "Data Source=movie.sqlite;Version=3;";
@@ -140,6 +140,39 @@ public class CinemaHall
             }
         }
     }
+
+
+        public void DisplaySoldTickets()
+    {
+        string connectionString = "Data Source=movie.sqlite;Version=3;";
+
+        using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+        {
+            connection.Open();
+
+            string selectQuery = @"SELECT Schedule.ID, Schedule.SoldSeats, Movie.Title "+
+                                 "FROM Schedule " +
+                                 "INNER JOIN Movie ON Movie.ID = Schedule.Movie_ID";
+            using (SQLiteCommand selectCommand = new SQLiteCommand(selectQuery, connection))
+            {
+                using (SQLiteDataReader reader = selectCommand.ExecuteReader())
+                {
+                    if(reader.HasRows)
+                    {
+                        Console.WriteLine("Display soldtickets per film: ");
+                        while (reader.Read())
+                        {
+                            int ID = Convert.ToInt32(reader["ID"]);
+                            string? title = reader["Title"].ToString();
+                            int soldSeats = Convert.ToInt32(reader["SoldSeats"]);
+                            System.Console.WriteLine($" Schedule: {ID}, Title: {title}, sold tickets: {soldSeats}");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
 
 

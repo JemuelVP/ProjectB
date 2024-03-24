@@ -7,13 +7,14 @@ Console.WriteLine("Data inserted successfully.");
 
 //checkt of de schedule overview correct update naar de databse
 hall.OverviewSchedules(1, 1, 1, 0, new DateTime(2024,12,12), new DateTime(2024,12,13));
-hall.OverviewSchedules(2, 1, 3, 0, new DateTime(2019,12,3), new DateTime(2020,12,30));
+hall.OverviewSchedules(2, 2, 3, 0, new DateTime(2019,12,3), new DateTime(2020,12,30));
 
 hall.OverviewTickets(1,"sude", 1, 2, "loveseat", 30, 1);
 hall.OverviewTickets(2, "twee", 1, 3, "extralegroom", 27.5,1 );
 hall.OverviewTickets(3, "drie", 2, 4, "loveseat", 30, 2);
 
 hall.CountTicketsPerFilm();
+hall.DisplaySoldTickets();
 
 
 Admin admin = new Admin();
@@ -21,7 +22,6 @@ Film film = new Film();
 
 
 Console.WriteLine("Voer je naam in");
-
 
 string? name = Console.ReadLine();
 
@@ -51,7 +51,8 @@ string? movieTitle = Console.ReadLine();
 film.DisplayMovieInfo(movieTitle);
 
 // Call the OverviewMovies method to insert movie data into the database
-// film.OverviewMovies("Batman", 2002, 200, "THE BOMB", "VALPOORT AND ARAB", "ACTION", "VALPOORT AND ARAB", 36, 120);
+//film.OverviewMovies("Batman", 2002, 200, "THE BOMB", "VALPOORT AND ARAB", "ACTION", "VALPOORT AND ARAB", 36, 120);
+//film.OverviewMovies("Spiderman", 2009, 300, "YUHHH", "WEUP", "Romance", "Sude", 20, 120);
 
 // // Print a message indicating successful data insertion
 // Console.WriteLine("Data inserted successfully.");
@@ -71,3 +72,4 @@ film.DisplayMovieInfo(movieTitle);
 // Revenue revenue = new Revenue();
 // double totalrev = revenue.TotalRevenue(Cinemahall1.Chairs);
 // Console.WriteLine(totalrev);
+
