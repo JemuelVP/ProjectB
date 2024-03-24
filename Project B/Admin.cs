@@ -2,6 +2,7 @@ using System.Data.SQLite;
 
 public class Admin
 {
+    public int ID { get; set; }
     public string? Name;
     public string? Password;
     public bool LoggedIn = false;
@@ -38,5 +39,12 @@ public class Admin
             }
         }
         connection.Close();
+    }
+    public static List<Film> GetAllMovies()
+    {
+        using DataBaseConnection db = new();
+        var films = db.Movie.ToList();
+
+        return films;
     }
 }

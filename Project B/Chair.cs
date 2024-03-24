@@ -1,15 +1,15 @@
 public class Chair
 {
     public int Id;
-    public string Name;
+    public string Type;
     public double Price;
 
     public bool Sold;
 
-    public Chair(int id, string name, double price)
+    public Chair(int id, string type, double price)
     {
         Id = id;
-        Name = name;
+        Type = type;
         Price = price;
         Sold = false;
     }

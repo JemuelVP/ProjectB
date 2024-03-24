@@ -1,5 +1,5 @@
-using System.Data.SQLite;
-class Film
+
+public class Film
 {
     public int ID { get; set; }
     public string? Title { get; set; }
