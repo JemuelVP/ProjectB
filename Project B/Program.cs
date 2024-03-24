@@ -1,13 +1,21 @@
 ﻿using Spectre.Console;
+
+CinemaHall1 Cinemahall1 = new CinemaHall1(1);
+CinemaHall2 Cinemahall2 = new CinemaHall2(1);
+CinemaHall3 Cinemahall3 = new CinemaHall3(1);
+Revenue revenue = new Revenue();
 Film film = new Film();
 Admin admin = new Admin();
 bool active = true;
+
 Console.WriteLine("Welkom bij YourEyes");
 while (active)
 {
-    var MainMenuOption = AnsiConsole.Prompt(new SelectionPrompt<MainMenuOptions>().Title("Bent u een admin of een klant").AddChoices(
-    MainMenuOptions.Admin,
-    MainMenuOptions.Customer));
+    var MainMenuOption = AnsiConsole.Prompt(
+        new SelectionPrompt<MainMenuOptions>()
+            .Title("Bent u een admin of een klant")
+            .AddChoices(MainMenuOptions.Admin, MainMenuOptions.Klant)
+    );
 
     switch (MainMenuOption)
     {
@@ -19,24 +27,54 @@ while (active)
             admin.Login(name, password);
             if (admin.LoggedIn == true)
             {
-                Console.WriteLine("hallo");
-            }
-            else
-            {
-                Console.WriteLine("niet ingelogd");
+                Console.Clear();
+                var adminMenuOption = AnsiConsole.Prompt(
+                    new SelectionPrompt<AdminMenuOptions>()
+                        .Title($"Welkom [blue]{name}[/] wat wilt u doen")
+                        .AddChoices(
+                            AdminMenuOptions.TotalRevenue,
+                            AdminMenuOptions.TicketsPerFilm,
+                            AdminMenuOptions.AddMovie
+                        )
+                );
+                switch (adminMenuOption)
+                {
+                    case AdminMenuOptions.TotalRevenue:
+                        double totalrev1 = revenue.TotalRevenue(Cinemahall1.Chairs);
+                        double totalrev2 = revenue.TotalRevenue(Cinemahall2.Chairs);
+                        double totalrev3 = revenue.TotalRevenue(Cinemahall3.Chairs);
+                        Console.Clear();
+                        Console.WriteLine($"Totale omzet zaal 1: ${totalrev1}");
+                        Console.WriteLine($"Totale omzet zaal 2: ${totalrev2}");
+                        Console.WriteLine($"Totale omzet zaal 3: ${totalrev3}");
+                        break;
+
+                    case AdminMenuOptions.TicketsPerFilm:
+                        break;
+
+                    case AdminMenuOptions.AddMovie:
+                        break;
+                }
             }
             break;
-        case MainMenuOptions.Customer:
-            var ReservationMenuOption = AnsiConsole.Prompt(new SelectionPrompt<MoviesMenuOptions>().Title("Beschikbare films").AddChoices(
-            MoviesMenuOptions.OverviewMovies));
+        case MainMenuOptions.Klant:
+            var ReservationMenuOption = AnsiConsole.Prompt(
+                new SelectionPrompt<MoviesMenuOptions>()
+                    .Title("Beschikbare films")
+                    .AddChoices(MoviesMenuOptions.OverviewMovies)
+            );
             switch (ReservationMenuOption)
             {
                 case MoviesMenuOptions.OverviewMovies:
                     var films = Film.GetAllMovies();
                     string[] movieInfoArray = films
-                                    .Select(book => $"Title: {book.Title}, Year: {book.Year}")
-                                    .ToArray();
-                    var overviewMenu = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Kies een film").AddChoices(movieInfoArray));
+                        .Select(book => $"Title: {book.Title}, Year: {book.Year}")
+                        .ToArray();
+                    var overviewMenu = AnsiConsole.Prompt(
+                        new SelectionPrompt<string>()
+                            .Title("Kies een film")
+                            .AddChoices(movieInfoArray)
+                    );
                     // Split the string by ','
                     string[] parts = overviewMenu.Split(',');
 
@@ -54,14 +92,13 @@ while (active)
             }
 
             break;
-
     }
 }
 
 public enum MainMenuOptions
 {
     Admin,
-    Customer
+    Klant
 }
 
 public enum MoviesMenuOptions
@@ -73,6 +110,12 @@ public enum ReservationMenuOption
 {
     MakeReservation,
     Back
-
 }
 
+public enum AdminMenuOptions
+{
+    TotalRevenue,
+    TicketsPerFilm,
+
+    AddMovie,
+}

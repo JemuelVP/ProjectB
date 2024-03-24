@@ -1,5 +1,6 @@
 using System.Data.SQLite;
-class Film
+
+public class Film
 {
     public int ID { get; set; }
     public string? Title { get; set; }
@@ -26,6 +27,7 @@ class Film
         var filmInfo = db.Movie.FirstOrDefault(film => film.Title == title && film.Year == year);
         return filmInfo;
     }
+
     public void Display(Film film)
     {
         Console.WriteLine("Movie Information:");
