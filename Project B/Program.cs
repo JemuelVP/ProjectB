@@ -27,15 +27,11 @@ while (active)
             }
             break;
         case MainMenuOptions.Customer:
-            var ReservationMenuOption = AnsiConsole.Prompt(new SelectionPrompt<ReservationMenuOptions>().Title("Beschikbare films").AddChoices(
-            ReservationMenuOptions.OverviewMovies,
-            ReservationMenuOptions.SearchMovies,
-            ReservationMenuOptions.SelectMovie,
-            ReservationMenuOptions.Back,
-            ReservationMenuOptions.Quit));
+            var ReservationMenuOption = AnsiConsole.Prompt(new SelectionPrompt<MoviesMenuOptions>().Title("Beschikbare films").AddChoices(
+            MoviesMenuOptions.OverviewMovies));
             switch (ReservationMenuOption)
             {
-                case ReservationMenuOptions.OverviewMovies:
+                case MoviesMenuOptions.OverviewMovies:
                     var films = Film.GetAllMovies();
                     string[] movieInfoArray = films
                                     .Select(book => $"Title: {book.Title}, Year: {book.Year}")
@@ -62,43 +58,21 @@ while (active)
     }
 }
 
-
-// while(active)
-// {
-//     Console.WriteLine("Bent u een admin kies dan 1 om in te loggen");
-//     Console.WriteLine("Bent u een klant kies dan 2");
-//     Console.WriteLine("Om te stoppen kunt u op elk moment q invoeren");
-//     string? activeChoice = Console.ReadLine();
-//     if(activeChoice.ToLower() == "q" )
-//     {
-//         active = false;
-//     }
-//     else if (Convert.ToInt32(activeChoice) == 1)
-//     {
-//        
-//     }
-//     else if(Convert.ToInt32(activeChoice) == 2)
-//     {
-//         // Film Overview
-//        
-//     }
-//     else
-//     {
-//         Console.WriteLine("Verkeerde input probeer het opnieuw");
-//     }
-
-// }
 public enum MainMenuOptions
 {
     Admin,
     Customer
 }
 
-public enum ReservationMenuOptions
+public enum MoviesMenuOptions
 {
     OverviewMovies,
-    SearchMovies,
-    SelectMovie,
-    Back,
-    Quit
 }
+
+public enum ReservationMenuOption
+{
+    MakeReservation,
+    Back
+
+}
+
