@@ -1,4 +1,3 @@
-
 public class Film
 {
     public int ID { get; set; }
@@ -16,7 +15,6 @@ public class Film
     {
         using DataBaseConnection db = new();
         var films = db.Movie.ToList();
-
         return films;
     }
 

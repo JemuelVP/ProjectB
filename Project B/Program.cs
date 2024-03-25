@@ -2,6 +2,8 @@
 Film film = new Film();
 Admin admin = new Admin();
 bool active = true;
+var dateTime = DateTime.Now;
+var endDateTime = DateTime.Now.AddDays(30).Date.ToShortDateString();
 Console.WriteLine("Welkom bij YourEyes");
 while (active)
 {
@@ -27,12 +29,13 @@ while (active)
             }
             break;
         case MainMenuOptions.Customer:
-            var ReservationMenuOption = AnsiConsole.Prompt(new SelectionPrompt<MoviesMenuOptions>().Title("Beschikbare films").AddChoices(
+            var ReservationMenuOption = AnsiConsole.Prompt(new SelectionPrompt<MoviesMenuOptions>().AddChoices(
             MoviesMenuOptions.OverviewMovies));
             switch (ReservationMenuOption)
             {
                 case MoviesMenuOptions.OverviewMovies:
                     var films = Film.GetAllMovies();
+                    System.Console.WriteLine($"Beschikbare Films Van {dateTime.ToShortDateString()} Tot {endDateTime}");
                     string[] movieInfoArray = films
                                     .Select(book => $"Title: {book.Title}, Year: {book.Year}")
                                     .ToArray();
@@ -46,6 +49,7 @@ while (active)
                     var selectedMovie = Film.GetMovieByTitleAndYear(title, year);
                     if (selectedMovie == null)
                     {
+                        Console.WriteLine("Film bestaat niet");
                         break;
                     }
                     selectedMovie.Display(selectedMovie);

@@ -11,7 +11,6 @@ public class Schedule
         EndDate = endDate;  
     }
 
-
     public void CalculateEndDate(Film film)
     {
         EndDate = StartDate.AddMinutes(film.DurationInMin);
