@@ -58,12 +58,14 @@ while (active)
                         string titlePart = overviewMovies.Replace("Titel: ", "");
                         var selectedMovie = AdminController.GetMovieByTitle(titlePart);
                         var ScheduleMovie = AnsiConsole.Prompt(new SelectionPrompt<RevenueOrScheduleMovie>().Title("[green]Wat wilt u nu doen[/]").AddChoices(
-                        RevenueOrScheduleMovie.SeeRevenue,
+                        RevenueOrScheduleMovie.TotaleOmzet,
                         RevenueOrScheduleMovie.ScheduleMovie));
                         switch (ScheduleMovie)
                         {
-                            case RevenueOrScheduleMovie.SeeRevenue:
-                                Console.WriteLine($"Total Revenue: {RevenueStatistics.GetTotalPricePerMovie(selectedMovie.ID)}");
+                            case RevenueOrScheduleMovie.TotaleOmzet:
+                                Console.ForegroundColor = ConsoleColor.Blue;
+                                AnsiConsole.WriteLine($"Total Tickets: {RevenueStatistics.GetTotalTicketsPerMovie(selectedMovie.ID)}");
+                                AnsiConsole.WriteLine($"Totale Omzet: {RevenueStatistics.GetTotalPricePerMovie(selectedMovie.ID)}");
                                 break;
                             case RevenueOrScheduleMovie.ScheduleMovie:
                                 Console.WriteLine("Voer een datum in ANSI-formaat in (dd-MM-jjjj HH:mm:ss):");
@@ -149,7 +151,7 @@ public enum MainMenuOptions
 
 public enum RevenueOrScheduleMovie
 {
-    SeeRevenue,
+    TotaleOmzet,
     ScheduleMovie
 
 }
