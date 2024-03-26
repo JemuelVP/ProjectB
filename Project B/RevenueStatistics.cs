@@ -18,4 +18,10 @@ class RevenueStatistics
         var totalPrice = db.Ticket.Where(t => t.Movie_ID == movieID).Sum(t => t.Price);
         return totalPrice;
     }
+    public static int GetTotalTicketsPerMovie(int movieID)
+    {
+        using DataBaseConnection db = new();
+        var totalTicket = db.Ticket.Where(t => t.Movie_ID == movieID).Count();
+        return totalTicket;
+    }
 }
