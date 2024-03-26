@@ -5,3 +5,4 @@ public class Chair
     public double Price { get; set; }
 
 }
+// added an if statement to determine what the price is for each seattype

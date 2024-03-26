@@ -18,5 +18,5 @@ public class CinemaHall
         }
     }
 }
-// this is the baseclass CinemaHall, it contains a list of chairs, numberOfSeats is the amount of seats
-// it has three deriven classes.
+// this is the baseclass CinemaHall, AddChairs() it adds chairs of every type (standard, extraleg, loveseat)
+// FillChairs() adds the chairs to a dictionary, int amountChairs is the maximum chairs of the specific type to be added
