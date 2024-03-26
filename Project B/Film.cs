@@ -11,30 +11,6 @@ public class Film
     public int Age { get; set; }
     public int DurationInMin { get; set; }
 
-    public static List<Film> GetAllMovies()
-    {
-        using DataBaseConnection db = new();
-        var films = db.Movie.ToList();
-        return films;
-    }
+    public List<Schedule> Schedules { get; set;}
 
-    public static Film? GetMovieByTitleAndYear(string title, int year)
-    {
-        using DataBaseConnection db = new();
-        var filmInfo = db.Movie.FirstOrDefault(film => film.Title == title && film.Year == year);
-        return filmInfo;
-    }
-    public void Display(Film film)
-    {
-        Console.WriteLine("Movie Information:");
-        Console.WriteLine($"Title: {film.Title}");
-        Console.WriteLine($"Year: {film.Year}");
-        Console.WriteLine($"Price: {film.Price}");
-        Console.WriteLine($"Description: {film.Description}");
-        Console.WriteLine($"Authors: {film.Authors}");
-        Console.WriteLine($"Categories: {film.Categories}");
-        Console.WriteLine($"Directors: {film.Directors}");
-        Console.WriteLine($"Age: {film.Age}");
-        Console.WriteLine($"Duration (minutes): {film.DurationInMin}");
-    }
 }

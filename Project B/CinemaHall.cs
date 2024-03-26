@@ -1,21 +1,20 @@
 public class CinemaHall
 {
-    public int ID;
-    public int numberOfSeats;
-    public List<Chair> Chairs;
+    public int ID { get; set; }
 
-    public CinemaHall(int id, int numberofseats)
-    {
-        ID = id;
-        numberOfSeats = numberofseats;
-        Chairs = new List<Chair>();
-    }
+    public string Name { get; set; }
+    public int NumberOfSeats { get; set; }
+    public List<Chair> Chairs { get; set; }
 
-    public virtual void FillChairs(int id, string name, double price)
+    public virtual void FillChairs(int id, string type, double price)
     {
-        for (int i = 0; i < numberOfSeats; i++)
+        for (int i = 0; i < this.NumberOfSeats; i++)
         {
-            Chairs.Add(new Chair(i, name, price));
+            Chairs.Add(new Chair
+            {
+                Type = type,
+                Price = price
+            });
         }
     }
 }

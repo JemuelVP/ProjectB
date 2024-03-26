@@ -1,16 +1,7 @@
 public class Chair
 {
-    public int Id;
-    public string Type;
-    public double Price;
+    public int ID { get; set; }
+    public string? Type { get; set; }
+    public double Price { get; set; }
 
-    public bool Sold;
-
-    public Chair(int id, string type, double price)
-    {
-        Id = id;
-        Type = type;
-        Price = price;
-        Sold = false;
-    }
 }

@@ -1,19 +1,35 @@
+using System.Data.Entity;
+
 public class Schedule
 {
-    public int ID;
-    public int SoldSeats;
+    public int ID { get; set; }
+    public int FilmID { get; set; }
+    public Film Film { get; set; }
+    public int HallID { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     
-    public Schedule(DateTime stratDate, DateTime endDate)
+    public DateTime CalculateEndDate(Film film)
     {
-        StartDate = stratDate;
-        EndDate = endDate;  
+        return StartDate.AddMinutes(film.DurationInMin);
     }
-
-    public void CalculateEndDate(Film film)
+    
+    public void CreateFromFilm(Film movie, int hallID, DateTime startDate)
     {
-        EndDate = StartDate.AddMinutes(film.DurationInMin);
+        DataBaseConnection db = new DataBaseConnection();
+        // Check if a schedule already exists for the given movie, hallID, and startDate
+        var existingSchedule = db.Schedule.FirstOrDefault(s => s.HallID == hallID && s.StartDate == startDate);
+        
+        if (existingSchedule != null)
+        {
+            Console.WriteLine("Er bestaat al een schema voor deze zaal en startdatum.");
+            return;
+        }
+        StartDate = startDate;
+        EndDate = CalculateEndDate(movie);
+        HallID = hallID;
+        FilmID = movie.ID;
+        var entry = db.Schedule.Add(this);
+        db.SaveChanges();
     }
-
 }
