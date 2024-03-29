@@ -131,10 +131,13 @@ while (active)
                                                         .AddChoices("Classic ", "Loveseat", "Extrabeenruimte"));
 
                     // Prompt the user to enter a seat number
+
+                    // we moeten hier maken dat je stoelen kan kiezen in de display ofzo dus niet dat je wat invult maar een stoel aanklikt.
                     var seatNumber = AnsiConsole.Prompt(new TextPrompt<int>("Voer een getal in tussen 1 en 10"));
 
                     // Create ticket with selected schedule, user name, seat type, and seat number
                     var ticket = new Ticket();
+                    // je moet hier of een zaal object meegeven of het aantal stoelen
                     ticket.GetSeatPrice(seatType, seatNumber); // Calculate ticket price based on seat type and number
                     ticket.CreateTicket(selectedSchedule, film.ID, userName, seatType, seatNumber);
                 }
