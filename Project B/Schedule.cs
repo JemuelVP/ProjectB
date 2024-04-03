@@ -3,9 +3,9 @@ using System.Data.Entity;
 public class Schedule
 {
     public int ID { get; set; }
-    public int FilmID { get; set; }
+    public int Movie_ID { get; set; }
     public Film Film { get; set; }
-    public int HallID { get; set; }
+    public int Hall_ID { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     
@@ -17,8 +17,8 @@ public class Schedule
     public void CreateFromFilm(Film movie, int hallID, DateTime startDate)
     {
         DataBaseConnection db = new DataBaseConnection();
-        // Check if a schedule already exists for the given movie, hallID, and startDate
-        var existingSchedule = db.Schedule.FirstOrDefault(s => s.HallID == hallID && s.StartDate == startDate);
+        // Check if a schedule already exists for the given hallID, and startDate
+        var existingSchedule = db.Schedule.FirstOrDefault(s => s.Hall_ID == hallID && s.StartDate == startDate);
         
         if (existingSchedule != null)
         {
@@ -27,8 +27,8 @@ public class Schedule
         }
         StartDate = startDate;
         EndDate = CalculateEndDate(movie);
-        HallID = hallID;
-        FilmID = movie.ID;
+        Hall_ID = hallID;
+        Movie_ID = movie.ID;
         var entry = db.Schedule.Add(this);
         db.SaveChanges();
     }
