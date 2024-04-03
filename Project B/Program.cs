@@ -118,6 +118,22 @@ while (active)
                 // Display the details of the selected movie
                 filmController.Display(film);
 
+                // Choose movie by category
+                var MovieCategory = AnsiConsole.Prompt(new TextPrompt<string>("Kies film categorie:"));
+                List<Film> MovieList123 = FilmController.GetMovieByCategory(MovieCategory);
+
+                if (MovieList123.Count() == 0)
+                {
+                    AnsiConsole.WriteLine($"No movies could be found with category {MovieCategory}");
+                }
+                else
+                {
+                    foreach (Film movie in MovieList123)
+                    {
+                        AnsiConsole.WriteLine(movie.Title.ToString());
+                    }            
+                }
+
                 // Prompt the user to make a reservation or go back
                 option = AnsiConsole.Prompt(new SelectionPrompt<ReservationMenuOption>().Title("Maak een keuze").AddChoices(ReservationMenuOption.MakeReservation, ReservationMenuOption.Back));
 

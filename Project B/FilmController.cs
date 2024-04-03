@@ -8,12 +8,15 @@ public class FilmController
         return films;
     }
 
-    public static Film? GetMovieByCategory(string categories)
+    
+    public static List<Film> GetMovieByCategory(string category)
     {
         using DataBaseConnection db = new();
-        var filmInfo = db.Movie.FirstOrDefault(film => film.Categories == categories);
-        return filmInfo;
+        var MovieInfo = db.Movie.Where(Movie => Movie.Categories == category).ToList();
+        return MovieInfo;
+
     }
+
     public void Display(Film film)
     {
         AnsiConsole.Write(new Rule("[green]Film Informatie[/]").RuleStyle("green"));
