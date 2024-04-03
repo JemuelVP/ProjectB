@@ -127,7 +127,7 @@ while (active)
 
                 // Display available films
                 AnsiConsole.Write(new Rule($"[blue]Beschikbare Films Van {nowDateTime} Tot {endDateTime}:[/]").RuleStyle("blue"));
-                var choices = schedules.Select(s => $"{s.Film.Title} - {s.StartDate}").ToList();
+                var choices = schedules.Select(s => $"{s.Film.Title} - {s.StartDate.ToString("dd-MM-yyyy HH:mm")}").ToList();
 
                 var selectedMovieIndex = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Kies een film").AddChoices(choices));
 
@@ -144,15 +144,9 @@ while (active)
                 {
                     var userName = AnsiConsole.Prompt(new TextPrompt<string>("Voer u naam in: "));
                     var age = AnsiConsole.Prompt(new TextPrompt<int>("Voer uw leeftijd in: "));
-                    var ticket = new Ticket();
-                    ticket.CheckAge(film, age); // checks age against age movie
+                    var ticketAge = new Ticket();
+                    ticketAge.CheckAge(film, age); // checks age against age movie
                     Console.ReadKey();
-                    
-                    AnsiConsole.Write(new Rule("[red]Stoel Kosten[/]").RuleStyle("red"));
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    AnsiConsole.WriteLine("Classic: 20");
-                    AnsiConsole.WriteLine("Loveseat: 25");
-                    AnsiConsole.WriteLine("Extrabeenruimte: 25");
                     AnsiConsole.Write(new Rule("[blue]Stoel Kosten[/]").RuleStyle("blue"));
 
                     // Display seat type options and prompt the user to choose
@@ -171,15 +165,8 @@ while (active)
                     var selectedSeat = availableSeats.FirstOrDefault(s => s.Position == seatNumber);
                     // Create ticket with selected schedule, user name, seat type, and seat number
 
-                    // var ticket = new Ticket();
-
                     var ticket = new Ticket();
                     // je moet hier of een zaal object meegeven of het aantal stoelen
-
-                    ticket.GetSeatPrice(seatType, seatNumber); // Calculate ticket price based on seat type and number
-                    ticket.CreateTicket(selectedSchedule, film.ID, userName, seatType, seatNumber);
-
-
 
                     double price = ticket.GetSeatPrice(seatTypeInt, seatNumber, selectedSchedule); // Calculate ticket price based on seat type and number
                     ticket.CreateTicket(selectedSchedule, selectedSeat.ID, film.ID,price);
