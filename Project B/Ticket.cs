@@ -1,3 +1,9 @@
+using System.Reflection.Metadata.Ecma335;
+using System.Runtime.InteropServices;
+using Spectre.Console;
+
+
+
 public class Ticket
 {
     public int ID { get; set; }
@@ -68,6 +74,15 @@ public class Ticket
         int hour = startTime.Hour;
         return hour >= 10 && hour <= 14; // Assuming peak hours are from 6 PM to 10 PM
     }
+
+    public void CheckAge(Film film, int age)
+    {
+        if (age < film.Age)
+        {
+            AnsiConsole.WriteLine($"Warning: this is a {film.Age}+ movie.");
+        }
+    }
+
 public static void DisplayTicketDetails(Ticket ticket,Chair chair, double price)
 {
     Console.WriteLine("Ticket Details:");
@@ -79,5 +94,6 @@ public static void DisplayTicketDetails(Ticket ticket,Chair chair, double price)
     Console.WriteLine($"Chair ID: {chair.Position}");
     Console.WriteLine($"Price: {price:C}"); // Format price as currency
 }
+
 
 }
