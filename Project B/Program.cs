@@ -120,7 +120,7 @@ while (active)
 
                 // Choose movie by category
                 var MovieCategory = AnsiConsole.Prompt(new TextPrompt<string>("Kies film categorie:"));
-                List<Film> MovieList123 = FilmController.GetMovieByCategory(MovieCategory);
+                List<Film> MovieList123 = FilmController.GetMovieByCategory(MovieCategory.ToLower());
 
                 if (MovieList123.Count() == 0)
                 {

@@ -12,7 +12,7 @@ public class FilmController
     public static List<Film> GetMovieByCategory(string category)
     {
         using DataBaseConnection db = new();
-        var MovieInfo = db.Movie.Where(Movie => Movie.Categories == category).ToList();
+        var MovieInfo = db.Movie.Where(Movie => Movie.Categories.ToLower() == category).ToList();
         return MovieInfo;
 
     }
