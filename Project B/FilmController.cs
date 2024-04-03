@@ -8,10 +8,10 @@ public class FilmController
         return films;
     }
 
-    public static Film? GetMovieByTitleAndYear(string title, int year)
+    public static Film? GetMovieByCategory(string categories)
     {
         using DataBaseConnection db = new();
-        var filmInfo = db.Movie.FirstOrDefault(film => film.Title == title && film.Year == year);
+        var filmInfo = db.Movie.FirstOrDefault(film => film.Categories == categories);
         return filmInfo;
     }
     public void Display(Film film)

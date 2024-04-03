@@ -1,7 +1,7 @@
 ﻿using Spectre.Console;
 Film film = new Film();
 FilmController filmController = new FilmController();
-Admin admin = new Admin();
+Users admin = new Users();
 AdminController adminController = new AdminController();
 bool active = true;
 DateTime startDate = DateTime.Now;
@@ -9,11 +9,14 @@ DateTime endDate = DateTime.Now.AddDays(28);
 var nowDateTime = DateTime.Now.Date.ToShortDateString();
 var endDateTime = DateTime.Now.AddDays(28).Date.ToShortDateString();
 using DataBaseConnection db = new();
+// ChairController chairController = new ChairController();
+// chairController.AddChairs();
+// Console.WriteLine("Chairs added to the database.");
 var hallsController = new CinemaHallController(db);
-AnsiConsole.Write(new Rule($"Welkom bij YourEyes").RuleStyle("red"));
+AnsiConsole.Write(new Rule($"Welkom bij YourEyes").RuleStyle("blue"));
 while (active)
 {
-    var MainMenuOption = AnsiConsole.Prompt(new SelectionPrompt<MainMenuOptions>().Title("[green]Bent u een admin of een klant[/]").AddChoices(
+    var MainMenuOption = AnsiConsole.Prompt(new SelectionPrompt<MainMenuOptions>().Title("[blue]Bent u een admin of een klant[/]").AddChoices(
     MainMenuOptions.Admin,
     MainMenuOptions.Customer));
     switch (MainMenuOption)
@@ -24,18 +27,20 @@ while (active)
             Console.WriteLine("Voer je wachtwoord in");
             string? password = Console.ReadLine();
             admin.Login(name, password);
-            if (admin.LoggedIn == true)
+            // bool LoggedIn = admin.LoggedIn;
+            while (admin.LoggedIn == true)
             {
                 var AdminOptions = AnsiConsole.Prompt(new SelectionPrompt<AdminChoices>().Title("[green]Wat wilt u nu doen[/]").AddChoices(
                 AdminChoices.AddMovie,
+                AdminChoices.Schedule,
                 AdminChoices.MoviesOverView,
-                AdminChoices.Revenue));
+                AdminChoices.Revenue,
+                AdminChoices.Logout));
                 switch (AdminOptions)
                 {
                     case AdminChoices.AddMovie:
                         string title = AnsiConsole.Ask<string>("Titel:");
                         int year = AnsiConsole.Ask<int>("Jaar: ");
-                        int price = AnsiConsole.Ask<int>("Prijs: ");
                         string description = AnsiConsole.Ask<string>("Beschrijving: ");
                         string authors = AnsiConsole.Ask<string>("Auteurs: ");
                         string categories = AnsiConsole.Ask<string>("Categorieën: ");
@@ -45,7 +50,16 @@ while (active)
                         AnsiConsole.Write(new Rule("[green]Film is toegevoegd [/]").RuleStyle("green")); ;
 
                         // Call the AddMovie method with the input parameters
-                        adminController.AddMovie(title, year, price, description, authors, categories, directors, age, durationInMin);
+                        adminController.AddMovie(title, year, description, authors, categories, directors, age, durationInMin);
+                        break;
+                    case AdminChoices.Schedule:
+                        var schedules = ScheduleController.GetAvailableSchedules(startDate, endDate);
+
+                        // Display available films
+                        AnsiConsole.Write(new Rule($"[blue]Beschikbare Films Van {nowDateTime} Tot {endDateTime}:[/]").RuleStyle("blue"));
+                        var movies = schedules.Select(s => $"{s.Film.Title} - {s.StartDate}").ToList();
+                        foreach (var movie in movies)
+                            AnsiConsole.WriteLine(movie);
                         break;
                     case AdminChoices.MoviesOverView:
                         var adminOverview = AdminController.GetAllMovies();
@@ -90,13 +104,20 @@ while (active)
                         var money = new RevenueStatistics();
                         money.GetTotalRevenue();
                         break;
+                    case AdminChoices.Logout:
+                        var choice = AnsiConsole.Prompt(new SelectionPrompt<Logout>().Title("[green]Are you sure you want to log out?[/]").AddChoices(
+                            Logout.Yes,
+                            Logout.No));
+                        switch (choice)
+                        {
+                            case Logout.Yes:
+                                admin.LoggedIn = false;
+                                break;
+                        }
+                        break;
                 }
-                break;
             }
-            else
-            {
-                Console.WriteLine("niet ingelogd");
-            }
+            Console.WriteLine("niet ingelogd");
             break;
         case MainMenuOptions.Customer:
             ReservationMenuOption option = ReservationMenuOption.MakeReservation; // Start with MakeReservation option
@@ -107,6 +128,7 @@ while (active)
                 // Display available films
                 AnsiConsole.Write(new Rule($"[blue]Beschikbare Films Van {nowDateTime} Tot {endDateTime}:[/]").RuleStyle("blue"));
                 var choices = schedules.Select(s => $"{s.Film.Title} - {s.StartDate}").ToList();
+
                 var selectedMovieIndex = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Kies een film").AddChoices(choices));
 
                 // Get the selected schedule based on the selected movie
@@ -131,17 +153,37 @@ while (active)
                     AnsiConsole.WriteLine("Classic: 20");
                     AnsiConsole.WriteLine("Loveseat: 25");
                     AnsiConsole.WriteLine("Extrabeenruimte: 25");
+                    AnsiConsole.Write(new Rule("[blue]Stoel Kosten[/]").RuleStyle("blue"));
+
                     // Display seat type options and prompt the user to choose
                     var seatType = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Kies u stoel")
-                                                        .AddChoices("Classic ", "Loveseat", "Extrabeenruimte"));
+                                                        .AddChoices("Classic", "Loveseat", "Extrabeenruimte"));
+                    int seatTypeInt = -1;
+                    Console.WriteLine(seatType);
+                    if (seatType == "Classic") seatTypeInt = 0;
+                    if (seatType == "Loveseat") seatTypeInt = 1;
+                    if (seatType == "Extrabeenruimte") seatTypeInt = 2;
 
+                    var availableSeats = ChairController.GetAvailableSeats(selectedSchedule.ID, selectedSchedule.Hall_ID, seatTypeInt);
+                    
                     // Prompt the user to enter a seat number
-                    var seatNumber = AnsiConsole.Prompt(new TextPrompt<int>("Voer een getal in tussen 1 en 10"));
-
+                    var seatNumber = AnsiConsole.Prompt(new SelectionPrompt<int>().Title("Select a seat number").AddChoices(availableSeats.Select(s => s.Position)));
+                    var selectedSeat = availableSeats.FirstOrDefault(s => s.Position == seatNumber);
                     // Create ticket with selected schedule, user name, seat type, and seat number
+
                     // var ticket = new Ticket();
+
+                    var ticket = new Ticket();
+                    // je moet hier of een zaal object meegeven of het aantal stoelen
+
                     ticket.GetSeatPrice(seatType, seatNumber); // Calculate ticket price based on seat type and number
                     ticket.CreateTicket(selectedSchedule, film.ID, userName, seatType, seatNumber);
+
+
+
+                    double price = ticket.GetSeatPrice(seatTypeInt, seatNumber, selectedSchedule); // Calculate ticket price based on seat type and number
+                    ticket.CreateTicket(selectedSchedule, selectedSeat.ID, film.ID,price);
+                    Ticket.DisplayTicketDetails(ticket,selectedSeat, price);
                 }
             }
             break;
@@ -164,8 +206,10 @@ public enum RevenueOrScheduleMovie
 public enum AdminChoices
 {
     AddMovie,
+    Schedule,
     MoviesOverView,
-    Revenue
+    Revenue,
+    Logout
 }
 
 public enum ReservationMenuOption
@@ -173,5 +217,11 @@ public enum ReservationMenuOption
     MakeReservation,
     Back
 
+}
+
+public enum Logout
+{
+    Yes,
+    No
 }
 

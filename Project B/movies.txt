@@ -1,0 +1,47 @@
+To add movies into ur database u can put this code inside the AdminController.cs
+    
+    
+    
+    public void AddMovies(List<(string title, int year, string description, string authors, string categories, string directors, int age, int durationInMin)> movies)
+    {
+        using (var db = new DataBaseConnection())
+        {
+            foreach (var movieInfo in movies)
+            {
+                var newMovie = new Film
+                {
+                    Title = movieInfo.title,
+                    Year = movieInfo.year,
+                    Description = movieInfo.description,
+                    Authors = movieInfo.authors,
+                    Categories = movieInfo.categories,
+                    Directors = movieInfo.directors,
+                    Age = movieInfo.age,
+                    DurationInMin = movieInfo.durationInMin
+                };
+
+                db.Movie.Add(newMovie);
+            }
+
+            db.SaveChanges();
+        }
+    }
+
+    And u need to put this inside the Program.cs and the run it and it well work
+
+    var movies = new List<(string title, int year, string description, string authors, string categories, string directors, int age, int durationInMin)>
+{
+    ("The Shawshank Redemption", 1994, "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.", "Frank Darabont", "Drama", "Frank Darabont", 18, 142),
+    ("The Godfather", 1972, "An organized crime dynasty's aging patriarch transfers control of his clandestine empire to his reluctant son.", "Mario Puzo, Francis Ford Coppola", "Crime, Drama", "Francis Ford Coppola", 18, 175),
+    ("The Dark Knight", 2008, "When the menace known as The Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.", "Jonathan Nolan, Christopher Nolan", "Action, Crime, Drama", "Christopher Nolan", 13, 152),
+    ("Pulp Fiction", 1994, "The lives of two mob hitmen, a boxer, a gangster and his wife, and a pair of diner bandits intertwine in four tales of violence and redemption.", "Quentin Tarantino", "Crime, Drama", "Quentin Tarantino", 18, 154),
+    ("The Lord of the Rings: The Return of the King", 2003, "Gandalf and Aragorn lead the World of Men against Sauron's army to draw his gaze from Frodo and Sam as they approach Mount Doom with the One Ring.", "J.R.R. Tolkien, Fran Walsh, Philippa Boyens, Peter Jackson", "Action, Adventure, Drama", "Peter Jackson", 13, 201),
+    ("Schindler's List", 1993, "In German-occupied Poland during World War II, industrialist Oskar Schindler gradually becomes concerned for his Jewish workforce after witnessing their persecution by the Nazis.", "Thomas Keneally, Steven Zaillian", "Biography, Drama, History", "Steven Spielberg", 18, 195),
+    ("Inception", 2010, "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.", "Christopher Nolan", "Action, Adventure, Sci-Fi", "Christopher Nolan", 13, 148),
+    ("Fight Club", 1999, "An insomniac office worker and a devil-may-care soapmaker form an underground fight club that evolves into something much, much more.", "Chuck Palahniuk, Jim Uhls", "Drama", "David Fincher", 18, 139),
+    ("Forrest Gump", 1994, "The presidencies of Kennedy and Johnson, the Vietnam War, the Watergate scandal and other historical events unfold from the perspective of an Alabama man with an IQ of 75, whose only desire is to be reunited with his childhood sweetheart.", "Winston Groom, Eric Roth", "Drama, Romance", "Robert Zemeckis", 13, 142),
+    ("The Matrix", 1999, "A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers.", "Lana Wachowski, Lilly Wachowski", "Action, Sci-Fi", "Lana Wachowski, Lilly Wachowski", 18, 136)
+};
+AdminController adminController = new AdminController();
+
+adminController.AddMovies(movies);

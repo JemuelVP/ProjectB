@@ -2,69 +2,79 @@ using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
 using Spectre.Console;
 
+
+
 public class Ticket
 {
     public int ID { get; set; }
     public int Schedule_ID { get; set; }
+    public int User_ID { get; set; }
     public int Movie_ID { get; set; }
-    public string? SeatType { get; set; }
-    public int SeatNumber { get; set; }
+    public int Chair_ID{get; set;}
     public double Price { get; set; }
-    public string? UserName { get; set; }
 
-    public void CreateTicket(Schedule schedule, int movieId , string userName, string seatType, int seatNumber)
+    public void CreateTicket(Schedule schedule, int chair_ID, int movieId, double price, int? userId = null)
     {
         Schedule_ID = schedule.ID;
-        UserName = userName;
-        SeatType = seatType;
-        SeatNumber = seatNumber;
-        Price = Price;
+        Chair_ID = chair_ID;
         Movie_ID = movieId; // Set Movie_ID
+        Price = price;
+        User_ID = userId ?? 0; // Assign User_ID if it's provided, otherwise use 0 or any other default value
 
         using DataBaseConnection db = new();
         var entry = db.Ticket.Add(this);
         db.SaveChanges();
     }
-    public void GetSeatPrice(string seatType, int seatNumber)
+    public double GetSeatPrice(int seatType, int seatNumber, Schedule schedule)
     {
-        Price = 20;
-        if(seatType.ToLower() == "classic" &&  seatNumber == 5 &&  seatNumber == 6)
+        // Here you can implement your pricing logic based on seat type, seat number, and schedule
+        // For demonstration purposes, let's say you have a simple pricing logic
+        double basePrice = 20.0; // Base price for all seats
+        double priceMultiplier = 1.0; // Multiplier for seat types
+
+        // Adjust price based on seat type
+        switch (seatType)
         {
-            Price += 5;
+            case 1: // Loveseat
+                priceMultiplier = 1.5;
+                break;
+            case 2: // Extrabeenruimte
+                priceMultiplier = 2.0;
+                break;
+            // Classic seats have the base price, so no need for a case for seatType == 0
         }
-        else if (seatType.ToLower() == "classic" &&  seatNumber == 3 || seatNumber == 4 || seatNumber == 7 || seatNumber == 8 )
+
+        // Calculate final price based on base price, multiplier, or any other factors
+        double Price = basePrice * priceMultiplier;
+
+        // Example: If the movie is shown during a peak time, increase the price
+        if (IsPeakTime(schedule.StartDate))
         {
-            Price = Price;
+            Price += 5.0;
         }
-        else if (seatType.ToLower() == "classic" &&  seatNumber == 1 || seatNumber == 2 || seatNumber == 9 || seatNumber == 10 )
+        if(IsEarlyTime(schedule.StartDate))
         {
             Price -= 5;
         }
-        else if(seatType.ToLower() == "loveseat" &&  seatNumber == 5 || seatNumber == 6)
-        {
-            Price += 10;
-        }
-        else if (seatType.ToLower() == "loveseat" &&  seatNumber == 3 || seatNumber == 4 || seatNumber == 7 || seatNumber == 8 )
-        {
-            Price += 5;
-        }
-        else if (seatType.ToLower() == "loveseat" &&  seatNumber == 1 || seatNumber == 2 || seatNumber == 9 || seatNumber == 10 )
-        {
-            Price = Price;
-        }
-        else if(seatType.ToLower() == "extrabeenruimte" &&  seatNumber == 5 ||  seatNumber == 6)
-        {
-            Price += 10;
-        }
-        else if (seatType.ToLower() == "extrabeenruimte" &&  seatNumber == 3 || seatNumber == 4 || seatNumber == 7 || seatNumber == 8 )
-        {
-            Price += 5;
-        }
-        else if (seatType.ToLower() == "extrabeenruimte" &&  seatNumber == 1 || seatNumber == 2 || seatNumber == 9 || seatNumber == 10 )
-        {
-            Price = Price;
-        }
+
+        return Price;
     }
+
+    private bool IsPeakTime(DateTime startTime)
+    {
+        // Example implementation: Check if the startTime falls within peak hours
+        // You can adjust this based on your business logic
+        int hour = startTime.Hour;
+        return hour >= 18 && hour <= 22; // Assuming peak hours are from 6 PM to 10 PM
+    }
+    private bool IsEarlyTime(DateTime startTime)
+    {
+        // Example implementation: Check if the startTime falls within peak hours
+        // You can adjust this based on your business logic
+        int hour = startTime.Hour;
+        return hour >= 10 && hour <= 14; // Assuming peak hours are from 6 PM to 10 PM
+    }
+
     public void CheckAge(Film film, int age)
     {
         if (age < film.Age)
@@ -72,4 +82,18 @@ public class Ticket
             AnsiConsole.WriteLine($"Warning: this is a {film.Age}+ movie.");
         }
     }
+
+public static void DisplayTicketDetails(Ticket ticket,Chair chair, double price)
+{
+    Console.WriteLine("Ticket Details:");
+    Console.WriteLine("----------------");
+    Console.WriteLine($"Ticket ID: {ticket.ID}");
+    Console.WriteLine($"Schedule ID: {ticket.Schedule_ID}");
+    Console.WriteLine($"Movie ID: {ticket.Movie_ID}");
+    Console.WriteLine($"Chair ID: {chair.SeatType}");
+    Console.WriteLine($"Chair ID: {chair.Position}");
+    Console.WriteLine($"Price: {price:C}"); // Format price as currency
+}
+
+
 }
