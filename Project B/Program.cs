@@ -29,6 +29,7 @@ while (active)
             {
                 var AdminOptions = AnsiConsole.Prompt(new SelectionPrompt<AdminChoices>().Title("[green]Wat wilt u nu doen[/]").AddChoices(
                 AdminChoices.AddMovie,
+                AdminChoices.Schedule,
                 AdminChoices.MoviesOverView,
                 AdminChoices.Revenue,
                 AdminChoices.Logout));
@@ -48,6 +49,15 @@ while (active)
 
                         // Call the AddMovie method with the input parameters
                         adminController.AddMovie(title, year, price, description, authors, categories, directors, age, durationInMin);
+                        break;
+                    case AdminChoices.Schedule:
+                        var schedules = ScheduleController.GetAvailableSchedules(startDate, endDate);
+
+                        // Display available films
+                        AnsiConsole.Write(new Rule($"[blue]Beschikbare Films Van {nowDateTime} Tot {endDateTime}:[/]").RuleStyle("blue"));
+                        var movies = schedules.Select(s => $"{s.Film.Title} - {s.StartDate}").ToList();
+                        foreach (var movie in movies)
+                            AnsiConsole.WriteLine(movie);
                         break;
                     case AdminChoices.MoviesOverView:
                         var adminOverview = AdminController.GetAllMovies();
@@ -169,6 +179,7 @@ public enum RevenueOrScheduleMovie
 public enum AdminChoices
 {
     AddMovie,
+    Schedule,
     MoviesOverView,
     Revenue,
     Logout
