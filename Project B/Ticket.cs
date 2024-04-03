@@ -1,5 +1,6 @@
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
+using Spectre.Console;
 
 public class Ticket
 {
@@ -62,6 +63,13 @@ public class Ticket
         else if (seatType.ToLower() == "extrabeenruimte" &&  seatNumber == 1 || seatNumber == 2 || seatNumber == 9 || seatNumber == 10 )
         {
             Price = Price;
+        }
+    }
+    public void CheckAge(Film film, int age)
+    {
+        if (age < film.Age)
+        {
+            AnsiConsole.WriteLine($"Warning: this is a {film.Age}+ movie.");
         }
     }
 }

@@ -121,6 +121,11 @@ while (active)
                 if (option == ReservationMenuOption.MakeReservation)
                 {
                     var userName = AnsiConsole.Prompt(new TextPrompt<string>("Voer u naam in: "));
+                    var age = AnsiConsole.Prompt(new TextPrompt<int>("Voer uw leeftijd in: "));
+                    var ticket = new Ticket();
+                    ticket.CheckAge(film, age); // checks age against age movie
+                    Console.ReadKey();
+                    
                     AnsiConsole.Write(new Rule("[red]Stoel Kosten[/]").RuleStyle("red"));
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     AnsiConsole.WriteLine("Classic: 20");
@@ -134,7 +139,7 @@ while (active)
                     var seatNumber = AnsiConsole.Prompt(new TextPrompt<int>("Voer een getal in tussen 1 en 10"));
 
                     // Create ticket with selected schedule, user name, seat type, and seat number
-                    var ticket = new Ticket();
+                    // var ticket = new Ticket();
                     ticket.GetSeatPrice(seatType, seatNumber); // Calculate ticket price based on seat type and number
                     ticket.CreateTicket(selectedSchedule, film.ID, userName, seatType, seatNumber);
                 }
