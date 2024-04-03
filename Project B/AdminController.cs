@@ -14,14 +14,13 @@ public class AdminController
         var filmInfo = db.Movie.FirstOrDefault(film => film.Title == title);
         return filmInfo;
     }
-    public void AddMovie(string title, int year, int price, string description, string authors, string categories, string directors, int age, int durationInMin)
+    public void AddMovie(string title, int year, string description, string authors, string categories, string directors, int age, int durationInMin)
     {
         using DataBaseConnection db = new();
         var newMovie = new Film
         {
             Title = title,
             Year = year,
-            Price = price,
             Description = description,
             Authors = authors,
             Categories = categories,
@@ -33,4 +32,5 @@ public class AdminController
         db.Movie.Add(newMovie);
         db.SaveChanges();
     }
+
 }
