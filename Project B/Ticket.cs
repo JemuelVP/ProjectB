@@ -29,20 +29,19 @@ public class Ticket
     {
         // Here you can implement your pricing logic based on seat type, seat number, and schedule
         // For demonstration purposes, let's say you have a simple pricing logic
-        double basePrice = 20.0; // Base price for all seats
+        double basePrice = 30.0; // Base price for all seats
         double priceMultiplier = 1.0; // Multiplier for seat types
 
         // Adjust price based on seat type
-        switch (seatType)
+        if (seatType == 0 && seatNumber >= 50 && seatNumber <= 59 || seatType == 1 && seatNumber >= 1 && seatNumber <= 5 || seatType == 2 && seatNumber >= 1 && seatNumber <= 3 )
         {
-            case 1: // Loveseat
-                priceMultiplier = 1.5;
-                break;
-            case 2: // Extrabeenruimte
-                priceMultiplier = 2.0;
-                break;
-            // Classic seats have the base price, so no need for a case for seatType == 0
+            priceMultiplier *= 2.0; // Multiply the price by 1.5
         }
+        if (seatType == 0 && seatNumber >= 40 && seatNumber <= 49 || seatType == 1 && seatNumber >= 6 && seatNumber <= 10 || seatType == 2 && seatNumber >= 8 && seatNumber <= 10 )
+        {
+            priceMultiplier *= 1.5; // Multiply the price by 1.5
+        }
+
 
         // Calculate final price based on base price, multiplier, or any other factors
         double Price = basePrice * priceMultiplier;
@@ -80,6 +79,8 @@ public class Ticket
         if (age < film.Age)
         {
             AnsiConsole.WriteLine($"Warning: this is a {film.Age}+ movie.");
+            Console.WriteLine("Druk op enter om verder te gaan");
+            Console.ReadKey();
         }
     }
 
@@ -92,7 +93,7 @@ public static void DisplayTicketDetails(Ticket ticket,Chair chair, double price)
     Console.WriteLine($"Movie ID: {ticket.Movie_ID}");
     Console.WriteLine($"Chair ID: {chair.SeatType}");
     Console.WriteLine($"Chair ID: {chair.Position}");
-    Console.WriteLine($"Price: {price:C}"); // Format price as currency
+    Console.WriteLine($"Price: {price} euro"); // Format price as euros
 }
 
 

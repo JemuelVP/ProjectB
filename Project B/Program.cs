@@ -146,7 +146,6 @@ while (active)
                     var age = AnsiConsole.Prompt(new TextPrompt<int>("Voer uw leeftijd in: "));
                     var ticketAge = new Ticket();
                     ticketAge.CheckAge(film, age); // checks age against age movie
-                    Console.ReadKey();
                     AnsiConsole.Write(new Rule("[blue]Stoel Kosten[/]").RuleStyle("blue"));
 
                     // Display seat type options and prompt the user to choose
