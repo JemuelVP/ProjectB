@@ -13,7 +13,7 @@ public class Ticket
     public int Chair_ID{get; set;}
     public double Price { get; set; }
 
-    public void CreateTicket(Schedule schedule, int chair_ID, int movieId, double price, int? userId = null)
+    public double CreateTicket(Schedule schedule, int chair_ID, int movieId, double price, int? userId = null)
     {
         Schedule_ID = schedule.ID;
         Chair_ID = chair_ID;
@@ -24,6 +24,8 @@ public class Ticket
         using DataBaseConnection db = new();
         var entry = db.Ticket.Add(this);
         db.SaveChanges();
+
+        return price;
     }
     public double GetSeatPrice(int seatType, int seatNumber, Schedule schedule)
     {

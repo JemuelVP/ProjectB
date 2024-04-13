@@ -168,8 +168,20 @@ while (active)
                     // je moet hier of een zaal object meegeven of het aantal stoelen
 
                     double price = ticket.GetSeatPrice(seatTypeInt, seatNumber, selectedSchedule); // Calculate ticket price based on seat type and number
-                    ticket.CreateTicket(selectedSchedule, selectedSeat.ID, film.ID,price);
-                    Ticket.DisplayTicketDetails(ticket,selectedSeat, price);
+                    Console.WriteLine($"Ticket price: {price} euro");
+
+                    var confirmPurchase = AnsiConsole.Confirm("Do you want to proceed with the purchase?", false);
+                    if (confirmPurchase)
+                    {
+                        // Create the ticket
+                        double finalPrice = ticket.CreateTicket(selectedSchedule, selectedSeat.ID, film.ID, price);
+                        Ticket.DisplayTicketDetails(ticket, selectedSeat, finalPrice);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Purchase cancelled. Press any key to continue.");
+                        Console.ReadKey();
+                    }
                 }
             }
             break;
