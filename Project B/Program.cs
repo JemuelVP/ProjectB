@@ -340,10 +340,7 @@ while (active)
                         }
                     }
                     break;
-            }
-
-            break;
-        case (MainMenuOptions)CustomerChoices.SeeMovies:
+                case CustomerChoices.SeeMovies:
             ReservationMenuOption option = ReservationMenuOption.MakeReservation; // Start with MakeReservation option
             while (option != ReservationMenuOption.Back)
             {
@@ -432,8 +429,9 @@ while (active)
                 }
             }
             break;
+        }
+        break;         
     }
-
     break;
 }
 
