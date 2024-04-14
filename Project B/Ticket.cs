@@ -9,7 +9,13 @@ public class Ticket
     public int Chair_ID { get; set; }
     public double Price { get; set; }
 
-    public double CreateTicket(Schedule schedule, int chair_ID, int movieId, double price, int? userId = null)
+    public double CreateTicket(
+        Schedule schedule,
+        int chair_ID,
+        int movieId,
+        double price,
+        int? userId = null
+    )
     {
         Schedule_ID = schedule.ID;
         Chair_ID = chair_ID;
@@ -32,15 +38,22 @@ public class Ticket
         double priceMultiplier = 1.0; // Multiplier for seat types
 
         // Adjust price based on seat type
-        if (seatType == 0 && seatNumber >= 50 && seatNumber <= 59 || seatType == 1 && seatNumber >= 1 && seatNumber <= 5 || seatType == 2 && seatNumber >= 1 && seatNumber <= 3 )
+        if (
+            seatType == 0 && seatNumber >= 50 && seatNumber <= 59
+            || seatType == 1 && seatNumber >= 1 && seatNumber <= 5
+            || seatType == 2 && seatNumber >= 1 && seatNumber <= 3
+        )
         {
             priceMultiplier *= 2.0; // Multiply the price by 1.5
         }
-        if (seatType == 0 && seatNumber >= 40 && seatNumber <= 49 || seatType == 1 && seatNumber >= 6 && seatNumber <= 10 || seatType == 2 && seatNumber >= 8 && seatNumber <= 10 )
+        if (
+            seatType == 0 && seatNumber >= 40 && seatNumber <= 49
+            || seatType == 1 && seatNumber >= 6 && seatNumber <= 10
+            || seatType == 2 && seatNumber >= 8 && seatNumber <= 10
+        )
         {
             priceMultiplier *= 1.5; // Multiply the price by 1.5
         }
-
 
         // Calculate final price based on base price, multiplier, or any other factors
         double Price = basePrice * priceMultiplier;
@@ -73,13 +86,17 @@ public class Ticket
         int hour = startTime.Hour;
         return hour >= 10 && hour <= 14; // Assuming peak hours are from 6 PM to 10 PM
     }
-    
+
     public void CheckAge(Film film, int age)
     {
         if (age < film.Age)
         {
-            AnsiConsole.Write(new Rule($"[red]Waarschuwing: dit is een {film.Age}+ film.[/]").RuleStyle("red"));
-            AnsiConsole.Write(new Rule($"[blue]Druk op iets om verder te gaan[/]").RuleStyle("blue"));
+            AnsiConsole.Write(
+                new Rule($"[red]Waarschuwing: dit is een {film.Age}+ film.[/]").RuleStyle("red")
+            );
+            AnsiConsole.Write(
+                new Rule($"[blue]Druk op iets om verder te gaan[/]").RuleStyle("blue")
+            );
             Console.ReadKey();
         }
     }
@@ -114,11 +131,50 @@ public static void DisplayTicketDetails(Ticket ticket,Chair chair, double price)
 
         int ticketCount = db.Ticket.Count(t => t.User_ID == userID);
 
-        if (ticketCount >= 3)
+        if (ticketCount >= 10)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("U heeft meer dan 10 tickets bij ons gekocht!");
             Console.WriteLine("Hier een kortingscode voor de volgende bestelling: BIG10");
+            Console.ResetColor();
+        }
+    }
+
+    public static void SeeUserStats(int userID)
+    {
+        using DataBaseConnection db = new();
+
+        List<Ticket> userTickets = db.Ticket.Where(t => t.User_ID == userID).ToList();
+
+        var ticketsPerMovie = userTickets
+            .GroupBy(t => t.Movie_ID)
+            .Select(g => new
+            {
+                MovieID = g.Key,
+                MovieName = db.Movie.FirstOrDefault(movie => movie.ID == g.Key).Title,
+                TicketCount = g.Count()
+            })
+            .ToList();
+
+        if (ticketsPerMovie.Any())
+        {
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("Overzicht van bezochte films en totale tickets per film");
+            Console.ResetColor();
+
+            foreach (var movieInfo in ticketsPerMovie)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine(
+                    $"Film: {movieInfo.MovieName}, Tickets gekocht: {movieInfo.TicketCount}"
+                );
+                Console.ResetColor();
+            }
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"Er zijn nog geen tickets gekocht op dit account");
             Console.ResetColor();
         }
     }
