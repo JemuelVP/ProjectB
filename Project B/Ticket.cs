@@ -1,13 +1,21 @@
+using Spectre.Console;
+
 public class Ticket
 {
     public int ID { get; set; }
     public int Schedule_ID { get; set; }
     public int User_ID { get; set; }
     public int Movie_ID { get; set; }
-    public int Chair_ID{get; set;}
+    public int Chair_ID { get; set; }
     public double Price { get; set; }
 
-    public void CreateTicket(Schedule schedule, int chair_ID, int movieId, double price, int? userId = null)
+    public void CreateTicket(
+        Schedule schedule,
+        int chair_ID,
+        int movieId,
+        double price,
+        int? userId
+    )
     {
         Schedule_ID = schedule.ID;
         Chair_ID = chair_ID;
@@ -19,6 +27,7 @@ public class Ticket
         var entry = db.Ticket.Add(this);
         db.SaveChanges();
     }
+
     public double GetSeatPrice(int seatType, int seatNumber, Schedule schedule)
     {
         // Here you can implement your pricing logic based on seat type, seat number, and schedule
@@ -46,7 +55,7 @@ public class Ticket
         {
             Price += 5.0;
         }
-        if(IsEarlyTime(schedule.StartDate))
+        if (IsEarlyTime(schedule.StartDate))
         {
             Price -= 5;
         }
@@ -61,6 +70,7 @@ public class Ticket
         int hour = startTime.Hour;
         return hour >= 18 && hour <= 22; // Assuming peak hours are from 6 PM to 10 PM
     }
+
     private bool IsEarlyTime(DateTime startTime)
     {
         // Example implementation: Check if the startTime falls within peak hours
@@ -68,16 +78,31 @@ public class Ticket
         int hour = startTime.Hour;
         return hour >= 10 && hour <= 14; // Assuming peak hours are from 6 PM to 10 PM
     }
-public static void DisplayTicketDetails(Ticket ticket,Chair chair, double price)
-{
-    Console.WriteLine("Ticket Details:");
-    Console.WriteLine("----------------");
-    Console.WriteLine($"Ticket ID: {ticket.ID}");
-    Console.WriteLine($"Schedule ID: {ticket.Schedule_ID}");
-    Console.WriteLine($"Movie ID: {ticket.Movie_ID}");
-    Console.WriteLine($"Chair ID: {chair.SeatType}");
-    Console.WriteLine($"Chair ID: {chair.Position}");
-    Console.WriteLine($"Price: {price:C}"); // Format price as currency
-}
 
+    public static void DisplayTicketDetails(Ticket ticket, Chair chair, double price)
+    {
+        Console.WriteLine("Ticket Details:");
+        Console.WriteLine("----------------");
+        Console.WriteLine($"Ticket ID: {ticket.ID}");
+        Console.WriteLine($"Schedule ID: {ticket.Schedule_ID}");
+        Console.WriteLine($"Movie ID: {ticket.Movie_ID}");
+        Console.WriteLine($"Chair ID: {chair.SeatType}");
+        Console.WriteLine($"Chair ID: {chair.Position}");
+        Console.WriteLine($"Price: {price:C}"); // Format price as currency
+    }
+
+    public static void CheckBoughtTickets(int userID)
+    {
+        using DataBaseConnection db = new();
+
+        int ticketCount = db.Ticket.Count(t => t.User_ID == userID);
+
+        if (ticketCount >= 3)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("U heeft meer dan 10 tickets bij ons gekocht!");
+            Console.WriteLine("Hier een kortingscode voor de volgende bestelling: BIG10");
+            Console.ResetColor();
+        }
+    }
 }

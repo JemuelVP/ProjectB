@@ -1,3 +1,5 @@
+using Spectre.Console;
+
 public class Users
 {
     public int ID { get; set; }
@@ -15,6 +17,10 @@ public class Users
         );
         if (admin != null)
         {
+            ID = admin.ID;
+            Name = admin.Name;
+            Password = admin.Password;
+            IsAdmin = admin.IsAdmin;
             LoggedIn = true;
         }
         else
@@ -31,11 +37,15 @@ public class Users
         );
         if (user != null)
         {
+            ID = user.ID;
+            Name = user.Name;
+            Password = user.Password;
+            IsAdmin = user.IsAdmin;
             LoggedIn = true;
         }
         else
         {
-            Console.WriteLine("Verkeerde gegevens ingevuld, probeer het opnieuw");
+            AnsiConsole.WriteLine("Verkeerde gegevens ingevuld, probeer het opnieuw");
         }
     }
 }
