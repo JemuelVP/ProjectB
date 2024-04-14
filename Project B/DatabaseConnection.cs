@@ -11,16 +11,13 @@ class DataBaseConnection : DbContext
     public DbSet<Ticket> Ticket { get; set; }
     public DbSet<Chair> Chair { get; set; }
 
-
-
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-
-        modelBuilder.Entity<Schedule>()
-        .HasOne(s => s.Film)
-        .WithMany(f => f.Schedules)
-        .HasForeignKey(s => s.Movie_ID);
+        modelBuilder
+            .Entity<Schedule>()
+            .HasOne(s => s.Film)
+            .WithMany(f => f.Schedules)
+            .HasForeignKey(s => s.Movie_ID);
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -31,5 +28,4 @@ class DataBaseConnection : DbContext
 
         // options.UseSqlite($"Data source = ../../../DataBase/movie.sqlite");
     }
-
 }
