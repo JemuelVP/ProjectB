@@ -1,5 +1,3 @@
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime.InteropServices;
 using Spectre.Console;
 
 
@@ -80,8 +78,8 @@ public class Ticket
     {
         if (age < film.Age)
         {
-            AnsiConsole.WriteLine($"Warning: this is a {film.Age}+ movie.");
-            Console.WriteLine("Druk op enter om verder te gaan");
+            AnsiConsole.Write(new Rule($"[red]Waarschuwing: dit is een {film.Age}+ film.[/]").RuleStyle("red"));
+            AnsiConsole.Write(new Rule($"[blue]Druk op iets om verder te gaan[/]").RuleStyle("blue"));
             Console.ReadKey();
         }
     }
@@ -91,11 +89,9 @@ public static void DisplayTicketDetails(Ticket ticket,Chair chair, double price)
     Console.WriteLine("Ticket Details:");
     Console.WriteLine("----------------");
     Console.WriteLine($"Ticket ID: {ticket.ID}");
-    Console.WriteLine($"Schedule ID: {ticket.Schedule_ID}");
-    Console.WriteLine($"Movie ID: {ticket.Movie_ID}");
-    Console.WriteLine($"Chair ID: {chair.SeatType}");
-    Console.WriteLine($"Chair ID: {chair.Position}");
-    Console.WriteLine($"Price: {price} euro"); // Format price as euros
+    Console.WriteLine($"Stoel type: {chair.SeatType}");
+    Console.WriteLine($"Stoel nummer: {chair.Position}");
+    Console.WriteLine($"Prijs: {price} euro"); // Format price as euros
 }
 
 

@@ -168,7 +168,7 @@ while (active)
                     // je moet hier of een zaal object meegeven of het aantal stoelen
 
                     double price = ticket.GetSeatPrice(seatTypeInt, seatNumber, selectedSchedule); // Calculate ticket price based on seat type and number
-                    Console.WriteLine($"Ticket price: {price} euro");
+                    AnsiConsole.Write(new Rule($"[blue]Ticket price: {price} euro[/]").RuleStyle("blue"));
 
                     var confirmPurchase = AnsiConsole.Confirm("Do you want to proceed with the purchase?", false);
                     if (confirmPurchase)
@@ -179,7 +179,7 @@ while (active)
                     }
                     else
                     {
-                        Console.WriteLine("Purchase cancelled. Press any key to continue.");
+                        Console.WriteLine("Aankoop geannuleerd. Druk op iets om door te gaan.");
                         Console.ReadKey();
                     }
                 }
