@@ -173,11 +173,10 @@ while (active)
 
                     // var ticket = new Ticket();
 
-                    var ticket = new Ticket();
+                    // var ticket = new Ticket();
                     // je moet hier of een zaal object meegeven of het aantal stoelen
 
-                    ticket.GetSeatPrice(seatType, seatNumber); // Calculate ticket price based on seat type and number
-                    ticket.CreateTicket(selectedSchedule, film.ID, userName, seatType, seatNumber);
+                    ticket.GetSeatPrice(seatTypeInt, seatNumber, selectedSchedule); // Calculate ticket price based on seat type and number
 
 
 
