@@ -9,13 +9,7 @@ public class Ticket
     public int Chair_ID { get; set; }
     public double Price { get; set; }
 
-    public void CreateTicket(
-        Schedule schedule,
-        int chair_ID,
-        int movieId,
-        double price,
-        int? userId
-    )
+    public double CreateTicket(Schedule schedule, int chair_ID, int movieId, double price, int? userId = null)
     {
         Schedule_ID = schedule.ID;
         Chair_ID = chair_ID;
@@ -26,26 +20,27 @@ public class Ticket
         using DataBaseConnection db = new();
         var entry = db.Ticket.Add(this);
         db.SaveChanges();
+
+        return price;
     }
 
     public double GetSeatPrice(int seatType, int seatNumber, Schedule schedule)
     {
         // Here you can implement your pricing logic based on seat type, seat number, and schedule
         // For demonstration purposes, let's say you have a simple pricing logic
-        double basePrice = 20.0; // Base price for all seats
+        double basePrice = 30.0; // Base price for all seats
         double priceMultiplier = 1.0; // Multiplier for seat types
 
         // Adjust price based on seat type
-        switch (seatType)
+        if (seatType == 0 && seatNumber >= 50 && seatNumber <= 59 || seatType == 1 && seatNumber >= 1 && seatNumber <= 5 || seatType == 2 && seatNumber >= 1 && seatNumber <= 3 )
         {
-            case 1: // Loveseat
-                priceMultiplier = 1.5;
-                break;
-            case 2: // Extrabeenruimte
-                priceMultiplier = 2.0;
-                break;
-            // Classic seats have the base price, so no need for a case for seatType == 0
+            priceMultiplier *= 2.0; // Multiply the price by 1.5
         }
+        if (seatType == 0 && seatNumber >= 40 && seatNumber <= 49 || seatType == 1 && seatNumber >= 6 && seatNumber <= 10 || seatType == 2 && seatNumber >= 8 && seatNumber <= 10 )
+        {
+            priceMultiplier *= 1.5; // Multiply the price by 1.5
+        }
+
 
         // Calculate final price based on base price, multiplier, or any other factors
         double Price = basePrice * priceMultiplier;
@@ -83,21 +78,22 @@ public class Ticket
     {
         if (age < film.Age)
         {
-            AnsiConsole.WriteLine($"Warning: this is a {film.Age}+ movie.");
+            AnsiConsole.Write(new Rule($"[red]Waarschuwing: dit is een {film.Age}+ film.[/]").RuleStyle("red"));
+            AnsiConsole.Write(new Rule($"[blue]Druk op iets om verder te gaan[/]").RuleStyle("blue"));
+            Console.ReadKey();
         }
     }
 
-    public static void DisplayTicketDetails(Ticket ticket, Chair chair, double price)
-    {
-        Console.WriteLine("Ticket Details:");
-        Console.WriteLine("----------------");
-        Console.WriteLine($"Ticket ID: {ticket.ID}");
-        Console.WriteLine($"Schedule ID: {ticket.Schedule_ID}");
-        Console.WriteLine($"Movie ID: {ticket.Movie_ID}");
-        Console.WriteLine($"Chair ID: {chair.SeatType}");
-        Console.WriteLine($"Chair ID: {chair.Position}");
-        Console.WriteLine($"Price: {price:C}"); // Format price as currency
-    }
+public static void DisplayTicketDetails(Ticket ticket,Chair chair, double price)
+{
+    AnsiConsole.Write(new Rule($"[blue]Ticket Informatie [/]").RuleStyle("blue"));
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine($"Ticket ID: {ticket.ID}");
+    Console.WriteLine($"Stoel type: {chair.SeatType}");
+    Console.WriteLine($"Stoel nummer: {chair.Position}");
+    Console.WriteLine($"Prijs: {price} euro");
+    Console.ResetColor();
+}
 
     public static void CheckBoughtTickets(int userID)
     {

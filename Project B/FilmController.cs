@@ -16,8 +16,10 @@ public class FilmController
     }
     public void Display(Film film)
     {
-        AnsiConsole.Write(new Rule("[green]Film Informatie[/]").RuleStyle("green"));
-        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.ForegroundColor = ConsoleColor.Green;
+        AnsiConsole.WriteLine("Film Informatie: ");
+        Console.ResetColor();
+        Console.ForegroundColor = ConsoleColor.Blue;
         Console.WriteLine($"Titel: {film.Title}");
         Console.WriteLine($"Jaar: {film.Year}");
         Console.WriteLine($"Beschrijving: {film.Description}");
