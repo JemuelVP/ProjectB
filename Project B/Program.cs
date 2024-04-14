@@ -32,17 +32,15 @@ while (active)
             Console.WriteLine("Voer je wachtwoord in");
             string? password = Console.ReadLine();
             user.Login(name, password);
-            if (user.LoggedIn == true)
+            // bool LoggedIn = admin.LoggedIn;
+            while (user.LoggedIn == true)
             {
-                var AdminOptions = AnsiConsole.Prompt(
-                    new SelectionPrompt<AdminChoices>()
-                        .Title("[green]Wat wilt u nu doen[/]")
-                        .AddChoices(
-                            AdminChoices.AddMovie,
-                            AdminChoices.MoviesOverView,
-                            AdminChoices.Revenue
-                        )
-                );
+                var AdminOptions = AnsiConsole.Prompt(new SelectionPrompt<AdminChoices>().Title("[green]Wat wilt u nu doen[/]").AddChoices(
+                AdminChoices.AddMovie,
+                AdminChoices.Schedule,
+                AdminChoices.MoviesOverView,
+                AdminChoices.Revenue,
+                AdminChoices.Logout));
                 switch (AdminOptions)
                 {
                     case AdminChoices.AddMovie:
@@ -70,6 +68,15 @@ while (active)
                             age,
                             durationInMin
                         );
+                        break;
+                    case AdminChoices.Schedule:
+                        var schedules = ScheduleController.GetAvailableSchedules(startDate, endDate);
+
+                        // Display available films
+                        AnsiConsole.Write(new Rule($"[blue]Beschikbare Films Van {nowDateTime} Tot {endDateTime}:[/]").RuleStyle("blue"));
+                        var movies = schedules.Select(s => $"{s.Film.Title} - {s.StartDate}").ToList();
+                        foreach (var movie in movies)
+                            AnsiConsole.WriteLine(movie);
                         break;
                     case AdminChoices.MoviesOverView:
                         var adminOverview = AdminController.GetAllMovies();
@@ -136,13 +143,20 @@ while (active)
                         var money = new RevenueStatistics();
                         money.GetTotalRevenue();
                         break;
+                    case AdminChoices.Logout:
+                        var choice = AnsiConsole.Prompt(new SelectionPrompt<Logout>().Title("[green]Are you sure you want to log out?[/]").AddChoices(
+                            Logout.Yes,
+                            Logout.No));
+                        switch (choice)
+                        {
+                            case Logout.Yes:
+                                user.LoggedIn = false;
+                                break;
+                        }
+                        break;
                 }
-                break;
             }
-            else
-            {
-                Console.WriteLine("niet ingelogd");
-            }
+            Console.WriteLine("niet ingelogd");
             break;
         case MainMenuOptions.Customer:
             var Customeroptions = AnsiConsole.Prompt(
@@ -366,6 +380,16 @@ while (active)
                 if (option == ReservationMenuOption.MakeReservation)
                 {
                     var userName = AnsiConsole.Prompt(new TextPrompt<string>("Voer u naam in: "));
+                    var age = AnsiConsole.Prompt(new TextPrompt<int>("Voer uw leeftijd in: "));
+                    var ticket = new Ticket();
+                    ticket.CheckAge(film, age); // checks age against age movie
+                    Console.ReadKey();
+                    
+                    AnsiConsole.Write(new Rule("[red]Stoel Kosten[/]").RuleStyle("red"));
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    AnsiConsole.WriteLine("Classic: 20");
+                    AnsiConsole.WriteLine("Loveseat: 25");
+                    AnsiConsole.WriteLine("Extrabeenruimte: 25");
                     AnsiConsole.Write(new Rule("[blue]Stoel Kosten[/]").RuleStyle("blue"));
 
                     // Display seat type options and prompt the user to choose
@@ -397,7 +421,15 @@ while (active)
                     );
                     var selectedSeat = availableSeats.FirstOrDefault(s => s.Position == seatNumber);
                     // Create ticket with selected schedule, user name, seat type, and seat number
+
+                    // var ticket = new Ticket();
+
                     var ticket = new Ticket();
+                    // je moet hier of een zaal object meegeven of het aantal stoelen
+
+                    ticket.GetSeatPrice(seatType, seatNumber); // Calculate ticket price based on seat type and number
+                    ticket.CreateTicket(selectedSchedule, film.ID, userName, seatType, seatNumber);
+
 
                     double price = ticket.GetSeatPrice(seatTypeInt, seatNumber, selectedSchedule); // Calculate ticket price based on seat type and number
                     ticket.CreateTicket(selectedSchedule, selectedSeat.ID, film.ID, price, user.ID);
@@ -425,8 +457,10 @@ public enum RevenueOrScheduleMovie
 public enum AdminChoices
 {
     AddMovie,
+    Schedule,
     MoviesOverView,
-    Revenue
+    Revenue,
+    Logout
 }
 
 public enum ReservationMenuOption
@@ -446,9 +480,9 @@ public enum CustomerChoices
     SeeUserStats,
     LogOut
 }
-
 public enum Logout
 {
     Yes,
     No
 }
+
