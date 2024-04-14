@@ -17,6 +17,7 @@ using DataBaseConnection db = new();
 // Console.WriteLine("Chairs added to the database.");
 var hallsController = new CinemaHallController(db);
 AnsiConsole.Write(new Rule($"Welkom bij YourEyes").RuleStyle("blue"));
+
 while (active)
 {
     var MainMenuOption = AnsiConsole.Prompt(
@@ -200,7 +201,25 @@ while (active)
                     );
                     break;
                 case CustomerChoices.SearchMovie:
-                    break;
+                    // Choose movie by category
+                    string MovieSearchMo = AnsiConsole.Prompt(new TextPrompt<string>("Zoek film categorie: "));
+                    List<Schedule> searchSchedules = FilmController.GetAllMoviesByMo(MovieSearchMo, startDate, endDate);
+                    System.Console.WriteLine(searchSchedules.Count);
+
+                    if (searchSchedules.Count > 0)
+                    {
+                        var choices = searchSchedules.Select(s => $"{s.Film.Title} - {s.StartDate.ToString("dd-MM-yyyy HH:mm")}").ToList();
+
+                        var selectedMovieIndex = AnsiConsole.Prompt(
+                            new SelectionPrompt<string>().Title("Kies een film").AddChoices(choices)
+                        );
+                    }
+                    else
+                    {
+                        Console.WriteLine($"No movies found for category '{MovieSearchMo}'.");
+                        Console.ReadLine();
+                    }
+                    continue;
 
                 case CustomerChoices.CustomerLogin:
                     var customerName = AnsiConsole.Prompt(
@@ -480,17 +499,12 @@ while (active)
                         );
                         Ticket.DisplayTicketDetails(ticket, selectedSeat, finalPrice);
                     }
-                    else
-                    {
-                        Console.WriteLine("Aankoop geannuleerd. Druk op iets om door te gaan.");
-                        Console.ReadKey();
-                    }
-                }
+                    break;
             }
             break;
     }
-
     break;
+    }
 }
 
 public enum MainMenuOptions

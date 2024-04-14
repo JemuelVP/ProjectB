@@ -1,3 +1,4 @@
+using System.Data.Entity;
 using Spectre.Console;
 public class FilmController
 {
@@ -7,19 +8,32 @@ public class FilmController
         var films = db.Movie.ToList();
         return films;
     }
-
-    public static Film? GetMovieByCategory(string categories)
+    public static List<Schedule> GetAllMoviesByMo(string cat, DateTime startDate, DateTime endDate)
     {
         using DataBaseConnection db = new();
-        var filmInfo = db.Movie.FirstOrDefault(film => film.Categories == categories);
-        return filmInfo;
+        var schedules = db.Schedule.
+        Include(s => s.Film).
+        Where(s => s.Film != null && s.Film.Categories.ToLower().StartsWith(cat.ToLower())).
+        Where(s => s.StartDate >= startDate && s.EndDate < endDate).
+        ToList();
+        foreach (var f in schedules)
+        {
+            db.Entry(f).Reference(f => f.Film).Load();
+        }
+        return schedules;
     }
+
+    public static List<Film> GetMovieByCategory(string category)
+    {
+        using DataBaseConnection db = new();
+        var MovieInfo = db.Movie.Where(Movie => Movie.Categories.ToLower() == category).ToList();
+        return MovieInfo;
+    }
+
     public void Display(Film film)
     {
-        Console.ForegroundColor = ConsoleColor.Green;
-        AnsiConsole.WriteLine("Film Informatie: ");
-        Console.ResetColor();
-        Console.ForegroundColor = ConsoleColor.Blue;
+        AnsiConsole.Write(new Rule("[green]Film Informatie[/]").RuleStyle("green"));
+        Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine($"Titel: {film.Title}");
         Console.WriteLine($"Jaar: {film.Year}");
         Console.WriteLine($"Beschrijving: {film.Description}");

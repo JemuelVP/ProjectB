@@ -101,16 +101,29 @@ public class Ticket
         }
     }
 
-    public static void DisplayTicketDetails(Ticket ticket, Chair chair, double price)
+public static void DisplayTicketDetails(Ticket ticket,Chair chair, double price)
+{
+    string stoelType;
+    switch (chair.SeatType)
     {
-        AnsiConsole.Write(new Rule($"[blue]Ticket Informatie [/]").RuleStyle("blue"));
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"Ticket ID: {ticket.ID}");
-        Console.WriteLine($"Stoel type: {chair.SeatType}");
-        Console.WriteLine($"Stoel nummer: {chair.Position}");
-        Console.WriteLine($"Prijs: {price} euro");
-        Console.ResetColor();
+        case 1:
+            stoelType = "LoveSeat";
+            break;
+        case 2:
+            stoelType = "ExtraBeenRuimte";
+            break;
+        default:
+            stoelType = "Classic";
+            break;
     }
+    AnsiConsole.Write(new Rule($"[blue]Ticket Informatie [/]").RuleStyle("blue"));
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine($"Ticket ID: {ticket.ID}");
+    Console.WriteLine($"Stoel type: {stoelType}");
+    Console.WriteLine($"Stoel nummer: {chair.Position}");
+    Console.WriteLine($"Prijs: {price} euro");
+    Console.ResetColor();
+}
 
     public static void CheckBoughtTickets(int userID)
     {
