@@ -86,12 +86,13 @@ public class Ticket
 
 public static void DisplayTicketDetails(Ticket ticket,Chair chair, double price)
 {
-    Console.WriteLine("Ticket Details:");
-    Console.WriteLine("----------------");
+    AnsiConsole.Write(new Rule($"[blue]Ticket Informatie [/]").RuleStyle("blue"));
+    Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine($"Ticket ID: {ticket.ID}");
     Console.WriteLine($"Stoel type: {chair.SeatType}");
     Console.WriteLine($"Stoel nummer: {chair.Position}");
-    Console.WriteLine($"Prijs: {price} euro"); // Format price as euros
+    Console.WriteLine($"Prijs: {price} euro");
+    Console.ResetColor();
 }
 
 
