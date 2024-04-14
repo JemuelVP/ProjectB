@@ -1,14 +1,17 @@
 ﻿using Spectre.Console;
+
 Film film = new Film();
 FilmController filmController = new FilmController();
-Users admin = new Users();
+Users user = new Users();
 AdminController adminController = new AdminController();
+UserController userController = new();
 bool active = true;
 DateTime startDate = DateTime.Now;
 DateTime endDate = DateTime.Now.AddDays(28);
 var nowDateTime = DateTime.Now.Date.ToShortDateString();
 var endDateTime = DateTime.Now.AddDays(28).Date.ToShortDateString();
 using DataBaseConnection db = new();
+
 // ChairController chairController = new ChairController();
 // chairController.AddChairs();
 // Console.WriteLine("Chairs added to the database.");
@@ -16,9 +19,11 @@ var hallsController = new CinemaHallController(db);
 AnsiConsole.Write(new Rule($"Welkom bij YourEyes").RuleStyle("blue"));
 while (active)
 {
-    var MainMenuOption = AnsiConsole.Prompt(new SelectionPrompt<MainMenuOptions>().Title("[blue]Bent u een admin of een klant[/]").AddChoices(
-    MainMenuOptions.Admin,
-    MainMenuOptions.Customer));
+    var MainMenuOption = AnsiConsole.Prompt(
+        new SelectionPrompt<MainMenuOptions>()
+            .Title("[blue]Bent u een admin of een klant[/]")
+            .AddChoices(MainMenuOptions.Admin, MainMenuOptions.Customer)
+    );
     switch (MainMenuOption)
     {
         case MainMenuOptions.Admin:
@@ -26,13 +31,18 @@ while (active)
             string? name = Console.ReadLine();
             Console.WriteLine("Voer je wachtwoord in");
             string? password = Console.ReadLine();
-            admin.Login(name, password);
-            if (admin.LoggedIn == true)
+            user.Login(name, password);
+            if (user.LoggedIn == true)
             {
-                var AdminOptions = AnsiConsole.Prompt(new SelectionPrompt<AdminChoices>().Title("[green]Wat wilt u nu doen[/]").AddChoices(
-                AdminChoices.AddMovie,
-                AdminChoices.MoviesOverView,
-                AdminChoices.Revenue));
+                var AdminOptions = AnsiConsole.Prompt(
+                    new SelectionPrompt<AdminChoices>()
+                        .Title("[green]Wat wilt u nu doen[/]")
+                        .AddChoices(
+                            AdminChoices.AddMovie,
+                            AdminChoices.MoviesOverView,
+                            AdminChoices.Revenue
+                        )
+                );
                 switch (AdminOptions)
                 {
                     case AdminChoices.AddMovie:
@@ -44,10 +54,22 @@ while (active)
                         string directors = AnsiConsole.Ask<string>("Directeuren: ");
                         int age = AnsiConsole.Ask<int>("Minimale leeftijd: ");
                         int durationInMin = AnsiConsole.Ask<int>("Duurt in (minuten): ");
-                        AnsiConsole.Write(new Rule("[green]Film is toegevoegd [/]").RuleStyle("green")); ;
+                        AnsiConsole.Write(
+                            new Rule("[green]Film is toegevoegd [/]").RuleStyle("green")
+                        );
+                        ;
 
                         // Call the AddMovie method with the input parameters
-                        adminController.AddMovie(title, year, description, authors, categories, directors, age, durationInMin);
+                        adminController.AddMovie(
+                            title,
+                            year,
+                            description,
+                            authors,
+                            categories,
+                            directors,
+                            age,
+                            durationInMin
+                        );
                         break;
                     case AdminChoices.MoviesOverView:
                         var adminOverview = AdminController.GetAllMovies();
@@ -55,32 +77,54 @@ while (active)
                         string[] movieTitle = adminOverview
                             .Select(book => $"Titel: {book.Title}")
                             .ToArray();
-                        var overviewMovies = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Kies een film :").AddChoices(movieTitle));
+                        var overviewMovies = AnsiConsole.Prompt(
+                            new SelectionPrompt<string>()
+                                .Title("Kies een film :")
+                                .AddChoices(movieTitle)
+                        );
                         // Get the total price for the selected movie
                         string titlePart = overviewMovies.Replace("Titel: ", "");
                         var selectedMovie = AdminController.GetMovieByTitle(titlePart);
-                        var ScheduleMovie = AnsiConsole.Prompt(new SelectionPrompt<RevenueOrScheduleMovie>().Title("[green]Wat wilt u nu doen[/]").AddChoices(
-                        RevenueOrScheduleMovie.TotaleOmzet,
-                        RevenueOrScheduleMovie.ScheduleMovie));
+                        var ScheduleMovie = AnsiConsole.Prompt(
+                            new SelectionPrompt<RevenueOrScheduleMovie>()
+                                .Title("[green]Wat wilt u nu doen[/]")
+                                .AddChoices(
+                                    RevenueOrScheduleMovie.TotaleOmzet,
+                                    RevenueOrScheduleMovie.ScheduleMovie
+                                )
+                        );
                         switch (ScheduleMovie)
                         {
                             case RevenueOrScheduleMovie.TotaleOmzet:
                                 Console.ForegroundColor = ConsoleColor.Blue;
-                                AnsiConsole.WriteLine($"Total Tickets: {RevenueStatistics.GetTotalTicketsPerMovie(selectedMovie.ID)}");
-                                AnsiConsole.WriteLine($"Totale Omzet: {RevenueStatistics.GetTotalPricePerMovie(selectedMovie.ID)}");
+                                AnsiConsole.WriteLine(
+                                    $"Total Tickets: {RevenueStatistics.GetTotalTicketsPerMovie(selectedMovie.ID)}"
+                                );
+                                AnsiConsole.WriteLine(
+                                    $"Totale Omzet: {RevenueStatistics.GetTotalPricePerMovie(selectedMovie.ID)}"
+                                );
                                 break;
                             case RevenueOrScheduleMovie.ScheduleMovie:
-                                Console.WriteLine("Voer een datum in ANSI-formaat in (dd-MM-jjjj HH:mm:ss):");
+                                Console.WriteLine(
+                                    "Voer een datum in ANSI-formaat in (dd-MM-jjjj HH:mm:ss):"
+                                );
                                 string? userInput = Console.ReadLine();
-                                if (userInput == null) break;
-                                var date = DateTime.ParseExact(userInput, "dd-MM-yyyy HH:mm:ss", null, System.Globalization.DateTimeStyles.None);
+                                if (userInput == null)
+                                    break;
+                                var date = DateTime.ParseExact(
+                                    userInput,
+                                    "dd-MM-yyyy HH:mm:ss",
+                                    null,
+                                    System.Globalization.DateTimeStyles.None
+                                );
                                 var halls = hallsController.GetAllHalls();
-                                string[] hallNames = halls
-                                .Select(hall => hall.Name)
-                                .ToArray();
-                                var selectedHallName = AnsiConsole.Prompt(new SelectionPrompt<string>().AddChoices(hallNames));
+                                string[] hallNames = halls.Select(hall => hall.Name).ToArray();
+                                var selectedHallName = AnsiConsole.Prompt(
+                                    new SelectionPrompt<string>().AddChoices(hallNames)
+                                );
                                 var selectedHall = hallsController.GetByName(selectedHallName);
-                                if (selectedHall == null) break;
+                                if (selectedHall == null)
+                                    break;
                                 var schedule = new Schedule();
                                 schedule.CreateFromFilm(selectedMovie, selectedHall.ID, date);
 
@@ -101,54 +145,142 @@ while (active)
             }
             break;
         case MainMenuOptions.Customer:
-            ReservationMenuOption option = ReservationMenuOption.MakeReservation; // Start with MakeReservation option
-            while (option != ReservationMenuOption.Back)
+            var Customeroptions = AnsiConsole.Prompt(
+                new SelectionPrompt<CustomerChoices>()
+                    .Title("[blue]Wilt u een account aanmaken of een film zoeken[/]")
+                    .AddChoices(
+                        CustomerChoices.CreateUser,
+                        CustomerChoices.SearchMovie,
+                        CustomerChoices.CustomerLogin,
+                        CustomerChoices.SeeMovies
+                    )
+            );
+            switch (Customeroptions)
             {
-                var schedules = ScheduleController.GetAvailableSchedules(startDate, endDate);
+                case CustomerChoices.CreateUser:
+                    var username = AnsiConsole.Prompt(
+                        new TextPrompt<string>("Voer een gebruikersnaam in: ")
+                    );
+                    var passWord = AnsiConsole.Prompt(
+                        new TextPrompt<string>("Voer een wachtwoord in: ").Secret()
+                    );
+                    userController.CreateUser(username, passWord);
+                    AnsiConsole.Write(
+                        new Rule("[blue]Gebruiker is aangemaakt[/]").RuleStyle("blue")
+                    );
+                    break;
+                case CustomerChoices.SearchMovie:
+                    break;
 
-                // Display available films
-                AnsiConsole.Write(new Rule($"[blue]Beschikbare Films Van {nowDateTime} Tot {endDateTime}:[/]").RuleStyle("blue"));
-                var choices = schedules.Select(s => $"{s.Film.Title} - {s.StartDate}").ToList();
+                case CustomerChoices.CustomerLogin:
+                    var customerName = AnsiConsole.Prompt(
+                        new TextPrompt<string>("Voer je gebruikersnaam in: ")
+                    );
+                    var customerPassword = AnsiConsole.Prompt(
+                        new TextPrompt<string>("Voer je wachtwoord in: ").Secret()
+                    );
+                    user.UserLogin(customerName, customerPassword);
 
-                var selectedMovieIndex = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Kies een film").AddChoices(choices));
+                    if (user.LoggedIn == true)
+                    {
+                        AnsiConsole.Write(
+                            new Rule("[blue]Succesvol ingelogd[/]").RuleStyle("blue")
+                        );
+                        break;
+                    }
 
-                // Get the selected schedule based on the selected movie
-                var selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
-                film = selectedSchedule.Film;
-                // Display the details of the selected movie
-                filmController.Display(film);
+                    break;
+                case CustomerChoices.SeeMovies:
+                    ReservationMenuOption option = ReservationMenuOption.MakeReservation; // Start with MakeReservation option
+                    while (option != ReservationMenuOption.Back)
+                    {
+                        var schedules = ScheduleController.GetAvailableSchedules(
+                            startDate,
+                            endDate
+                        );
 
-                // Prompt the user to make a reservation or go back
-                option = AnsiConsole.Prompt(new SelectionPrompt<ReservationMenuOption>().Title("Maak een keuze").AddChoices(ReservationMenuOption.MakeReservation, ReservationMenuOption.Back));
+                        // Display available films
+                        AnsiConsole.Write(
+                            new Rule(
+                                $"[blue]Beschikbare Films Van {nowDateTime} Tot {endDateTime}:[/]"
+                            ).RuleStyle("blue")
+                        );
+                        var choices = schedules
+                            .Select(s => $"{s.Film.Title} - {s.StartDate}")
+                            .ToList();
 
-                if (option == ReservationMenuOption.MakeReservation)
-                {
-                    var userName = AnsiConsole.Prompt(new TextPrompt<string>("Voer u naam in: "));
-                    AnsiConsole.Write(new Rule("[blue]Stoel Kosten[/]").RuleStyle("blue"));
+                        var selectedMovieIndex = AnsiConsole.Prompt(
+                            new SelectionPrompt<string>().Title("Kies een film").AddChoices(choices)
+                        );
 
-                    // Display seat type options and prompt the user to choose
-                    var seatType = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Kies u stoel")
-                                                        .AddChoices("Classic", "Loveseat", "Extrabeenruimte"));
-                    int seatTypeInt = -1;
-                    Console.WriteLine(seatType);
-                    if (seatType == "Classic") seatTypeInt = 0;
-                    if (seatType == "Loveseat") seatTypeInt = 1;
-                    if (seatType == "Extrabeenruimte") seatTypeInt = 2;
+                        // Get the selected schedule based on the selected movie
+                        var selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
+                        film = selectedSchedule.Film;
+                        // Display the details of the selected movie
+                        filmController.Display(film);
 
-                    var availableSeats = ChairController.GetAvailableSeats(selectedSchedule.ID, selectedSchedule.Hall_ID, seatTypeInt);
-                    
-                    // Prompt the user to enter a seat number
-                    var seatNumber = AnsiConsole.Prompt(new SelectionPrompt<int>().Title("Select a seat number").AddChoices(availableSeats.Select(s => s.Position)));
-                    var selectedSeat = availableSeats.FirstOrDefault(s => s.Position == seatNumber);
-                    // Create ticket with selected schedule, user name, seat type, and seat number
-                    var ticket = new Ticket();
+                        // Prompt the user to make a reservation or go back
+                        option = AnsiConsole.Prompt(
+                            new SelectionPrompt<ReservationMenuOption>()
+                                .Title("Maak een keuze")
+                                .AddChoices(
+                                    ReservationMenuOption.MakeReservation,
+                                    ReservationMenuOption.Back
+                                )
+                        );
 
+                        if (option == ReservationMenuOption.MakeReservation)
+                        {
+                            var userName = AnsiConsole.Prompt(
+                                new TextPrompt<string>("Voer u naam in: ")
+                            );
+                            AnsiConsole.Write(new Rule("[blue]Stoel Kosten[/]").RuleStyle("blue"));
 
-                    double price = ticket.GetSeatPrice(seatTypeInt, seatNumber, selectedSchedule); // Calculate ticket price based on seat type and number
-                    ticket.CreateTicket(selectedSchedule, selectedSeat.ID, film.ID,price);
-                    Ticket.DisplayTicketDetails(ticket,selectedSeat, price);
-                }
+                            // Display seat type options and prompt the user to choose
+                            var seatType = AnsiConsole.Prompt(
+                                new SelectionPrompt<string>()
+                                    .Title("Kies u stoel")
+                                    .AddChoices("Classic", "Loveseat", "Extrabeenruimte")
+                            );
+                            int seatTypeInt = -1;
+                            Console.WriteLine(seatType);
+                            if (seatType == "Classic")
+                                seatTypeInt = 0;
+                            if (seatType == "Loveseat")
+                                seatTypeInt = 1;
+                            if (seatType == "Extrabeenruimte")
+                                seatTypeInt = 2;
+
+                            var availableSeats = ChairController.GetAvailableSeats(
+                                selectedSchedule.ID,
+                                selectedSchedule.Hall_ID,
+                                seatTypeInt
+                            );
+
+                            // Prompt the user to enter a seat number
+                            var seatNumber = AnsiConsole.Prompt(
+                                new SelectionPrompt<int>()
+                                    .Title("Select a seat number")
+                                    .AddChoices(availableSeats.Select(s => s.Position))
+                            );
+                            var selectedSeat = availableSeats.FirstOrDefault(s =>
+                                s.Position == seatNumber
+                            );
+                            // Create ticket with selected schedule, user name, seat type, and seat number
+                            var ticket = new Ticket();
+
+                            double price = ticket.GetSeatPrice(
+                                seatTypeInt,
+                                seatNumber,
+                                selectedSchedule
+                            ); // Calculate ticket price based on seat type and number
+                            ticket.CreateTicket(selectedSchedule, selectedSeat.ID, film.ID, price);
+                            Ticket.DisplayTicketDetails(ticket, selectedSeat, price);
+                        }
+                    }
+                    break;
             }
+
             break;
     }
 }
@@ -163,7 +295,6 @@ public enum RevenueOrScheduleMovie
 {
     TotaleOmzet,
     ScheduleMovie
-
 }
 
 public enum AdminChoices
@@ -177,6 +308,13 @@ public enum ReservationMenuOption
 {
     MakeReservation,
     Back
-
 }
 
+public enum CustomerChoices
+{
+    CreateUser,
+    SearchMovie,
+
+    CustomerLogin,
+    SeeMovies
+}
