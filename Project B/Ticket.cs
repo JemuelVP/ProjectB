@@ -101,44 +101,66 @@ public class Ticket
         }
     }
 
-public static void DisplayTicketDetails(Ticket ticket,Chair chair, double price)
-{
-    string stoelType;
-    switch (chair.SeatType)
+    public static void DisplayTicketDetails(Ticket ticket,Chair chair, double price)
     {
-        case 1:
-            stoelType = "LoveSeat";
-            break;
-        case 2:
-            stoelType = "ExtraBeenRuimte";
-            break;
-        default:
-            stoelType = "Classic";
-            break;
-    }
-    AnsiConsole.Write(new Rule($"[blue]Ticket Informatie [/]").RuleStyle("blue"));
-    Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine($"Ticket ID: {ticket.ID}");
-    Console.WriteLine($"Stoel type: {stoelType}");
-    Console.WriteLine($"Stoel nummer: {chair.Position}");
-    Console.WriteLine($"Prijs: {price} euro");
-    Console.ResetColor();
-}
-
-    public static void CheckBoughtTickets(int userID)
-    {
-        using DataBaseConnection db = new();
-
-        int ticketCount = db.Ticket.Count(t => t.User_ID == userID);
-
-        if (ticketCount >= 10)
+        string stoelType;
+        switch (chair.SeatType)
         {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("U heeft meer dan 10 tickets bij ons gekocht!");
-            Console.WriteLine("Hier een kortingscode voor de volgende bestelling: BIG10");
-            Console.ResetColor();
+            case 1:
+                stoelType = "LoveSeat";
+                break;
+            case 2:
+                stoelType = "ExtraBeenRuimte";
+                break;
+            default:
+                stoelType = "Classic";
+                break;
+        }
+        AnsiConsole.Write(new Rule($"[blue]Ticket Informatie [/]").RuleStyle("blue"));
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"Ticket ID: {ticket.ID}");
+        Console.WriteLine($"Stoel type: {stoelType}");
+        Console.WriteLine($"Stoel nummer: {chair.Position}");
+        Console.WriteLine($"Prijs: {price} euro");
+        Console.ResetColor();
+    }
+    public static void GetBoughtTicket(int schedule_ID, int hall_ID)
+    {
+        using (DataBaseConnection db = new DataBaseConnection())
+        {
+            var ticketInfo = db.Ticket
+                            .Join(db.Schedule,
+                                    ticket => ticket.Schedule_ID,
+                                    schedule => schedule.ID,
+                                    (ticket, schedule) => new
+                                    {
+                                        Ticket = ticket,
+                                        HallID = schedule.Hall_ID
+                                    })
+                            .FirstOrDefault(t => t.Ticket.Schedule_ID == schedule_ID);
+
+            if (ticketInfo != null)
+            {
+                int ticketCount = db.Ticket.Count(t => t.Schedule_ID == schedule_ID);
+            
+                if (ticketCount >= 10)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("U heeft meer dan 10 tickets bij ons gekocht!");
+                    Console.WriteLine("Hier een kortingscode voor de volgende bestelling: BIG10");
+                    Console.ResetColor();
+                }
+                
+                // Access the hall_ID
+                int selectedHallID = ticketInfo.HallID;
+            }
+            else
+            {
+                Console.WriteLine("No ticket found for the provided schedule ID.");
+            }
         }
     }
+
 
     public static void SeeUserStats(int userID)
     {
