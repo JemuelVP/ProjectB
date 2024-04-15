@@ -401,109 +401,111 @@ while (active)
                         }
                     }
                     break;
-            }
-
-            break;
-        case (MainMenuOptions)CustomerChoices.SeeMovies:
-            ReservationMenuOption option = ReservationMenuOption.MakeReservation; // Start with MakeReservation option
-            while (option != ReservationMenuOption.Back)
-            {
-                var schedules = ScheduleController.GetAvailableSchedules(startDate, endDate);
-
-                // Display available films
-                AnsiConsole.Write(
-                    new Rule(
-                        $"[blue]Beschikbare Films Van {nowDateTime} Tot {endDateTime}:[/]"
-                    ).RuleStyle("blue")
-                );
-                var choices = schedules
-                    .Select(s => $"{s.Film.Title} - {s.StartDate.ToString("dd-MM-yyyy HH:mm")}")
-                    .ToList();
-
-                var selectedMovieIndex = AnsiConsole.Prompt(
-                    new SelectionPrompt<string>().Title("Kies een film").AddChoices(choices)
-                );
-
-                // Get the selected schedule based on the selected movie
-                var selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
-                film = selectedSchedule.Film;
-                // Display the details of the selected movie
-                filmController.Display(film);
-
-                // Prompt the user to make a reservation or go back
-                option = AnsiConsole.Prompt(
-                    new SelectionPrompt<ReservationMenuOption>()
-                        .Title("Maak een keuze")
-                        .AddChoices(
-                            ReservationMenuOption.MakeReservation,
-                            ReservationMenuOption.Back
-                        )
-                );
-
-                if (option == ReservationMenuOption.MakeReservation)
+                case CustomerChoices.SeeMovies:
+                ReservationMenuOption option = ReservationMenuOption.MakeReservation; // Start with MakeReservation option
+                while (option != ReservationMenuOption.Back)
                 {
-                    var userName = AnsiConsole.Prompt(new TextPrompt<string>("Voer u naam in: "));
-                    var age = AnsiConsole.Prompt(new TextPrompt<int>("Voer uw leeftijd in: "));
-                    var ticketAge = new Ticket();
-                    ticketAge.CheckAge(film, age); // checks age against age movie
-                    AnsiConsole.Write(new Rule("[blue]Stoel Kosten[/]").RuleStyle("blue"));
+                    var schedules = ScheduleController.GetAvailableSchedules(startDate, endDate);
 
-                    // Display seat type options and prompt the user to choose
-                    var seatType = AnsiConsole.Prompt(
-                        new SelectionPrompt<string>()
-                            .Title("Kies u stoel")
-                            .AddChoices("Classic", "Loveseat", "Extrabeenruimte")
+                    // Display available films
+                    AnsiConsole.Write(
+                        new Rule(
+                            $"[blue]Beschikbare Films Van {nowDateTime} Tot {endDateTime}:[/]"
+                        ).RuleStyle("blue")
                     );
-                    int seatTypeInt = -1;
-                    Console.WriteLine(seatType);
-                    if (seatType == "Classic")
-                        seatTypeInt = 0;
-                    if (seatType == "Loveseat")
-                        seatTypeInt = 1;
-                    if (seatType == "Extrabeenruimte")
-                        seatTypeInt = 2;
+                    var choices = schedules
+                        .Select(s => $"{s.Film.Title} - {s.StartDate.ToString("dd-MM-yyyy HH:mm")}")
+                        .ToList();
 
-                    var availableSeats = ChairController.GetAvailableSeats(
-                        selectedSchedule.ID,
-                        selectedSchedule.Hall_ID,
-                        seatTypeInt
+                    var selectedMovieIndex = AnsiConsole.Prompt(
+                        new SelectionPrompt<string>().Title("Kies een film").AddChoices(choices)
                     );
 
-                    // Prompt the user to enter a seat number
-                    var seatNumber = AnsiConsole.Prompt(
-                        new SelectionPrompt<int>()
-                            .Title("Select a seat number")
-                            .AddChoices(availableSeats.Select(s => s.Position))
+                    // Get the selected schedule based on the selected movie
+                    var selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
+                    film = selectedSchedule.Film;
+                    // Display the details of the selected movie
+                    filmController.Display(film);
+
+                    // Prompt the user to make a reservation or go back
+                    option = AnsiConsole.Prompt(
+                        new SelectionPrompt<ReservationMenuOption>()
+                            .Title("Maak een keuze")
+                            .AddChoices(
+                                ReservationMenuOption.MakeReservation,
+                                ReservationMenuOption.Back
+                            )
                     );
-                    var selectedSeat = availableSeats.FirstOrDefault(s => s.Position == seatNumber);
-                    // Create ticket with selected schedule, user name, seat type, and seat number
 
-                    var ticket = new Ticket();
-                    // je moet hier of een zaal object meegeven of het aantal stoelen
-
-                    double price = ticket.GetSeatPrice(seatTypeInt, seatNumber, selectedSchedule); // Calculate ticket price based on seat type and number
-                    AnsiConsole.Write(new Rule($"[blue]Prijs: {price} euro[/]").RuleStyle("blue"));
-
-                    var confirmPurchase = AnsiConsole.Confirm(
-                        "Wil je de bestelling bevestigen?",
-                        false
-                    );
-                    if (confirmPurchase)
+                    if (option == ReservationMenuOption.MakeReservation)
                     {
-                        // Create the ticket
-                        double finalPrice = ticket.CreateTicket(
-                            selectedSchedule,
-                            selectedSeat.ID,
-                            film.ID,
-                            price
+                        var userName = AnsiConsole.Prompt(new TextPrompt<string>("Voer u naam in: "));
+                        var age = AnsiConsole.Prompt(new TextPrompt<int>("Voer uw leeftijd in: "));
+                        var ticketAge = new Ticket();
+                        ticketAge.CheckAge(film, age); // checks age against age movie
+                        AnsiConsole.Write(new Rule("[blue]Stoel Kosten[/]").RuleStyle("blue"));
+
+                        // Display seat type options and prompt the user to choose
+                        var seatType = AnsiConsole.Prompt(
+                            new SelectionPrompt<string>()
+                                .Title("Kies u stoel")
+                                .AddChoices("Classic", "Loveseat", "Extrabeenruimte")
                         );
-                        Ticket.DisplayTicketDetails(ticket, selectedSeat, finalPrice);
-                    }
-                    break;
+                        int seatTypeInt = -1;
+                        Console.WriteLine(seatType);
+                        if (seatType == "Classic")
+                            seatTypeInt = 0;
+                        if (seatType == "Loveseat")
+                            seatTypeInt = 1;
+                        if (seatType == "Extrabeenruimte")
+                            seatTypeInt = 2;
+
+                        var availableSeats = ChairController.GetAvailableSeats(
+                            selectedSchedule.ID,
+                            selectedSchedule.Hall_ID,
+                            seatTypeInt
+                        );
+
+                        // Prompt the user to enter a seat number
+                        var seatNumber = AnsiConsole.Prompt(
+                            new SelectionPrompt<int>()
+                                .Title("Select a seat number")
+                                .AddChoices(availableSeats.Select(s => s.Position))
+                        );
+                        var selectedSeat = availableSeats.FirstOrDefault(s => s.Position == seatNumber);
+                        // Create ticket with selected schedule, user name, seat type, and seat number
+
+                        var ticket = new Ticket();
+                        // je moet hier of een zaal object meegeven of het aantal stoelen
+
+                        double price = ticket.GetSeatPrice(seatTypeInt, seatNumber, selectedSchedule); // Calculate ticket price based on seat type and number
+                        AnsiConsole.Write(new Rule($"[blue]Prijs: {price} euro[/]").RuleStyle("blue"));
+
+                        var confirmPurchase = AnsiConsole.Confirm(
+                            "Wil je de bestelling bevestigen?",
+                            false
+                        );
+                        if (confirmPurchase)
+                        {
+                            // Create the ticket
+                            double finalPrice = ticket.CreateTicket(
+                                selectedSchedule,
+                                selectedSeat.ID,
+                                film.ID,
+                                price
+                            );
+                            Ticket.DisplayTicketDetails(ticket, selectedSeat, finalPrice);
+                        }
+                        break;
             }
             break;
     }
     break;
+        
+    }
+
+    break;
+        
     }
 }
 
