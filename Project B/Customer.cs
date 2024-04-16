@@ -14,15 +14,23 @@ public class Customer
     }
     private void SetSelectedCustomerOption()
     {
+        var choices = new List<CustomerChoices>{
+            CustomerChoices.Inloggen,
+            CustomerChoices.FilmZoeken,
+                    CustomerChoices.Films,
+                    CustomerChoices.Back
+                    };
+        if (User.LoggedIn)
+        {
+            choices.Remove(CustomerChoices.Inloggen);
+            choices.Add(CustomerChoices.SeeUserStats);
+            choices.Add(CustomerChoices.LogOut);
+        }
         SelectedCustomerOption = AnsiConsole.Prompt(
             new SelectionPrompt<CustomerChoices>()
                 .Title($"[blue]Welkom {User.Name} wat wilt u doen?[/]")
                 .AddChoices(
-                    CustomerChoices.FilmZoeken,
-                    CustomerChoices.Films,
-                    CustomerChoices.SeeUserStats,
-                    CustomerChoices.LogOut,
-                    CustomerChoices.Back
+                    choices
                 )
         );
     }
@@ -75,7 +83,7 @@ public class Customer
             new Rule("[blue]Gebruiker is aangemaakt[/]").RuleStyle("blue")
         );
     }
-    private static void FilmZoeken()
+    private void FilmZoeken()
     {
         DateTime startDate = DateTime.Now;
         DateTime endDate = DateTime.Now.AddDays(28);
@@ -85,11 +93,7 @@ public class Customer
 
         if (searchSchedules.Count > 0)
         {
-            var choices = searchSchedules.Select(s => $"{s.Film.Title} - {s.StartDate.ToString("dd-MM-yyyy HH:mm")}").ToList();
-
-            var selectedMovieIndex = AnsiConsole.Prompt(
-                new SelectionPrompt<string>().Title("Kies een film").AddChoices(choices)
-            );
+            FilmTicketKopen();
 
         }
         else
@@ -120,10 +124,9 @@ public class Customer
     }
     private void FilmsBekijken()
     {
-        Film film = new();
+        
         DateTime startDate = DateTime.Now;
         DateTime endDate = DateTime.Now.AddDays(28);
-        var schedules = ScheduleController.GetAvailableSchedules(startDate, endDate);
         ReservationMenuOption selectedReservationOption = ReservationMenuOption.MakeReservation; // Start with MakeReservation option
         while (selectedReservationOption != ReservationMenuOption.Back)
         {
@@ -133,7 +136,17 @@ public class Customer
                     $"[blue]Beschikbare Films Van {startDate.Date.ToShortDateString()} Tot {endDate.Date.ToShortDateString()}:[/]"
                 ).RuleStyle("blue")
             );
-            var choices = schedules
+            FilmTicketKopen();
+        }
+    }
+    private void FilmTicketKopen()
+    {
+        ReservationMenuOption selectedReservationOption = ReservationMenuOption.MakeReservation; // Start with MakeReservation option
+        DateTime startDate = DateTime.Now;
+        DateTime endDate = DateTime.Now.AddDays(28);
+        var schedules = ScheduleController.GetAvailableSchedules(startDate, endDate);
+        Film film = new();
+        var choices = schedules
                 .Select(s => $"{s.Film.Title} - {s.StartDate.ToString("dd-MM-yyyy HH:mm")}")
                 .ToList();
 
@@ -204,7 +217,6 @@ public class Customer
                 {
                     Console.WriteLine("Seat not found, try again!");
                     selectedReservationOption = ReservationMenuOption.Back;
-                    continue;
                 }
                 // Create ticket with selected schedule, user name, seat type, and seat number
 
@@ -238,7 +250,6 @@ public class Customer
                     AnsiConsole.Write(new Rule($"[blue]Totaal bedrag: {totalPrice} euro[/]").RuleStyle("blue"));
                 }
             }
-        }
     }
     public enum CustomerChoices
     {

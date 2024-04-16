@@ -125,7 +125,6 @@ public class Ticket
         }
         AnsiConsole.Write(new Rule($"[blue]Ticket Informatie [/]").RuleStyle("blue"));
         Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"Ticket ID: {ticket.ID}");
         Console.WriteLine($"Stoel type: {stoelType}");
         Console.WriteLine($"Stoel nummer: {chair.Position}");
         Console.WriteLine($"Prijs: {price} euro");
