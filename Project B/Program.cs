@@ -1,8 +1,10 @@
-﻿using Spectre.Console;
+﻿using System.Diagnostics.CodeAnalysis;
+using Spectre.Console;
 Film film = new Film();
 FilmController filmController = new FilmController();
 Users admin = new Users();
 AdminController adminController = new AdminController();
+Schedule schedule = new Schedule();
 bool active = true;
 DateTime startDate = DateTime.Now;
 DateTime endDate = DateTime.Now.AddDays(28);
@@ -93,7 +95,6 @@ while (active)
                                 var selectedHallName = AnsiConsole.Prompt(new SelectionPrompt<string>().AddChoices(hallNames));
                                 var selectedHall = hallsController.GetByName(selectedHallName);
                                 if (selectedHall == null) break;
-                                var schedule = new Schedule();
                                 schedule.CreateFromFilm(selectedMovie, selectedHall.ID, date);
 
                                 Console.ReadKey();
@@ -134,9 +135,40 @@ while (active)
                 // Get the selected schedule based on the selected movie
                 var selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
                 film = selectedSchedule.Film;
+
+
+                var selectedScheduleId = selectedSchedule.ID;
+                
+                //checks if the tickets are sold out for the choisen schedule
+                while (schedule.CountTickets(selectedScheduleId))
+                {
+                    AnsiConsole.Write("the movie you have selected is sold out please choose a different date");
+
+                    choices.Clear();
+
+                    var availableMoviesList = schedule.DisplayAvailableMovies(selectedScheduleId);
+                    foreach (var schedule1 in availableMoviesList)
+                    {   
+                
+                        var choice = $" {schedule1.Item1} - {schedule1.Item2.ToString("dd-MM-yyyy HH:mm")} - {schedule1.Item3.ToString("dd-MM-yyyy HH:mm")}";
+                        choices.Add(choice);
+                        
+                    }
+                            
+                    selectedMovieIndex = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Kies een film").AddChoices(choices));
+
+                    // Get the selected schedule based on the selected movie
+                    selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
+                    film = selectedSchedule.Film;
+
+                }
+            
+                
                 // Display the details of the selected movie
                 filmController.Display(film);
-
+                
+                
+                
                 // Prompt the user to make a reservation or go back
                 option = AnsiConsole.Prompt(new SelectionPrompt<ReservationMenuOption>().Title("Maak een keuze").AddChoices(ReservationMenuOption.MakeReservation, ReservationMenuOption.Back));
 

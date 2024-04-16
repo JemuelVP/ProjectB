@@ -32,4 +32,82 @@ public class Schedule
         var entry = db.Schedule.Add(this);
         db.SaveChanges();
     }
+        public static int GetTotalTicketsPerMovie(int movieID)
+    {
+        using DataBaseConnection db = new();
+        var totalTicket = db.Ticket.Where(t => t.Movie_ID == movieID).Count();
+        return totalTicket;
+    }
+    public bool CountTickets (int schedule_id)
+    {   
+        DataBaseConnection db = new DataBaseConnection();
+        var count = db.Ticket.Where(s=> s.Schedule_ID == schedule_id).Count();
+        //var getschedule = db.Ticket.Where(s => s.Schedule_ID == schedule_id);
+    
+
+        var getHallID = db.Schedule.Where(s => s.ID == schedule_id).Select(s => s.Hall_ID).FirstOrDefault();
+
+        if (getHallID == 1)
+        {
+            if (count >= 150)
+            {
+                return true;
+            }
+            else 
+            {
+                return false;
+            }
+        }
+        else if (getHallID == 2)
+        {
+            if (count >= 300)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+        
+            if (count >= 500)
+            {
+                return true;
+            }
+            else 
+            {
+                return false;
+            }
+        }
+        
+    }
+
+    public List<(string, DateTime, DateTime)> DisplayAvailableMovies (int schedule_id)
+    {
+        DataBaseConnection db = new DataBaseConnection();
+        // 
+        var MatchingScheduleId = db.Schedule.FirstOrDefault(s => s.ID == schedule_id);
+        var matchingMovieID = MatchingScheduleId.Movie_ID;
+
+        if (MatchingScheduleId != null)
+        {   
+            var availableMoviesList = (from schedule in db.Schedule
+                                    join movie in db.Movie on schedule.Movie_ID equals movie.ID
+                                    where schedule.Movie_ID == matchingMovieID
+                                    select new { FilmTitle = movie.Title, ScheduleStartDate = schedule.StartDate, ScheduleEndDate = schedule.EndDate })
+                                    .ToList();
+
+            // Convert the result to the desired format
+            var formattedList = availableMoviesList.Select(item => (item.FilmTitle, item.ScheduleStartDate, item.ScheduleEndDate )).ToList();
+
+
+
+            return formattedList;
+        }
+       
+        return null;
+    }
 }
+

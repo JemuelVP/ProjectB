@@ -1,3 +1,4 @@
+using System.Data.Entity.Core.Common.CommandTrees;
 using Spectre.Console;
 public class FilmController
 {
@@ -14,6 +15,14 @@ public class FilmController
         var filmInfo = db.Movie.FirstOrDefault(film => film.Categories == categories);
         return filmInfo;
     }
+
+    public static Film? GetMovieByTitle (string title)
+    {
+        using var db = new DataBaseConnection();
+        var filmInfo = db.Movie.FirstOrDefault(film => film.Title == title);
+        return filmInfo;
+    }
+
     public void Display(Film film)
     {
         AnsiConsole.Write(new Rule("[green]Film Informatie[/]").RuleStyle("green"));
