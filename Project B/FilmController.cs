@@ -8,7 +8,7 @@ public class FilmController
         var films = db.Movie.ToList();
         return films;
     }
-    public static List<Schedule> GetAllMoviesByMo(string cat, DateTime startDate, DateTime endDate)
+    public static List<Schedule> GetMovieByCategory(string cat, DateTime startDate, DateTime endDate)
     {
         using DataBaseConnection db = new();
         var schedules = db.Schedule.
@@ -21,13 +21,6 @@ public class FilmController
             db.Entry(f).Reference(f => f.Film).Load();
         }
         return schedules;
-    }
-
-    public static List<Film> GetMovieByCategory(string category)
-    {
-        using DataBaseConnection db = new();
-        var MovieInfo = db.Movie.Where(Movie => Movie.Categories.ToLower() == category).ToList();
-        return MovieInfo;
     }
 
     public void Display(Film film)

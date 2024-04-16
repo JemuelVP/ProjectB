@@ -124,43 +124,6 @@ public class Ticket
         Console.WriteLine($"Prijs: {price} euro");
         Console.ResetColor();
     }
-    public static void GetBoughtTicket(int schedule_ID, int hall_ID)
-    {
-        using (DataBaseConnection db = new DataBaseConnection())
-        {
-            var ticketInfo = db.Ticket
-                            .Join(db.Schedule,
-                                    ticket => ticket.Schedule_ID,
-                                    schedule => schedule.ID,
-                                    (ticket, schedule) => new
-                                    {
-                                        Ticket = ticket,
-                                        HallID = schedule.Hall_ID
-                                    })
-                            .FirstOrDefault(t => t.Ticket.Schedule_ID == schedule_ID);
-
-            if (ticketInfo != null)
-            {
-                int ticketCount = db.Ticket.Count(t => t.Schedule_ID == schedule_ID);
-            
-                if (ticketCount >= 10)
-                {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("U heeft meer dan 10 tickets bij ons gekocht!");
-                    Console.WriteLine("Hier een kortingscode voor de volgende bestelling: BIG10");
-                    Console.ResetColor();
-                }
-                
-                // Access the hall_ID
-                int selectedHallID = ticketInfo.HallID;
-            }
-            else
-            {
-                Console.WriteLine("No ticket found for the provided schedule ID.");
-            }
-        }
-    }
-
 
     public static void SeeUserStats(int userID)
     {
