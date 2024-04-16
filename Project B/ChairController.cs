@@ -28,6 +28,29 @@ class ChairController
 
         return chairs;
     }
-    
+    public static List<List<Chair>> GetAvailableAdjecentSeats(int amountOfChairs, int scheduleId, int hallId, int seatType)
+    {
+        // check if amount chairs and amount positions conjoined is available
+        List<List<Chair>> availableGroupSeatsToReturn = new(); 
+        var availableSeats = GetAvailableSeats(scheduleId, hallId, seatType);
+        availableSeats.OrderBy(item => item.Position);
+        for(int pos = 0; pos < availableSeats.Count; pos++)
+        {
+            var chair = availableSeats[pos];
 
+                var nextChair = availableSeats[pos+amountOfChairs];
+                if (nextChair.Position == chair.Position + amountOfChairs)
+                {
+                    List<Chair> row = new();
+                    //get the row of available chairs
+                    for(int i = 0; i < amountOfChairs; i++ )
+                    {
+                        row.Add(availableSeats[pos+i]);
+                    }
+                    //add to the list of rows with availeable chairs
+                    availableGroupSeatsToReturn.Add(row);
+                } 
+        }
+        return availableGroupSeatsToReturn;
+    }
 }

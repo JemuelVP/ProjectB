@@ -305,9 +305,9 @@ while (active)
                                         );
 
                                         // Display seat type options and prompt the user to choose
-                                        var seatType = AnsiConsole.Prompt(
+                                        string seatType = AnsiConsole.Prompt(
                                             new SelectionPrompt<string>()
-                                                .Title("Kies u stoel")
+                                                .Title("Kies uw stoel")
                                                 .AddChoices(
                                                     "Classic",
                                                     "Loveseat",
@@ -323,12 +323,16 @@ while (active)
                                         if (seatType == "Extrabeenruimte")
                                             seatTypeInt = 2;
 
-                                        var availableSeats = ChairController.GetAvailableSeats(
+                                        List<Chair> availableSeats = ChairController.GetAvailableSeats(
                                             selectedSchedule.ID,
                                             selectedSchedule.Hall_ID,
                                             seatTypeInt
                                         );
-
+                                        Console.WriteLine("How many seats do you want to reserve");
+                                        int amountOfChairs = Convert.ToInt32(Console.ReadLine());
+                                        List<List<Chair>> availableGroupSeats = ChairController.GetAvailableAdjecentSeats(amountOfChairs, selectedSchedule.ID,
+                                            selectedSchedule.Hall_ID,
+                                            seatTypeInt);
                                         // Prompt the user to enter a seat number
                                         var seatNumber = AnsiConsole.Prompt(
                                             new SelectionPrompt<int>()
