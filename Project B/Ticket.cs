@@ -24,7 +24,14 @@ public class Ticket
         User_ID = userId ?? 0; // Assign User_ID if it's provided, otherwise use 0 or any other default value
 
         using DataBaseConnection db = new();
-        var entry = db.Ticket.Add(this);
+        var entry = db.Ticket.Add(new Ticket
+        {
+            Schedule_ID = schedule.ID,
+            Chair_ID = chair_ID,
+            Movie_ID = movieId,
+            Price = price,
+            User_ID = userId ?? 0
+        });
         db.SaveChanges();
 
         return price;
@@ -101,7 +108,7 @@ public class Ticket
         }
     }
 
-    public static void DisplayTicketDetails(Ticket ticket,Chair chair, double price)
+    public static void DisplayTicketDetails(Ticket ticket, Chair chair, double price)
     {
         string stoelType;
         switch (chair.SeatType)
