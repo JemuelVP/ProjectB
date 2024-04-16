@@ -15,16 +15,24 @@ public class Customer
     private void SetSelectedCustomerOption()
     {
         var choices = new List<CustomerChoices>{
+            CustomerChoices.AccountAanmaken,
             CustomerChoices.Inloggen,
             CustomerChoices.FilmZoeken,
-                    CustomerChoices.Films,
-                    CustomerChoices.Back
-                    };
+            CustomerChoices.Films,
+            CustomerChoices.Back
+            };
         if (User.LoggedIn)
         {
+            choices.Remove(CustomerChoices.AccountAanmaken);
             choices.Remove(CustomerChoices.Inloggen);
+            choices.Remove(CustomerChoices.FilmZoeken);
+            choices.Remove(CustomerChoices.Films);
+            choices.Remove(CustomerChoices.Back);
+            choices.Add(CustomerChoices.FilmZoeken);
+            choices.Add(CustomerChoices.Films);
             choices.Add(CustomerChoices.SeeUserStats);
             choices.Add(CustomerChoices.LogOut);
+            choices.Add(CustomerChoices.Back);
         }
         SelectedCustomerOption = AnsiConsole.Prompt(
             new SelectionPrompt<CustomerChoices>()
