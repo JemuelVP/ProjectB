@@ -16,9 +16,12 @@ public class ScheduleController
                 db.Entry(s).Reference(s => s.Film).Load();
 
                 // Define hall capacities based on hall ID
-                int hallCapacity = 150;
+                int hallCapacity = 0;
                 switch (s.Hall_ID)
                 {
+                    case 1: // Hall 2
+                        hallCapacity = 150;
+                        break;
                     case 2: // Hall 2
                         hallCapacity = 300;
                         break;
