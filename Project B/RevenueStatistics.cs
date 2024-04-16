@@ -1,3 +1,4 @@
+using Spectre.Console;
 class RevenueStatistics
 {
     public void GetTotalRevenue()
@@ -10,7 +11,8 @@ class RevenueStatistics
         {
             totalRevenue += ticket.Price;
         }
-        Console.WriteLine($"Totale omzet: {totalRevenue}");
+        Console.ForegroundColor = ConsoleColor.Blue;
+        AnsiConsole.WriteLine($"Totale omzet: {totalRevenue}");
     }
     public static double GetTotalPricePerMovie(int movieID)
     {
