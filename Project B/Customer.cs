@@ -67,6 +67,7 @@ public class Customer
                     FilmsBekijken();
                     break;
                 case CustomerChoices.SeeUserStats:
+                    User = new Users();
                     Ticket.SeeUserStats(User.ID);
                     break;
                 case CustomerChoices.LogOut:
@@ -107,7 +108,7 @@ public class Customer
         }
         else
         {
-            Console.WriteLine($"No movies found for category '{MovieSearch}'.");
+            Console.WriteLine($"Geen films gevonden voor '{MovieSearch}'.");
             Console.ReadLine();
         }
     }
@@ -116,7 +117,6 @@ public class Customer
         var customerName = AnsiConsole.Prompt(new TextPrompt<string>("Voer je gebruikersnaam in: "));
         var customerPassword = AnsiConsole.Prompt(new TextPrompt<string>("Voer je wachtwoord in: ").Secret());
         User.UserLogin(customerName, customerPassword);
-        AnsiConsole.Write(new Rule("[blue]Succesvol ingelogd[/]").RuleStyle("blue"));
 
     }
     private void Uitloggen()
@@ -150,6 +150,7 @@ public class Customer
     }
     private void FilmTicketKopen()
     {
+        Console.Clear();
         ReservationMenuOption selectedReservationOption = ReservationMenuOption.MakeReservation; // Start with MakeReservation option
         DateTime startDate = DateTime.Now;
         DateTime endDate = DateTime.Now.AddDays(28);
@@ -282,8 +283,8 @@ public class Customer
                         }
                     }
 
-               
             }
+            
     }
     public enum CustomerChoices
     {
