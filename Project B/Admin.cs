@@ -20,25 +20,28 @@ public class Admin
     }
     private void SetSelectedAdminOption()
     {
+        
+        var choices = new List<AdminChoices>
+        {
+            AdminChoices.FilmToevoegen,
+            AdminChoices.GeplandeFilms,
+            AdminChoices.FilmsOverZicht,
+            AdminChoices.Omzet,
+            AdminChoices.UitLoggen,
+            AdminChoices.Back
+        };
         SelectedAdminOption = AnsiConsole.Prompt(
             new SelectionPrompt<AdminChoices>()
                 .Title($"[blue]Welkom {admin.Name} wat wilt u doen?[/]")
                 .AddChoices(
-                    AdminChoices.FilmToevoegen,
-                    AdminChoices.GeplandeFilms,
-                    AdminChoices.FilmsOverZicht,
-                    AdminChoices.Omzet,
-                    AdminChoices.UitLoggen,
-                    AdminChoices.Back
+                    choices
                 )
         );
     }
     public void Run()
     {
-        Console.WriteLine("Voer je naam in");
-        string? name = Console.ReadLine();
-        Console.WriteLine("Voer je wachtwoord in");
-        string? password = Console.ReadLine();
+        var name = AnsiConsole.Prompt(new TextPrompt<string>("Voer je gebruikersnaam in: "));
+        var password = AnsiConsole.Prompt(new TextPrompt<string>("Voer je wachtwoord in: ").Secret());
         admin.Login(name, password);
         while (true)
         {
@@ -46,6 +49,18 @@ public class Admin
             if (SelectedAdminOption == AdminChoices.Back)
             {
                 break;
+            }
+            if (SelectedAdminOption == AdminChoices.UitLoggen)
+            {
+                            var choice = AnsiConsole.Prompt(
+            new SelectionPrompt<Logout>()
+                .Title("[red]Weet je zeker dat je wilt uitloggen?[/]")
+                .AddChoices(Logout.Yes, Logout.No)
+            );
+            if (choice == Logout.Yes)
+            {
+                break;
+            }
             }
             switch (SelectedAdminOption)
             {
@@ -60,9 +75,6 @@ public class Admin
                     break;
                 case AdminChoices.Omzet:
                     Omzet();
-                    break;
-                case AdminChoices.UitLoggen:
-                    UitLoggen();
                     break;
             }
         }
@@ -188,9 +200,9 @@ public class Admin
                 .Title("[red]Weet je zeker dat je wilt uitloggen?[/]")
                 .AddChoices(Logout.Yes, Logout.No)
         );
-        if (choice == Logout.Yes)
+        while (choice == Logout.Yes)
         {
-            admin = new Users();
+            break;
         }
     }
     public enum AdminChoices
