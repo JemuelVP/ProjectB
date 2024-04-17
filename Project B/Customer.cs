@@ -217,7 +217,7 @@ public class Customer
                 // Prompt the user to enter a seat number
                 var selectedSeatNumbers = AnsiConsole.Prompt(
                     new MultiSelectionPrompt<int>()
-                        .Title("Select seats")
+                        .Title("Selecteer stoel/en")
                         .AddChoices(availableSeats.Select(s => s.Position))
                 );
                 var sortedSeatNumbers = selectedSeatNumbers.OrderBy(x => x).ToList();
@@ -235,7 +235,9 @@ public class Customer
 
                     if (!areSeatsAdjacent)
                     {
-                        Console.WriteLine("Selected seats are not adjacent. Please select adjacent seats.");
+                        AnsiConsole.Write(
+                            new Rule($"[blue]Geselecteerde zitplaatsen liggen niet naast elkaar. Selecteer aangrenzende zitplaatsen.[/]").RuleStyle("blue")
+                        );
                         selectedReservationOption = ReservationMenuOption.Back;
                     }
                     else
@@ -243,7 +245,9 @@ public class Customer
                         var selectedSeats = availableSeats.Where(s => selectedSeatNumbers.Contains(s.Position));
                         if (selectedSeats == null)
                         {
-                            Console.WriteLine("Seat not found, try again!");
+                            AnsiConsole.Write(
+                            new Rule($"[blue]Stoel niet gevonden, probeer het opnieuw![/]").RuleStyle("blue")
+                            );
                             selectedReservationOption = ReservationMenuOption.Back;
                         }
                         // Create ticket with selected schedule, user name, seat type, and seat number
