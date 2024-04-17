@@ -212,51 +212,76 @@ public class Customer
                     selectedSchedule.Hall_ID,
                     seatTypeInt
                 );
-
+                while (true)
+                {
                 // Prompt the user to enter a seat number
-                var seatNumbers = AnsiConsole.Prompt(
+                var selectedSeatNumbers = AnsiConsole.Prompt(
                     new MultiSelectionPrompt<int>()
                         .Title("Select seats")
                         .AddChoices(availableSeats.Select(s => s.Position))
                 );
+                var sortedSeatNumbers = selectedSeatNumbers.OrderBy(x => x).ToList();
 
-                var selectedSeats = availableSeats.Where(s => seatNumbers.Contains(s.Position));
-                if (selectedSeats == null)
-                {
-                    Console.WriteLine("Seat not found, try again!");
-                    selectedReservationOption = ReservationMenuOption.Back;
-                }
-                // Create ticket with selected schedule, user name, seat type, and seat number
-
-                var ticket = new Ticket();
-                // je moet hier of een zaal object meegeven of het aantal stoelen
-                foreach (var seat in selectedSeats)
-                {
-                    var seatPrice = ticket.GetSeatPrice(seatTypeInt, seat.Position, selectedSchedule);
-                    AnsiConsole.Write(new Rule($"[blue]Prijs: {seatPrice} euro[/]").RuleStyle("blue"));
-                }
-
-                var confirmPurchase = AnsiConsole.Confirm(
-                    "Wil je de bestelling bevestigen?",
-                    false
-                );
-                if (confirmPurchase)
-                {
-                    double totalPrice = 0;
-                    foreach (var seat in selectedSeats)
+                // Check if the selected seats are adjacent
+                    bool areSeatsAdjacent = true;
+                    for (int i = 0; i < sortedSeatNumbers.Count - 1; i++)
                     {
-                        // Create the ticket
-                        double finalPrice = ticket.CreateTicket(
-                            selectedSchedule,
-                            seat.ID,
-                            film.ID,
-                            ticket.GetSeatPrice(seatTypeInt, seat.Position, selectedSchedule)
-                        );
-                        totalPrice += finalPrice;
-                        Ticket.DisplayTicketDetails(ticket, seat, finalPrice);
+                        if (sortedSeatNumbers[i + 1] != sortedSeatNumbers[i] + 1)
+                        {
+                            areSeatsAdjacent = false;
+                            break;
+                        }
                     }
-                    AnsiConsole.Write(new Rule($"[blue]Totaal bedrag: {totalPrice} euro[/]").RuleStyle("blue"));
-                }
+
+                    if (!areSeatsAdjacent)
+                    {
+                        Console.WriteLine("Selected seats are not adjacent. Please select adjacent seats.");
+                        selectedReservationOption = ReservationMenuOption.Back;
+                    }
+                    else
+                    {
+                        var selectedSeats = availableSeats.Where(s => selectedSeatNumbers.Contains(s.Position));
+                        if (selectedSeats == null)
+                        {
+                            Console.WriteLine("Seat not found, try again!");
+                            selectedReservationOption = ReservationMenuOption.Back;
+                        }
+                        // Create ticket with selected schedule, user name, seat type, and seat number
+
+                        var ticket = new Ticket();
+                        // je moet hier of een zaal object meegeven of het aantal stoelen
+                        foreach (var seat in selectedSeats)
+                        {
+                            var seatPrice = ticket.GetSeatPrice(seatTypeInt, seat.Position, selectedSchedule);
+                            AnsiConsole.Write(new Rule($"[blue]Prijs: {seatPrice} euro[/]").RuleStyle("blue"));
+                        }
+
+                        var confirmPurchase = AnsiConsole.Confirm(
+                            "Wil je de bestelling bevestigen?",
+                            false
+                        );
+                        if (confirmPurchase)
+                        {
+                            double totalPrice = 0;
+                            foreach (var seat in selectedSeats)
+                            {
+                                // Create the ticket
+                                double finalPrice = ticket.CreateTicket(
+                                    selectedSchedule,
+                                    seat.ID,
+                                    film.ID,
+                                    ticket.GetSeatPrice(seatTypeInt, seat.Position, selectedSchedule)
+                                );
+                                totalPrice += finalPrice;
+                                Ticket.DisplayTicketDetails(ticket, seat, finalPrice);
+                            }
+                            AnsiConsole.Write(new Rule($"[blue]Totaal bedrag: {totalPrice} euro[/]").RuleStyle("blue"));
+                        }
+                        break;
+                        }
+                    }
+
+               
             }
     }
     public enum CustomerChoices
