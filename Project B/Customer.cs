@@ -28,6 +28,7 @@ public class Customer
             choices.Remove(CustomerChoices.FilmZoeken);
             choices.Remove(CustomerChoices.Films);
             choices.Remove(CustomerChoices.Back);
+            AnsiConsole.Write(new Rule("[blue]Succesvol ingelogd[/]").RuleStyle("blue"));
             choices.Add(CustomerChoices.FilmZoeken);
             choices.Add(CustomerChoices.Films);
             choices.Add(CustomerChoices.SeeUserStats);
@@ -106,7 +107,7 @@ public class Customer
         }
         else
         {
-            Console.WriteLine($"No movies found for category '{MovieSearch}'.");
+            Console.WriteLine($"Geen films gevonden voor '{MovieSearch}'.");
             Console.ReadLine();
         }
     }
@@ -115,7 +116,6 @@ public class Customer
         var customerName = AnsiConsole.Prompt(new TextPrompt<string>("Voer je gebruikersnaam in: "));
         var customerPassword = AnsiConsole.Prompt(new TextPrompt<string>("Voer je wachtwoord in: ").Secret());
         User.UserLogin(customerName, customerPassword);
-        AnsiConsole.Write(new Rule("[blue]Succesvol ingelogd[/]").RuleStyle("blue"));
 
     }
     private void Uitloggen()
@@ -145,8 +145,10 @@ public class Customer
                 ).RuleStyle("blue")
             );
             FilmTicketKopen();
+            break;
         }
     }
+
     private void FilmTicketKopen()
     {
         ReservationMenuOption selectedReservationOption = ReservationMenuOption.MakeReservation; // Start with MakeReservation option
@@ -274,7 +276,8 @@ public class Customer
                                     selectedSchedule,
                                     seat.ID,
                                     film.ID,
-                                    ticket.GetSeatPrice(seatTypeInt, seat.Position, selectedSchedule)
+                                    ticket.GetSeatPrice(seatTypeInt, seat.Position, selectedSchedule),
+                                    User.ID
                                 );
                                 totalPrice += finalPrice;
                                 Ticket.DisplayTicketDetails(ticket, seat, finalPrice);
@@ -283,11 +286,12 @@ public class Customer
                         }
                         break;
                         }
-                    }
+                }
 
-               
             }
+            
     }
+    
     public enum CustomerChoices
     {
         AccountAanmaken,
