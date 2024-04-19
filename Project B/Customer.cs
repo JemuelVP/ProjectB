@@ -67,7 +67,6 @@ public class Customer
                     FilmsBekijken();
                     break;
                 case CustomerChoices.SeeUserStats:
-                    User = new Users();
                     Ticket.SeeUserStats(User.ID);
                     break;
                 case CustomerChoices.LogOut:
@@ -146,11 +145,12 @@ public class Customer
                 ).RuleStyle("blue")
             );
             FilmTicketKopen();
+            break;
         }
     }
+
     private void FilmTicketKopen()
     {
-        Console.Clear();
         ReservationMenuOption selectedReservationOption = ReservationMenuOption.MakeReservation; // Start with MakeReservation option
         DateTime startDate = DateTime.Now;
         DateTime endDate = DateTime.Now.AddDays(28);
@@ -237,7 +237,7 @@ public class Customer
 
                     if (!areSeatsAdjacent)
                     {
-                        Console.WriteLine("Selected seats are not adjacent. Please select adjacent seats.");
+                        Console.WriteLine("Geselecteerde zitplaatsen liggen niet naast elkaar. Selecteer aangrenzende zitplaatsen.");
                         selectedReservationOption = ReservationMenuOption.Back;
                     }
                     else
@@ -245,7 +245,7 @@ public class Customer
                         var selectedSeats = availableSeats.Where(s => selectedSeatNumbers.Contains(s.Position));
                         if (selectedSeats == null)
                         {
-                            Console.WriteLine("Seat not found, try again!");
+                            Console.WriteLine("Stoel niet gevonden, probeer het opnieuw!");
                             selectedReservationOption = ReservationMenuOption.Back;
                         }
                         // Create ticket with selected schedule, user name, seat type, and seat number
@@ -272,7 +272,8 @@ public class Customer
                                     selectedSchedule,
                                     seat.ID,
                                     film.ID,
-                                    ticket.GetSeatPrice(seatTypeInt, seat.Position, selectedSchedule)
+                                    ticket.GetSeatPrice(seatTypeInt, seat.Position, selectedSchedule),
+                                    User.ID
                                 );
                                 totalPrice += finalPrice;
                                 Ticket.DisplayTicketDetails(ticket, seat, finalPrice);
@@ -281,11 +282,12 @@ public class Customer
                         }
                         break;
                         }
-                    }
+                }
 
             }
             
     }
+    
     public enum CustomerChoices
     {
         AccountAanmaken,
