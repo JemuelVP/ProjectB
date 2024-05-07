@@ -173,10 +173,9 @@ public class Customer
             // Get the selected schedule based on the selected movie
             var selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
 
-                              
         var newChoices = AllSchedules.Where(s => s.Film.Title == selectedSchedule.Film.Title)
-                                     .Select(s => $"{s.Film.Title} - {s.StartDate.ToString("dd-MM-yyyy HH:mm")}")
-                                     .ToList();
+                                    .Select(s => $"{s.Film.Title} - {s.StartDate.ToString("dd-MM-yyyy HH:mm")}")
+                                    .ToList();
             
             var newSelectedSchedules = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Kies een datum").AddChoices(newChoices));
 
