@@ -266,9 +266,10 @@ public class Customer
 
                         var ticket = new Ticket();
                         // je moet hier of een zaal object meegeven of het aantal stoelen
+                        bool qualifyForDiscount = Ticket.UserTicketDiscount(User.ID);
                         foreach (var seat in selectedSeats)
                         {
-                            var seatPrice = ticket.GetSeatPrice(seatTypeInt, seat.Position, selectedSchedule);
+                            var seatPrice = ticket.GetSeatPrice(seatTypeInt, seat.Position, selectedSchedule, qualifyForDiscount);
                             AnsiConsole.Write(new Rule($"[blue]Prijs: {seatPrice} euro[/]").RuleStyle("blue"));
                         }
 
@@ -286,7 +287,7 @@ public class Customer
                                     selectedSchedule,
                                     seat.ID,
                                     film.ID,
-                                    ticket.GetSeatPrice(seatTypeInt, seat.Position, selectedSchedule),
+                                    ticket.GetSeatPrice(seatTypeInt, seat.Position, selectedSchedule, qualifyForDiscount),
                                     User.ID
                                 );
                                 totalPrice += finalPrice;

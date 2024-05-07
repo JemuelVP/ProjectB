@@ -1,6 +1,6 @@
 public class UserController
 {
-    public void CreateUser(string name, string password, int Isadmin = 1)
+    public void CreateUser(string name, string password, int Isadmin = 1, bool discountReceived = false)
     {
         using DataBaseConnection db = new();
         var newUser = new Users
