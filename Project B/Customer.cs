@@ -182,7 +182,17 @@ public class Customer
 
             if (selectedReservationOption == ReservationMenuOption.MakeReservation)
             {
-                var userName = AnsiConsole.Prompt(new TextPrompt<string>("Voer u naam in: "));
+                // checks if user is logged in and username is excists
+                // asks for user name only when not logged in
+                string userName;
+                if (User.LoggedIn && !string.IsNullOrWhiteSpace(User.Name))
+                {
+                    userName = User.Name;
+                }
+                else
+                {
+                    AnsiConsole.Prompt(new TextPrompt<string>("Voer uw naam in: "));
+                }
                 var age = AnsiConsole.Prompt(new TextPrompt<int>("Voer uw leeftijd in: "));
                 var ticketAge = new Ticket();
                 ticketAge.CheckAge(film, age); // checks age against age movie
