@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.IO;
 
 class DataBaseConnection : DbContext
 {
@@ -22,7 +24,10 @@ class DataBaseConnection : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        var databasePath = Path.GetFullPath("../../../DataBase\\movie.sqlite");
+        var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        var projectDirectory = new DirectoryInfo(baseDirectory).Parent?.Parent?.Parent;
+
+        var databasePath = Path.Combine(projectDirectory.FullName, "DataBase", "movie.sqlite");
         optionsBuilder.UseSqlite($"Data Source={databasePath}");
         optionsBuilder.EnableSensitiveDataLogging();
 
