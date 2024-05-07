@@ -159,10 +159,11 @@ public class Customer
         ReservationMenuOption selectedReservationOption = ReservationMenuOption.MakeReservation; // Start with MakeReservation option
         DateTime startDate = DateTime.Now;
         DateTime endDate = DateTime.Now.AddDays(28);
-        var schedules = ScheduleController.GetAvailableSchedules(startDate, endDate);
+        var schedules = ScheduleController.GetTitlesForScheduledMovies(startDate, endDate);
+        var AllSchedules = ScheduleController.GetAllSchedules(startDate,endDate);
         Film film = new();
         var choices = schedules
-                .Select(s => $"{s.Film.Title} - {s.StartDate.ToString("dd-MM-yyyy HH:mm")}")
+                .Select(s => $"{s.Film.Title}")
                 .ToList();
 
             var selectedMovieIndex = AnsiConsole.Prompt(
@@ -171,6 +172,16 @@ public class Customer
 
             // Get the selected schedule based on the selected movie
             var selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
+
+                              
+        var newChoices = AllSchedules.Where(s => s.Film.Title == selectedSchedule.Film.Title)
+                                     .Select(s => $"{s.Film.Title} - {s.StartDate.ToString("dd-MM-yyyy HH:mm")}")
+                                     .ToList();
+            
+            var newSelectedSchedules = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Kies een datum").AddChoices(newChoices));
+
+            selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
+
             film = selectedSchedule.Film;
             // Display the details of the selected movie
             filmController.Display(film);
