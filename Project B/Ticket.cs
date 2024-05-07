@@ -37,7 +37,7 @@ public class Ticket
         return price;
     }
 
-    public double GetSeatPrice(int seatType, int seatNumber, Schedule schedule)
+    public double GetSeatPrice(int seatType, int seatrow, int seatcol, Schedule schedule)
     {
         // Here you can implement your pricing logic based on seat type, seat number, and schedule
         // For demonstration purposes, let's say you have a simple pricing logic
@@ -46,17 +46,17 @@ public class Ticket
 
         // Adjust price based on seat type
         if (
-            seatType == 0 && seatNumber >= 50 && seatNumber <= 59
-            || seatType == 1 && seatNumber >= 1 && seatNumber <= 5
-            || seatType == 2 && seatNumber >= 1 && seatNumber <= 3
+            seatType == 0 && seatrow >= 50 && seatrow <= 59
+            || seatType == 1 && seatrow >= 1 && seatrow <= 5
+            || seatType == 2 && seatrow >= 1 && seatrow <= 3
         )
         {
             priceMultiplier *= 2.0; // Multiply the price by 1.5
         }
         if (
-            seatType == 0 && seatNumber >= 40 && seatNumber <= 49
-            || seatType == 1 && seatNumber >= 6 && seatNumber <= 10
-            || seatType == 2 && seatNumber >= 8 && seatNumber <= 10
+            seatType == 0 && seatrow >= 40 && seatrow <= 49
+            || seatType == 1 && seatrow >= 6 && seatrow <= 10
+            || seatType == 2 && seatrow >= 8 && seatrow <= 10
         )
         {
             priceMultiplier *= 1.5; // Multiply the price by 1.5
@@ -108,10 +108,10 @@ public class Ticket
         }
     }
 
-    public static void DisplayTicketDetails(Ticket ticket, Chair chair, double price)
+    public static void DisplayTicketDetails( int seatType ,int row , int col,double price)
     {
         string stoelType;
-        switch (chair.SeatType)
+        switch (seatType)
         {
             case 1:
                 stoelType = "LoveSeat";
@@ -126,7 +126,8 @@ public class Ticket
         AnsiConsole.Write(new Rule($"[blue]Ticket Informatie [/]").RuleStyle("blue"));
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine($"Stoel type: {stoelType}");
-        Console.WriteLine($"Stoel nummer: {chair.Position}");
+        Console.WriteLine($"Rij: {row}");
+        Console.WriteLine($"Nummer: {col}");
         Console.WriteLine($"Prijs: {price} euro");
         Console.ResetColor();
     }

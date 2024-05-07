@@ -25,7 +25,6 @@ class DataBaseConnection : DbContext
         var databasePath = Path.GetFullPath("../../../DataBase\\movie.sqlite");
         optionsBuilder.UseSqlite($"Data Source={databasePath}");
         optionsBuilder.EnableSensitiveDataLogging();
-
         // options.UseSqlite($"Data source = ../../../DataBase/movie.sqlite");
     }
 }
