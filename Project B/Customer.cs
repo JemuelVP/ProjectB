@@ -84,13 +84,18 @@ public class Customer
         var username = AnsiConsole.Prompt(
             new TextPrompt<string>("Voer een gebruikersnaam in: ")
         );
-        var passWord = AnsiConsole.Prompt(
+        var password = AnsiConsole.Prompt(
             new TextPrompt<string>("Voer een wachtwoord in: ").Secret()
         );
-        userController.CreateUser(username, passWord);
-        AnsiConsole.Write(
-            new Rule("[blue]Gebruiker is aangemaakt[/]").RuleStyle("blue")
-        );
+        // checks if user was succesfully created or not
+        bool userCreated = userController.CreateUser(username, password);
+        if (userCreated)
+        {
+            // only shows message if username is not a duplicate
+            AnsiConsole.Write(
+                new Rule("[blue]Gebruiker is aangemaakt[/]").RuleStyle("blue")
+            );
+        }
     }
     private void FilmZoeken()
     {
