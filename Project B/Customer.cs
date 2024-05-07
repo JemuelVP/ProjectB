@@ -79,12 +79,8 @@ public class Customer
 
     private void AccountAanmaken()
     {
-        if (IsLoggedIn)
-        {
-            AnsiConsole.WriteLine("[red]U bent al ingelogd.[/]");
-            return;
-        }
-        UserController userController = new UserController();
+        if (IsLoggedIn) return;
+        UserController userController = new();
         var username = AnsiConsole.Prompt(
             new TextPrompt<string>("Voer een gebruikersnaam in: ")
         );

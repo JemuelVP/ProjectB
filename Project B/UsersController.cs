@@ -19,7 +19,6 @@ public class UserController
         };
         db.Users.Add(newUser);
         db.SaveChanges();
-        Console.WriteLine("Account successvol aangemaakt");
         return true;
     }
 }
