@@ -28,6 +28,4 @@ class ChairController
 
         return chairs;
     }
-    
-
 }

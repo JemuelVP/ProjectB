@@ -6,6 +6,9 @@ public class Schedule
     public int Movie_ID { get; set; }
     public Film Film { get; set; }
     public int Hall_ID { get; set; }
+
+    public bool SoldOut { get; set; } = false;
+
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     
