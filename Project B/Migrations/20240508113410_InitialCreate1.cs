@@ -6,18 +6,17 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProjectB.Migrations
 {
     /// <inheritdoc />
-    public partial class AddSoldOutColumn : Migration
+    public partial class InitialCreate1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.AddColumn<bool>(
-                name: "SoldOut",
-                table: "Schedule",
-                type: "BOOLEAN",
-                nullable: false,
-                defaultValue: false);
-        }
+    {
+        migrationBuilder.AddColumn<bool>(
+            name: "SoldOut",
+            table: "Schedule",
+            nullable: false,
+            defaultValue: false);
+    }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {

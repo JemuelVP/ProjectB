@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ProjectB.Migrations
 {
     [DbContext(typeof(DataBaseConnection))]
-    [Migration("20240507213523_AddSoldOutColumn")]
-    partial class AddSoldOutColumn
+    [Migration("20240508113410_InitialCreate1")]
+    partial class InitialCreate1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
