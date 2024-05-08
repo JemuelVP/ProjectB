@@ -172,11 +172,11 @@ public class Customer
 
             // Get the selected schedule based on the selected movie
             var selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
-        // start code here
+            // start code here
             var newChoices = AllSchedules.Where(s => s.Film.Title == selectedSchedule.Film.Title)
                                     .Select(s =>
                                     {
-                                        
+
                                         if (s.SoldOut)
                                             return $"{s.Film.Title} - {s.StartDate.ToString("dd-MM-yyyy HH:mm")} - uitverkocht";
                                         else
@@ -288,9 +288,10 @@ public class Customer
 
                         var ticket = new Ticket();
                         // je moet hier of een zaal object meegeven of het aantal stoelen
+                        bool qualifyForDiscount = Ticket.UserTicketDiscount(User.ID);
                         foreach (var seat in selectedSeats)
                         {
-                            var seatPrice = ticket.GetSeatPrice(seatTypeInt, seat.Position, selectedSchedule);
+                            var seatPrice = ticket.GetSeatPrice(seatTypeInt, seat.Position, selectedSchedule, qualifyForDiscount);
                             AnsiConsole.Write(new Rule($"[blue]Prijs: {seatPrice} euro[/]").RuleStyle("blue"));
                         }
 
@@ -308,7 +309,7 @@ public class Customer
                                     selectedSchedule,
                                     seat.ID,
                                     film.ID,
-                                    ticket.GetSeatPrice(seatTypeInt, seat.Position, selectedSchedule),
+                                    ticket.GetSeatPrice(seatTypeInt, seat.Position, selectedSchedule, qualifyForDiscount),
                                     User.ID
                                 );
                                 totalPrice += finalPrice;

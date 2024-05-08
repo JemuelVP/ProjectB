@@ -24,20 +24,27 @@ public class Ticket
         User_ID = userId ?? 0; // Assign User_ID if it's provided, otherwise use 0 or any other default value
 
         using DataBaseConnection db = new();
-        var entry = db.Ticket.Add(new Ticket
-        {
-            Schedule_ID = schedule.ID,
-            Chair_ID = chair_ID,
-            Movie_ID = movieId,
-            Price = price,
-            User_ID = userId ?? 0
-        });
+        var entry = db.Ticket.Add(
+            new Ticket
+            {
+                Schedule_ID = schedule.ID,
+                Chair_ID = chair_ID,
+                Movie_ID = movieId,
+                Price = price,
+                User_ID = userId ?? 0
+            }
+        );
         db.SaveChanges();
 
         return price;
     }
 
-    public double GetSeatPrice(int seatType, int seatNumber, Schedule schedule)
+    public double GetSeatPrice(
+        int seatType,
+        int seatNumber,
+        Schedule schedule,
+        bool qualifyForDiscount
+    )
     {
         // Here you can implement your pricing logic based on seat type, seat number, and schedule
         // For demonstration purposes, let's say you have a simple pricing logic
@@ -73,6 +80,13 @@ public class Ticket
         if (IsEarlyTime(schedule.StartDate))
         {
             Price -= 5;
+        }
+
+        if (qualifyForDiscount)
+        {
+            double discountPercentage = 0.10;
+            double discountAmount = Price * discountPercentage;
+            Price -= discountAmount;
         }
 
         return Price;
@@ -168,5 +182,28 @@ public class Ticket
             Console.WriteLine($"Er zijn nog geen tickets gekocht op dit account");
             Console.ResetColor();
         }
+    }
+
+    public static bool UserTicketDiscount(int userID)
+    {
+        using DataBaseConnection db = new();
+
+        Users user = db.Users.FirstOrDefault(u => u.ID == userID);
+
+        if (!user.DiscountReceived)
+        {
+            List<Ticket> userTickets = db.Ticket.Where(t => t.User_ID == userID).ToList();
+            int totalTicketsBought = userTickets.Count;
+
+            if (totalTicketsBought > 10)
+            {
+                Console.WriteLine("Gefeliciteerd je ontvangt korting op je volgende bestelling!");
+                user.DiscountReceived = true;
+                db.SaveChanges();
+                return true;
+            }
+        }
+
+        return false;
     }
 }
