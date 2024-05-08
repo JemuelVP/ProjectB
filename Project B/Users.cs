@@ -9,6 +9,8 @@ public class Users
 
     public bool LoggedIn = false;
 
+    public bool DiscountReceived { get; set; }
+
     public void Login(string? name, string? password)
     {
         using DataBaseConnection db = new();

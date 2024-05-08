@@ -3,7 +3,7 @@ public class ScheduleController
 {
 
 
-   public static List<Schedule> GetTitlesForScheduledMovies(DateTime startDate, DateTime endDate)
+public static List<Schedule> GetTitlesForScheduledMovies(DateTime startDate, DateTime endDate)
     {
         using (DataBaseConnection db = new DataBaseConnection())
         {   
