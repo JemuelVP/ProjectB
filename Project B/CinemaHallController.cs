@@ -16,4 +16,9 @@ class CinemaHallController
     {
         return this.db.Hall.First(hall => hall.Name == name);
     }
+
+    public CinemaHall? GetByID(int id)
+    {
+        return this.db.Hall.FirstOrDefault(hall => hall.ID == id);
+    }
 }

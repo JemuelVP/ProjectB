@@ -188,20 +188,34 @@ public class Customer
             var ticketAge = new Ticket();
             ticketAge.CheckAge(film, age); // checks age against age movie
             // AnsiConsole.Write(new Rule("[blue]Stoel Kosten[/]").RuleStyle("blue"));
-
+            var targetHall = new CinemaHallController(new DataBaseConnection()).GetByID(selectedSchedule.Hall_ID);
+            if (targetHall == null) return;
             // var availableSeats = ChairController.GetAvailableSeats(
             //     selectedSchedule.ID,
             //     selectedSchedule.Hall_ID
             // );
-            while(true)
-            {            
-                ConsoleCanvas canvas = new ConsoleCanvas(12, 14);
+            while (true)
+            {
+                int width = -1;
+                int height = -1;
+                switch(targetHall.Size)
+                {
+                    case "Small":
+                        width = 12;
+                        height = 14;
+                        break;
+                    case "Medium":
+                        width = 18;
+                        height = 19;
+                        break;
+                }
+                ConsoleCanvas canvas = new(12, 14);
 
                 Console.CursorVisible = false; // Hide the cursor
 
 
                 // Draw the canvas
-                canvas.Draw(selectedSchedule.ID);
+                canvas.Draw(selectedSchedule.ID, targetHall.Size,width,height);
                 var selectedChairs = new List<int>();
                 var isSelectingChair = true;
                 // Main loop to handle cursor movement
@@ -241,30 +255,31 @@ public class Customer
                                     selectedChairs.Add(chair.ID);
                                 }
                             }
+                            canvas.SetPixel(canvas.cursorX, canvas.cursorY, 'C');
                             break;
                         case ConsoleKey.Enter:
                             isSelectingChair = false;
                             Console.WriteLine(selectedChairs);
-                        break;
+                            break;
                     }
                     // Redraw canvas with updated cursor position
-                    canvas.Draw(selectedSchedule.ID);
-                    AnsiConsole.WriteLine(selectedChairs.Count);
+                    canvas.Draw(selectedSchedule.ID, targetHall.Size, width, height);
+                    AnsiConsole.WriteLine($"Aantal geslecteerde stoelen: {selectedChairs.Count}");
                 }
                 Console.Clear();
                 int seatType = -1;
                 using (DataBaseConnection db = new DataBaseConnection())
                 {
                     var chairType = db.Chair.FirstOrDefault(c => c.Row == canvas.cursorY && c.Column == canvas.cursorX && c.CinemaHallID == 1);
-                    if(chairType.SeatType == 0)
+                    if (chairType.SeatType == 0)
                     {
                         seatType = 0;
                     }
-                    else if(chairType.SeatType == 1)
+                    else if (chairType.SeatType == 1)
                     {
                         seatType = 1;
                     }
-                    if(chairType.SeatType == 2)
+                    if (chairType.SeatType == 2)
                     {
                         seatType = 2;
                     }
@@ -273,11 +288,11 @@ public class Customer
                 // je moet hier of een zaal object meegeven of het aantal stoelen
                 foreach (var seat in selectedChairs)
                 {
-                var seatPrice = ticket.GetSeatPrice(seatType, canvas.cursorY, canvas.cursorX ,selectedSchedule);
-                AnsiConsole.Write(new Rule($"[blue]Prijs: {seatPrice} euro[/]").RuleStyle("blue"));
+                    var seatPrice = ticket.GetSeatPrice(seatType, canvas.cursorY, canvas.cursorX, selectedSchedule);
+                    AnsiConsole.Write(new Rule($"[blue]Prijs: {seatPrice} euro[/]").RuleStyle("blue"));
                 }
-                var confirmPurchase = AnsiConsole.Confirm( "Wil je de bestelling bevestigen?", false);
-                if(confirmPurchase)
+                var confirmPurchase = AnsiConsole.Confirm("Wil je de bestelling bevestigen?", false);
+                if (confirmPurchase)
                 {
                     var db = new DataBaseConnection();
                     var totalPrice = 0.0;
@@ -285,7 +300,7 @@ public class Customer
                     {
                         // Retrieve chair object by ID from the database
                         var chair = db.Chair.FirstOrDefault(c => c.ID == chairId);
-                        
+
                         if (chair != null)
                         {
                             // Assuming chair has properties for X and Y coordinates
@@ -305,7 +320,7 @@ public class Customer
                 }
                 break;
             }
-            
+
             // while (true)
             // {
             // // Prompt the user to enter a seat number

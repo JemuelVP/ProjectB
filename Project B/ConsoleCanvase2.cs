@@ -1,7 +1,6 @@
-
 using Spectre.Console;
 
-public class ConsoleCanvas
+public class ConsoleCanvas2
 {
     private struct CanvasPixel
     {
@@ -11,10 +10,10 @@ public class ConsoleCanvas
     private int width;
     private int height;
     private CanvasPixel[,] canvas;
-    public int cursorX { get; private set; }
-    public int cursorY { get; private set; }
+    private int cursorX;
+    private int cursorY;
 
-    public ConsoleCanvas(int width, int height)
+    public ConsoleCanvas2(int width, int height)
     {
         this.width = width;
         this.height = height;
@@ -34,54 +33,12 @@ public class ConsoleCanvas
             }
         }
     }
-    public void DrawSmallCanvas(Canvas canvas, int schedule_id)
-    {
-        for (var row = 0; row < canvas.Height; row++)
-        {
-            for (var col = 0; col < canvas.Width; col++)
-            {
-                using (DataBaseConnection db = new DataBaseConnection())
-                {
-                    var chair = db.Chair.FirstOrDefault(c => c.Row == row && c.Column == col && c.CinemaHallID == 1);
-                    if (chair != null)
-                    {
-                        var ticket = db.Ticket.FirstOrDefault(t => t.Schedule_ID == schedule_id && t.Chair_ID == chair.ID);
-                        if (ticket != null)
-                        {
-                            canvas.SetPixel(col, row, Color.Grey); // Chair is not available, color it gray
-                            continue; // Skip to the next iteration
-                        }
-                    }
-                }
 
-                // Set colors for other areas
-                if (row >= 5 && row <= 8 && col >= 5 && col <= 6)
-                {
-                    canvas.SetPixel(col, row, Color.Red);
-                }
-                else if ((row >= 3 && row <= 10 && col <= 4 && col >= 3) ||
-                        (row >= 3 && row <= 10 && col <= 8 && col >= 7) ||
-                        (row >= 9 && row <= 10 && col >= 5 && col <= 6) ||
-                        (row >= 3 && row <= 4 && col >= 5 && col <= 6))
-                {
-                    canvas.SetPixel(col, row, Color.Orange1);
-                }
-                else if ((row == 0 && col >= 0 && col <= 1) || (row >= 0 && row <= 2 && col == 0) ||
-                        (row == 13 && col >= 0 && col <= 1) || (row >= 11 && row <= 13 && col == 0) ||
-                        (row == 0 && col >= 10 && col <= 11) || (row >= 0 && row <= 2 && col == 11) ||
-                        (row == 13 && col >= 10 && col <= 11) || (row >= 11 && row <= 13 && col >= 11))
-                {
-                    canvas.SetPixel(col, row, Color.Black);
-                }
-                else
-                {
-                    canvas.SetPixel(col, row, Color.Blue);
-                }
-            }
-        }
-    }
-    public void DrawMidiumCanvas(Canvas canvas, int schedule_id)
+    public void Draw()
     {
+        Console.Clear();
+        var canvas = new Canvas(18, 19);
+        // Draw some shapes
         for (var row = 0; row < canvas.Height; row++)
         {
             for (var col = 0; col < canvas.Width; col++)
@@ -129,33 +86,15 @@ public class ConsoleCanvas
                 }
             }
         }
-    }
 
-    public void Draw(int schedule_id, string size, int width, int height)
-    {
-        Console.Clear();
-        var canvas = new Canvas(width, height);
-        // Draw some shapes
-        switch (size)
-        {
-            case "Small":
-                DrawSmallCanvas(canvas, schedule_id);
-                break;
-            case "Medium":
-                DrawMidiumCanvas(canvas, schedule_id);
-                break;
-            case "Large":
-                DrawSmallCanvas(canvas, schedule_id);
-                break;
-            default:
-                throw new ArgumentOutOfRangeException("size");
-        }
+        // Highlight cursor position with a different color or character
         canvas.SetPixel(cursorX, cursorY, 'X'); // For example, 'X' represents the cursor position
 
         // Render the canvas
         AnsiConsole.Write(canvas);
-        Console.SetCursorPosition(0, height+1);
+        Console.SetCursorPosition(cursorX, cursorY);
     }
+
     public void SetPixel(int x, int y, char c)
     {
         if (x >= 0 && x < width && y >= 0 && y < height)
@@ -177,4 +116,3 @@ public class ConsoleCanvas
         }
     }
 }
-

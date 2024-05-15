@@ -22,9 +22,17 @@ class DataBaseConnection : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        var databasePath = Path.GetFullPath("../../../DataBase\\movie.sqlite");
+        var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        var projectDirectory = new DirectoryInfo(baseDirectory).Parent?.Parent?.Parent;
+        if(projectDirectory is null)
+        {
+            return;
+        }
+
+        var databasePath = Path.Combine(projectDirectory.FullName, "DataBase", "movie.sqlite");
         optionsBuilder.UseSqlite($"Data Source={databasePath}");
         optionsBuilder.EnableSensitiveDataLogging();
+
         // options.UseSqlite($"Data source = ../../../DataBase/movie.sqlite");
     }
 }

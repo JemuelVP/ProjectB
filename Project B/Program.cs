@@ -1,6 +1,6 @@
 ﻿using Spectre.Console;
 bool active = true;
-using DataBaseConnection db = new();
+DataBaseConnection db = new();
 
 // ChairController chairController = new ChairController();
 // chairController.AddChairs();
