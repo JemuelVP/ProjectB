@@ -197,42 +197,49 @@ public class Ticket
 
     public static void SeeUserStats(int userID)
     {
-        using DataBaseConnection db = new();
-
-        List<Ticket> userTickets = db.Ticket.Where(t => t.User_ID == userID).ToList();
-
-        var ticketsPerMovie = userTickets
-            .GroupBy(t => t.Movie_ID)
-            .Select(g => new
-            {
-                MovieID = g.Key,
-                MovieName = db.Movie.FirstOrDefault(movie => movie.ID == g.Key)?.Title,
-                TicketCount = g.Count()
-            })
-            .ToList();
-
-        if (ticketsPerMovie.Any())
+        using (DataBaseConnection db = new DataBaseConnection())
         {
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine("Overzicht van bezochte films en totale tickets per film");
-            Console.ResetColor();
+            List<Ticket> userTickets = db.Ticket.Where(t => t.User_ID == userID).ToList();
 
-            foreach (var movieInfo in ticketsPerMovie)
+            var ticketsPerSchedule = userTickets
+                .GroupBy(t => new { t.Movie_ID, t.Schedule_ID, t.DateBought })
+                .GroupBy(g => g.Key.Schedule_ID) // Group by Schedule_ID
+                .Select(scheduleGroup => new
+                {
+                    MovieID = scheduleGroup.First().Key.Movie_ID, // Accessing Movie_ID from the key of the first item in the group
+                    MovieName = db.Movie.FirstOrDefault(movie => movie.ID == scheduleGroup.First().Key.Movie_ID)?.Title,
+                    DateBought = scheduleGroup.First().Key.DateBought.ToString("yyyy-MM-dd HH:mm"),
+                    TicketIDs = scheduleGroup.SelectMany(innerGroup => innerGroup.Select(t => t.ID)), // Collecting all ticket IDs within the group
+                    TicketCount = scheduleGroup.Sum(innerGroup => innerGroup.Count()), // Sum of counts of inner groups
+                    TotalPrice = scheduleGroup.Sum(innerGroup => innerGroup.Sum(t => t.Price)) // Sum of total prices of inner groups
+                })
+                .ToList();
+
+            if (ticketsPerSchedule.Any())
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine(
-                    $"Film: {movieInfo.MovieName}, Tickets gekocht: {movieInfo.TicketCount}"
-                );
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine("Overview of visited movies and total tickets per schedule");
+                Console.ResetColor();
+
+                foreach (var scheduleInfo in ticketsPerSchedule)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine(
+                        $"Movie: {scheduleInfo.MovieName}, Ticket IDS: {string.Join(", ", scheduleInfo.TicketIDs)} , Tickets bought: {scheduleInfo.TicketCount}, Total Price: {scheduleInfo.TotalPrice}, Date Bought: {scheduleInfo.DateBought}"
+                    );
+                    Console.ResetColor();
+                }
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("No tickets have been purchased on this account yet");
                 Console.ResetColor();
             }
         }
-        else
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"Er zijn nog geen tickets gekocht op dit account");
-            Console.ResetColor();
-        }
     }
+
+
 
     public static bool UserTicketDiscount(int userID)
     {
