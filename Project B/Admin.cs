@@ -92,8 +92,6 @@ public class Admin
         AnsiConsole.Write(
             new Rule("[green]Film is toegevoegd [/]").RuleStyle("green")
         );
-        ;
-
         // Call the AddMovie method with the input parameters
         adminController.AddMovie(
             title,
@@ -192,6 +190,7 @@ private void FilmsOverZicht()
             {
                 AnsiConsole.Markup("[red]Ongeldig datumformaat. Probeer het opnieuw.[/]\n");
             }
+            
         }
 
         // Check if the entered date is beyond 4 weeks from now

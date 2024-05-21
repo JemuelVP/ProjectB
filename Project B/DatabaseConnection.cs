@@ -26,6 +26,10 @@ class DataBaseConnection : DbContext
     {
         var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
         var projectDirectory = new DirectoryInfo(baseDirectory).Parent?.Parent?.Parent;
+        if(projectDirectory is null)
+        {
+            return;
+        }
 
         var databasePath = Path.Combine(projectDirectory.FullName, "DataBase", "movie.sqlite");
         optionsBuilder.UseSqlite($"Data Source={databasePath}");
