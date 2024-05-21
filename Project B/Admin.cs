@@ -131,7 +131,8 @@ public class Admin
     {
         var adminOverview = AdminController.GetAllMovies();
         string[] movieTitle = adminOverview
-        .Select(book => $"Titel: {book.Title}")
+        .Select(book => $"{book.Title}")
+        .OrderBy(title => title)  // Sort titles alphabetically
         .ToArray();
         var overviewMovies = AnsiConsole.Prompt(
             new SelectionPrompt<string>()
@@ -162,14 +163,14 @@ public class Admin
             break;
         case RevenueOrScheduleMovie.ScheduleMovie:
             Console.WriteLine(
-                "Voer een datum in ANSI-formaat in (dd-MM-jjjj HH:mm:ss):"
+                "Voer een datum in ANSI-formaat in (dd-MM-jjjj HH:mm):"
             );
             string? userInput = Console.ReadLine();
             if (userInput == null)
                 break;
             var date = DateTime.ParseExact(
                 userInput,
-                "dd-MM-yyyy HH:mm:ss",
+                "dd-MM-yyyy HH:mm",
                 null,
                 System.Globalization.DateTimeStyles.None
             );

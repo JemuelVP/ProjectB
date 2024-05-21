@@ -8,6 +8,7 @@ public class Ticket
     public int Movie_ID { get; set; }
     public int Chair_ID { get; set; }
     public double Price { get; set; }
+    public DateTime DateBought { get; set; }
 
     public double CreateTicket(
         Schedule schedule,
@@ -30,7 +31,8 @@ public class Ticket
             Chair_ID = chair_ID,
             Movie_ID = movieId,
             Price = price,
-            User_ID = userId ?? 0
+            User_ID = userId ?? 0,
+            DateBought = DateTime.Now
         });
         db.SaveChanges();
 
@@ -45,21 +47,49 @@ public class Ticket
         double priceMultiplier = 1.0; // Multiplier for seat types
 
         // Adjust price based on seat type
-        if (
-            seatType == 0 && seatrow >= 50 && seatrow <= 59
-            || seatType == 1 && seatrow >= 1 && seatrow <= 5
-            || seatType == 2 && seatrow >= 1 && seatrow <= 3
+        // This is for the red area
+        if
+        (
+            schedule.Hall_ID == 1 && 
+            seatType == 1 && seatrow >= 5 && seatrow <= 8 && seatcol >= 5 && seatcol <= 6 ||
+            schedule.Hall_ID == 2 && 
+            seatrow >= 5 && seatrow <= 12  && seatcol >= 8 && seatcol <= 9||
+            seatrow >= 6 && seatrow <= 11 && seatcol >= 7 && seatcol <= 10||
+            seatrow >= 7 && seatrow <= 10 && seatcol >= 6 && seatcol <= 11||
+            schedule.Hall_ID == 3 && 
+            seatrow >= 4 && seatrow <= 12 && seatcol >= 13 && seatcol <= 16||
+            seatrow >= 5 && seatrow <= 11 && seatcol >= 12 && seatcol <= 17||
+            seatrow >= 6 && seatrow <= 11 && seatcol >= 11 && seatcol <= 18
         )
         {
             priceMultiplier *= 2.0; // Multiply the price by 1.5
         }
-        if (
-            seatType == 0 && seatrow >= 40 && seatrow <= 49
-            || seatType == 1 && seatrow >= 6 && seatrow <= 10
-            || seatType == 2 && seatrow >= 8 && seatrow <= 10
+        // This is for the orange area 
+        if
+        ( 
+            schedule.Hall_ID == 1 && 
+            seatType == 2 && seatrow >= 3 && seatrow <= 10 && seatcol <= 4 && seatcol >= 3 ||
+            seatrow >= 3 && seatrow <= 10 && seatcol <= 8 && seatcol >= 7 ||
+            seatrow >= 9 && seatrow <= 10 && seatcol >= 5 && seatcol <= 6 ||
+            seatrow >= 3 && seatrow <= 4 && seatcol >= 5 && seatcol <= 6 || 
+            schedule.Hall_ID == 2 &&                     
+            seatType == 2 &&
+            seatrow >= 1 && seatrow <= 15 && seatcol >= 6 && seatcol <= 11 ||
+            seatrow >= 2 && seatrow <= 13 && seatcol >= 5 && seatcol <= 12 ||
+            seatrow >= 4 && seatrow <= 12 && seatcol >= 4 && seatcol <= 13 ||
+            seatrow >= 6 && seatrow <= 11 && seatcol >= 3 && seatcol <= 14 ||
+            seatrow >= 8 && seatrow <= 10 && seatcol >= 2 && seatcol <= 15 ||
+            schedule.Hall_ID == 3 && 
+            seatType == 2 &&                    
+            seatrow >= 1 && seatrow <= 16 && seatcol >= 12 && seatcol <= 17 ||
+            seatrow >= 1 && seatrow <= 15 && seatcol >= 9 && seatcol <= 20 ||
+            seatrow >= 2 && seatrow <= 13 && seatcol >= 8 && seatcol <= 21 ||
+            seatrow >= 4 && seatrow <= 11 && seatcol >= 7 && seatcol <= 22 ||
+            seatrow >= 6 && seatrow <= 10 && seatcol >= 6 && seatcol <= 23 ||
+            seatrow >= 8 && seatrow <= 9 && seatcol >= 5 && seatcol <= 24
         )
         {
-            priceMultiplier *= 1.5; // Multiply the price by 1.5
+            priceMultiplier *= 1.5;
         }
 
         // Calculate final price based on base price, multiplier, or any other factors
@@ -143,7 +173,7 @@ public class Ticket
             .Select(g => new
             {
                 MovieID = g.Key,
-                MovieName = db.Movie.FirstOrDefault(movie => movie.ID == g.Key).Title,
+                MovieName = db.Movie.FirstOrDefault(movie => movie.ID == g.Key)?.Title,
                 TicketCount = g.Count()
             })
             .ToList();

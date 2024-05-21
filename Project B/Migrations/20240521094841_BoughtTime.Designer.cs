@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ProjectB.Migrations
 {
     [DbContext(typeof(DataBaseConnection))]
-    [Migration("20240514174149_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240521094841_BoughtTime")]
+    partial class BoughtTime
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,7 +54,7 @@ namespace ProjectB.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("size")
+                    b.Property<string>("Size")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -131,6 +131,9 @@ namespace ProjectB.Migrations
 
                     b.Property<int>("Chair_ID")
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("DateBought")
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Movie_ID")
                         .HasColumnType("INTEGER");

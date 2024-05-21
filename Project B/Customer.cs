@@ -208,14 +208,20 @@ public class Customer
                         width = 18;
                         height = 19;
                         break;
+                    case "Large":
+                        width = 30;
+                        height = 20;
+                        break;
                 }
-                ConsoleCanvas canvas = new(12, 14);
+                ConsoleCanvas canvas = new(width, height);
 
                 Console.CursorVisible = false; // Hide the cursor
 
 
                 // Draw the canvas
-                canvas.Draw(selectedSchedule.ID, targetHall.Size,width,height);
+                Console.Clear();
+                List<Tuple<int,int>> listSelectedChairs = new();
+                canvas.Draw(selectedSchedule.ID, targetHall.Size,width,height, listSelectedChairs);
                 var selectedChairs = new List<int>();
                 var isSelectingChair = true;
                 // Main loop to handle cursor movement
@@ -239,7 +245,7 @@ public class Customer
                         case ConsoleKey.Spacebar:
                             using (DataBaseConnection db = new DataBaseConnection())
                             {
-                                var chair = db.Chair.FirstOrDefault(c => c.Row == canvas.cursorY && c.Column == canvas.cursorX && c.CinemaHallID == 1);
+                                var chair = db.Chair.FirstOrDefault(c => c.Row == canvas.cursorY && c.Column == canvas.cursorX && c.CinemaHallID == targetHall.ID);
                                 if (chair != null)
                                 {
                                     var getTicket = db.Ticket.FirstOrDefault(t => t.Schedule_ID == selectedSchedule.ID && t.Chair_ID == chair.ID);
@@ -250,12 +256,13 @@ public class Customer
                                     if (selectedChairs.Contains(chair.ID))
                                     {
                                         selectedChairs.Remove(chair.ID);
+                                        listSelectedChairs.Remove(Tuple.Create(canvas.cursorY, canvas.cursorX));
                                         break;
                                     }
                                     selectedChairs.Add(chair.ID);
+                                    listSelectedChairs.Add(Tuple.Create(canvas.cursorY, canvas.cursorX));
                                 }
                             }
-                            canvas.SetPixel(canvas.cursorX, canvas.cursorY, 'C');
                             break;
                         case ConsoleKey.Enter:
                             isSelectingChair = false;
@@ -263,35 +270,44 @@ public class Customer
                             break;
                     }
                     // Redraw canvas with updated cursor position
-                    canvas.Draw(selectedSchedule.ID, targetHall.Size, width, height);
-                    AnsiConsole.WriteLine($"Aantal geslecteerde stoelen: {selectedChairs.Count}");
+                    canvas.Draw(selectedSchedule.ID, targetHall.Size, width, height, listSelectedChairs);
+                    // AnsiConsole.WriteLine($"Aantal geslecteerde stoelen: {selectedChairs.Count}");
                 }
                 Console.Clear();
                 int seatType = -1;
                 using (DataBaseConnection db = new DataBaseConnection())
                 {
                     var chairType = db.Chair.FirstOrDefault(c => c.Row == canvas.cursorY && c.Column == canvas.cursorX && c.CinemaHallID == 1);
-                    if (chairType.SeatType == 0)
+                    if (chairType?.SeatType == 0)
                     {
                         seatType = 0;
                     }
-                    else if (chairType.SeatType == 1)
+                    else if (chairType?.SeatType == 1)
                     {
                         seatType = 1;
                     }
-                    if (chairType.SeatType == 2)
+                    if (chairType?.SeatType == 2)
                     {
                         seatType = 2;
                     }
                 }
                 var ticket = new Ticket();
                 // je moet hier of een zaal object meegeven of het aantal stoelen
-                foreach (var seat in selectedChairs)
+                foreach (var chairId in selectedChairs)
                 {
-                    var seatPrice = ticket.GetSeatPrice(seatType, canvas.cursorY, canvas.cursorX, selectedSchedule);
-                    AnsiConsole.Write(new Rule($"[blue]Prijs: {seatPrice} euro[/]").RuleStyle("blue"));
+                    var db = new DataBaseConnection();
+                    var chair = db.Chair.FirstOrDefault(c => c.ID == chairId);
+                    if (chair != null)
+                    {
+                        int chairX = chair.Column;
+                        int chairY = chair.Row;
+
+                        // Calculate the seat price using the actual chair coordinates
+                        var seatPrice = ticket.GetSeatPrice(seatType, chairY, chairX, selectedSchedule);
+                        AnsiConsole.Write(new Rule($"[blue]Prijs: {seatPrice} euro[/]").RuleStyle("blue"));
+                    }
                 }
-                var confirmPurchase = AnsiConsole.Confirm("Wil je de bestelling bevestigen?", false);
+                var confirmPurchase = AnsiConsole.Confirm("Wil je de bestelling bevestigen?");
                 if (confirmPurchase)
                 {
                     var db = new DataBaseConnection();
@@ -320,80 +336,6 @@ public class Customer
                 }
                 break;
             }
-
-            // while (true)
-            // {
-            // // Prompt the user to enter a seat number
-            // var selectedSeatNumbers = AnsiConsole.Prompt(
-            //     new MultiSelectionPrompt<int>()
-            //         .Title("Selecteer stoel/en")
-            //         .AddChoices(availableSeats.Select(s => s.Row))
-            // );
-            // var sortedSeatNumbers = selectedSeatNumbers.OrderBy(x => x).ToList();
-
-            // // Check if the selected seats are adjacent
-            //     bool areSeatsAdjacent = true;
-            //     for (int i = 0; i < sortedSeatNumbers.Count - 1; i++)
-            //     {
-            //         if (sortedSeatNumbers[i + 1] != sortedSeatNumbers[i] + 1)
-            //         {
-            //             areSeatsAdjacent = false;
-            //             break;
-            //         }
-            //     }
-
-            //     if (!areSeatsAdjacent)
-            //     {
-            //         AnsiConsole.Write(
-            //             new Rule($"[blue]Geselecteerde zitplaatsen liggen niet naast elkaar. Selecteer aangrenzende zitplaatsen.[/]").RuleStyle("blue")
-            //         );
-            //         selectedReservationOption = ReservationMenuOption.Back;
-            //     }
-            //     else
-            //     {
-            //         var selectedSeats = availableSeats.Where(s => selectedSeatNumbers.Contains(s.Row));
-            //         if (selectedSeats == null)
-            //         {
-            //             AnsiConsole.Write(
-            //             new Rule($"[blue]Stoel niet gevonden, probeer het opnieuw![/]").RuleStyle("blue")
-            //             );
-            //             selectedReservationOption = ReservationMenuOption.Back;
-            //         }
-            //         // Create ticket with selected schedule, user name, seat type, and seat number
-
-            //         var ticket = new Ticket();
-            //         // je moet hier of een zaal object meegeven of het aantal stoelen
-            //         foreach (var seat in selectedSeats)
-            //         {
-            //             var seatPrice = ticket.GetSeatPrice(seat.SeatType, seat.Row,seat.Column, selectedSchedule);
-            //             AnsiConsole.Write(new Rule($"[blue]Prijs: {seatPrice} euro[/]").RuleStyle("blue"));
-            //         }
-
-            //         var confirmPurchase = AnsiConsole.Confirm(
-            //             "Wil je de bestelling bevestigen?",
-            //             false
-            //         );
-            //         if (confirmPurchase)
-            //         {
-            //             double totalPrice = 0;
-            //             foreach (var seat in selectedSeats)
-            //             {
-            //                 // Create the ticket
-            //                 double finalPrice = ticket.CreateTicket(
-            //                     selectedSchedule,
-            //                     seat.ID,
-            //                     film.ID,
-            //                     ticket.GetSeatPrice(seat.SeatType, seat.Row,seat.Column, selectedSchedule),
-            //                     User.ID
-            //                 );
-            //                 totalPrice += finalPrice;
-            //                 Ticket.DisplayTicketDetails(ticket, seat, finalPrice);
-            //             }
-            //         }
-            //         break;
-            //         }
-            // }
-
         }
 
     }
