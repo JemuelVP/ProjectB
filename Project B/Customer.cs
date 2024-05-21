@@ -299,7 +299,7 @@ public class Customer
                 int seatType = -1;
                 using (DataBaseConnection db = new DataBaseConnection())
                 {
-                    var chairType = db.Chair.FirstOrDefault(c => c.Row == canvas.cursorY && c.Column == canvas.cursorX && c.CinemaHallID == 1);
+                    var chairType = db.Chair.FirstOrDefault(c => c.Row == canvas.cursorY && c.Column == canvas.cursorX && c.CinemaHallID == targetHall.ID);
                     if (chairType?.SeatType == 0)
                     {
                         seatType = 0;
@@ -315,6 +315,7 @@ public class Customer
                 }
                 var ticket = new Ticket();
                 // je moet hier of een zaal object meegeven of het aantal stoelen
+                bool qualifyForDiscount = User.LoggedIn && Ticket.UserTicketDiscount(User.ID);
                 foreach (var chairId in selectedChairs)
                 {
                     var db = new DataBaseConnection();
@@ -325,7 +326,7 @@ public class Customer
                         int chairY = chair.Row;
 
                         // Calculate the seat price using the actual chair coordinates
-                        var seatPrice = ticket.GetSeatPrice(seatType, chairY, chairX, selectedSchedule);
+                        var seatPrice = ticket.GetSeatPrice(seatType, chairY, chairX, selectedSchedule, qualifyForDiscount);
                         AnsiConsole.Write(new Rule($"[blue]Prijs: {seatPrice} euro[/]").RuleStyle("blue"));
                     }
                 }
@@ -346,7 +347,7 @@ public class Customer
                             int chairY = chair.Row;
 
                             // Use chairX and chairY in your logic to calculate the final price
-                            var finalPrice = ticket.CreateTicket(selectedSchedule, chairId, film.ID, ticket.GetSeatPrice(seatType, chairY, chairX, selectedSchedule), User.ID);
+                            var finalPrice = ticket.CreateTicket(selectedSchedule, chairId, film.ID, ticket.GetSeatPrice(seatType, chairY, chairX, selectedSchedule,qualifyForDiscount), User.ID);
 
                             // Increment total price
                             totalPrice += finalPrice;
