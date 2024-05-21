@@ -92,8 +92,6 @@ public class Admin
         AnsiConsole.Write(
             new Rule("[green]Film is toegevoegd [/]").RuleStyle("green")
         );
-        ;
-
         // Call the AddMovie method with the input parameters
         adminController.AddMovie(
             title,
