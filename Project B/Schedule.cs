@@ -8,7 +8,7 @@ public class Schedule
     public int Hall_ID { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
-    
+    public bool SoldOut { get; set; } = false;
     public DateTime CalculateEndDate(Film film)
     {
         return StartDate.AddMinutes(film.DurationInMin);

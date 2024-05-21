@@ -200,4 +200,26 @@ public class Ticket
             Console.ResetColor();
         }
     }
+    public static bool UserTicketDiscount(int userID)
+    {
+        using DataBaseConnection db = new();
+
+        Users user = db.Users.FirstOrDefault(u => u.ID == userID);
+
+        if (!user.DiscountReceived)
+        {
+            List<Ticket> userTickets = db.Ticket.Where(t => t.User_ID == userID).ToList();
+            int totalTicketsBought = userTickets.Count;
+
+            if (totalTicketsBought > 10)
+            {
+                Console.WriteLine("Gefeliciteerd je ontvangt korting op je volgende bestelling!");
+                user.DiscountReceived = true;
+                db.SaveChanges();
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

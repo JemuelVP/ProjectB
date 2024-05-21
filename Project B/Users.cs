@@ -6,8 +6,9 @@ public class Users
     public string? Name { get; set; }
     public string? Password { get; set; }
     public int IsAdmin { get; set; }
-
     public bool LoggedIn = false;
+    public bool DiscountReceived { get; set; }
+    public int Visits{get; set; } = 0;
     public void Login(string? name, string? password)
     {
         using DataBaseConnection db = new();
