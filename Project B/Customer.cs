@@ -123,13 +123,19 @@ public class Customer
 
     private void Inloggen()
     {
-        var customerName = AnsiConsole.Prompt(
-            new TextPrompt<string>("Voer je gebruikersnaam in: ")
-        );
-        var customerPassword = AnsiConsole.Prompt(
-            new TextPrompt<string>("Voer je wachtwoord in: ").Secret()
-        );
-        User.UserLogin(customerName, customerPassword);
+        bool loggedIn = false;
+
+        while (!loggedIn)
+        {
+            var customerName = AnsiConsole.Prompt(
+                new TextPrompt<string>("Voer je gebruikersnaam in: ")
+            );
+            var customerPassword = AnsiConsole.Prompt(
+                new TextPrompt<string>("Voer je wachtwoord in: ").Secret()
+            );
+
+            User.UserLogin(customerName, customerPassword);
+        }
     }
 
     private void Uitloggen()

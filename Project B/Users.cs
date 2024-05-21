@@ -8,9 +8,12 @@ public class Users
     public int IsAdmin { get; set; }
     public bool LoggedIn = false;
     public bool DiscountReceived { get; set; }
-    public int Visits{get; set; } = 0;
-    public void Login(string? name, string? password)
+    public int Visits { get; set; } = 0;
+
+    public bool Login(string? name, string? password)
     {
+        bool LoggedIn = false;
+
         using DataBaseConnection db = new();
         var admin = db.Users.FirstOrDefault(admin =>
             admin.Name == name && admin.Password == password && admin.IsAdmin == 0
@@ -22,30 +25,38 @@ public class Users
             Password = admin.Password;
             IsAdmin = admin.IsAdmin;
             LoggedIn = true;
+            return true;
         }
         else
         {
             Console.WriteLine("Verkeerde gegevens ingevuld, probeer het opnieuw");
+            return false;
         }
     }
 
     public void UserLogin(string? name, string? password)
     {
-        using DataBaseConnection db = new();
-        var user = db.Users.FirstOrDefault(user =>
-            user.Name == name && user.Password == password && user.IsAdmin == 1
-        );
-        if (user != null)
+        bool LoggedIn = false;
+
+        while (!LoggedIn)
         {
-            ID = user.ID;
-            Name = user.Name;
-            Password = user.Password;
-            IsAdmin = user.IsAdmin;
-            LoggedIn = true;
-        }
-        else
-        {
-            AnsiConsole.WriteLine("Verkeerde gegevens ingevuld, probeer het opnieuw");
+            using DataBaseConnection db = new();
+            var user = db.Users.FirstOrDefault(user =>
+                user.Name == name && user.Password == password && user.IsAdmin == 1
+            );
+            if (user != null)
+            {
+                ID = user.ID;
+                Name = user.Name;
+                Password = user.Password;
+                IsAdmin = user.IsAdmin;
+                LoggedIn = true;
+            }
+            else
+            {
+                AnsiConsole.WriteLine("Verkeerde gegevens ingevuld, probeer het opnieuw");
+                return;
+            }
         }
     }
 }
