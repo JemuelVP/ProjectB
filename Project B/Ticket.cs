@@ -240,23 +240,17 @@ public class Ticket
 
         Users user = db.Users.FirstOrDefault(u => u.ID == userID);
 
-        if (!user.DiscountReceived)
+        if (user != null)
         {
-            List<Ticket> userTickets = db.Ticket.Where(t => t.User_ID == userID).ToList();
             int totalVisits = user.Visits;
             List<int> wantedTotalVisits = new List<int> { 11, 21, 31, 41, 51, 61, 71, 81, 91 };
 
-            foreach (int visit in wantedTotalVisits)
+            if (wantedTotalVisits.Contains(totalVisits))
             {
-                if (totalVisits == visit)
-                {
-                    Console.WriteLine(
-                        "Gefeliciteerd je ontvangt korting op je volgende bestelling!"
-                    );
-                    user.DiscountReceived = true;
-                    db.SaveChanges();
-                    return true;
-                }
+                user.DiscountReceived = true;
+                db.SaveChanges();
+                Console.WriteLine("Gefeliciteerd je ontvangt korting op je bestelling!");
+                return true;
             }
         }
 
