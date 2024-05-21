@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ProjectB.Migrations
 {
     [DbContext(typeof(DataBaseConnection))]
-    partial class DataBaseConnectionModelSnapshot : ModelSnapshot
+    [Migration("20240520235350_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.0");
@@ -110,9 +113,6 @@ namespace ProjectB.Migrations
                     b.Property<int>("Movie_ID")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("SoldOut")
-                        .HasColumnType("INTEGER");
-
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("TEXT");
 
@@ -131,9 +131,6 @@ namespace ProjectB.Migrations
 
                     b.Property<int>("Chair_ID")
                         .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("DateBought")
-                        .HasColumnType("TEXT");
 
                     b.Property<int>("Movie_ID")
                         .HasColumnType("INTEGER");
@@ -158,9 +155,6 @@ namespace ProjectB.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("DiscountReceived")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("IsAdmin")
                         .HasColumnType("INTEGER");
 
@@ -169,9 +163,6 @@ namespace ProjectB.Migrations
 
                     b.Property<string>("Password")
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("Visits")
-                        .HasColumnType("INTEGER");
 
                     b.HasKey("ID");
 
