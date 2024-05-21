@@ -39,7 +39,7 @@ public class Ticket
         return price;
     }
 
-    public double GetSeatPrice(int seatType, int seatrow, int seatcol, Schedule schedule)
+    public double GetSeatPrice(int seatType, int seatrow, int seatcol, Schedule schedule, bool qualifyForDiscount)
     {
         // Here you can implement your pricing logic based on seat type, seat number, and schedule
         // For demonstration purposes, let's say you have a simple pricing logic
@@ -103,6 +103,13 @@ public class Ticket
         if (IsEarlyTime(schedule.StartDate))
         {
             Price -= 5;
+        }
+
+        if (qualifyForDiscount)
+        {
+            double discountPercentage = 0.10;
+            double discountAmount = Price * discountPercentage;
+            Price -= discountAmount;
         }
 
         return Price;

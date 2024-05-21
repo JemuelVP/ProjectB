@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.IO;
 
 class DataBaseConnection : DbContext
 {

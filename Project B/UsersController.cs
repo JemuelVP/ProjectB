@@ -1,9 +1,17 @@
 public class UserController
 {
-    public void CreateUser(string name, string password, int Isadmin = 1)
+    public bool CreateUser(string name, string password, int Isadmin = 1, bool discountReceived = false)
     {
         using DataBaseConnection db = new();
-        var newUser = new Users
+        // check if user already exists (case sensitive)
+        Users existingUser = db.Users.FirstOrDefault(u => u.Name == name);
+        if (existingUser != null)
+        {
+            Console.WriteLine($"Gebruikersnaam ({name}) bestaat al, kies een andere naam: ");
+            return false;
+        }
+        // if user does not already exist, creates new user
+        Users newUser = new Users
         {
             Name = name,
             Password = password,
@@ -11,5 +19,6 @@ public class UserController
         };
         db.Users.Add(newUser);
         db.SaveChanges();
+        return true;
     }
 }

@@ -110,7 +110,7 @@ public class Admin
     {
         DateTime startDate = DateTime.Now;
         DateTime endDate = DateTime.Now.AddDays(28);
-        var schedules = ScheduleController.GetAvailableSchedules(
+        var schedules = ScheduleController.GetAllSchedules(
         startDate,
         endDate
         );

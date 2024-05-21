@@ -85,13 +85,18 @@ public class Customer
         var username = AnsiConsole.Prompt(
             new TextPrompt<string>("Voer een gebruikersnaam in: ")
         );
-        var passWord = AnsiConsole.Prompt(
+        var password = AnsiConsole.Prompt(
             new TextPrompt<string>("Voer een wachtwoord in: ").Secret()
         );
-        userController.CreateUser(username, passWord);
-        AnsiConsole.Write(
-            new Rule("[blue]Gebruiker is aangemaakt[/]").RuleStyle("blue")
-        );
+        // checks if user was succesfully created or not
+        bool userCreated = userController.CreateUser(username, password);
+        if (userCreated)
+        {
+            // only shows message if username is not a duplicate
+            AnsiConsole.Write(
+                new Rule("[blue]Gebruiker is aangemaakt[/]").RuleStyle("blue")
+            );
+        }
     }
     private void FilmZoeken()
     {
@@ -155,21 +160,38 @@ public class Customer
         ReservationMenuOption selectedReservationOption = ReservationMenuOption.MakeReservation; // Start with MakeReservation option
         DateTime startDate = DateTime.Now;
         DateTime endDate = DateTime.Now.AddDays(28);
-        var schedules = ScheduleController.GetAvailableSchedules(startDate, endDate);
+        var schedules = ScheduleController.GetTitlesForScheduledMovies(startDate, endDate);
+        var AllSchedules = ScheduleController.GetAvailableSchedules(startDate,endDate);
         Film film = new();
         var choices = schedules
-                .Select(s => $"{s.Film.Title} - {s.StartDate.ToString("dd-MM-yyyy HH:mm")}")
+                .Select(s => $"{s.Film.Title}")
                 .ToList();
 
         var selectedMovieIndex = AnsiConsole.Prompt(
             new SelectionPrompt<string>().Title("Kies een film").AddChoices(choices)
         );
 
-        // Get the selected schedule based on the selected movie
-        var selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
-        film = selectedSchedule.Film;
-        // Display the details of the selected movie
-        filmController.Display(film);
+            // Get the selected schedule based on the selected movie
+            var selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
+            // start code here
+            var newChoices = AllSchedules.Where(s => s.Film.Title == selectedSchedule.Film.Title)
+                                    .Select(s =>
+                                    {
+
+                                        if (s.SoldOut)
+                                            return $"{s.Film.Title} - {s.StartDate.ToString("dd-MM-yyyy HH:mm")} - uitverkocht";
+                                        else
+                                            return $"{s.Film.Title} - {s.StartDate.ToString("dd-MM-yyyy HH:mm")}";
+                                    })
+                                    .ToList();
+            var newSelectedSchedules = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Kies een datum").AddChoices(newChoices));
+
+            selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
+
+            film = selectedSchedule.Film;
+            // end code here
+            // Display the details of the selected movie
+            filmController.Display(film);
 
         // Prompt the user to make a reservation or go back
         selectedReservationOption = AnsiConsole.Prompt(
