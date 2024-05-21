@@ -173,6 +173,21 @@ public class Admin
                 null,
                 System.Globalization.DateTimeStyles.None
             );
+            // Check if the entered date is in the past
+            if (date < DateTime.Now)
+            {
+                AnsiConsole.Markup("[red]De ingevoerde datum ligt in het verleden. Probeer het opnieuw.[/]");
+                AnsiConsole.WriteLine();
+                break;
+            }
+
+            // Check if the entered date is beyond 4 weeks from now
+            var maxScheduleDate = DateTime.Now.AddDays(28);
+            if (date > maxScheduleDate)
+            {
+                AnsiConsole.Markup("[yellow]De ingevoerde datum ligt buiten de 4-weken termijn, maar de film zal worden gepland.[/]");
+            }
+            AnsiConsole.WriteLine();
             var halls = hallController.GetAllHalls();
             string[] hallNames = halls.Select(hall => hall.Name).ToArray();
             var selectedHallName = AnsiConsole.Prompt(
@@ -183,7 +198,8 @@ public class Admin
                 break;
             var schedule = new Schedule();
             schedule.CreateFromFilm(selectedMovie, selectedHall.ID, date);
-
+            AnsiConsole.Markup("[green]Film is succesvol toegevoegd aan de schema.[/]");
+            AnsiConsole.WriteLine();
             Console.ReadKey();
             break;
         }
