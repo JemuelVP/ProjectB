@@ -1,5 +1,6 @@
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using Spectre.Console;
+
 public class Customer
 {
     private bool IsLoggedIn { get; set; }
@@ -7,21 +8,24 @@ public class Customer
 
     private Users User { get; set; }
     private CustomerChoices SelectedCustomerOption { get; set; }
+
     public Customer()
     {
         IsLoggedIn = false;
         filmController = new FilmController();
         User = new Users();
     }
+
     private void SetSelectedCustomerOption()
     {
-        var choices = new List<CustomerChoices>{
+        var choices = new List<CustomerChoices>
+        {
             CustomerChoices.AccountAanmaken,
             CustomerChoices.Inloggen,
             CustomerChoices.FilmZoeken,
             CustomerChoices.Films,
             CustomerChoices.Back
-            };
+        };
         if (User.LoggedIn)
         {
             choices.Remove(CustomerChoices.AccountAanmaken);
@@ -39,11 +43,10 @@ public class Customer
         SelectedCustomerOption = AnsiConsole.Prompt(
             new SelectionPrompt<CustomerChoices>()
                 .Title($"[blue]Welkom {User.Name} wat wilt u doen?[/]")
-                .AddChoices(
-                    choices
-                )
+                .AddChoices(choices)
         );
     }
+
     public void Run()
     {
         while (true)
@@ -75,16 +78,14 @@ public class Customer
                     break;
             }
         }
-
     }
 
     private void AccountAanmaken()
     {
-        if (IsLoggedIn) return;
+        if (IsLoggedIn)
+            return;
         UserController userController = new();
-        var username = AnsiConsole.Prompt(
-            new TextPrompt<string>("Voer een gebruikersnaam in: ")
-        );
+        var username = AnsiConsole.Prompt(new TextPrompt<string>("Voer een gebruikersnaam in: "));
         var password = AnsiConsole.Prompt(
             new TextPrompt<string>("Voer een wachtwoord in: ").Secret()
         );
@@ -93,23 +94,25 @@ public class Customer
         if (userCreated)
         {
             // only shows message if username is not a duplicate
-            AnsiConsole.Write(
-                new Rule("[blue]Gebruiker is aangemaakt[/]").RuleStyle("blue")
-            );
+            AnsiConsole.Write(new Rule("[blue]Gebruiker is aangemaakt[/]").RuleStyle("blue"));
         }
     }
+
     private void FilmZoeken()
     {
         DateTime startDate = DateTime.Now;
         DateTime endDate = DateTime.Now.AddDays(28);
         string MovieSearch = AnsiConsole.Prompt(new TextPrompt<string>("Zoek film categorie: "));
-        List<Schedule> searchSchedules = FilmController.GetMovieByCategory(MovieSearch, startDate, endDate);
+        List<Schedule> searchSchedules = FilmController.GetMovieByCategory(
+            MovieSearch,
+            startDate,
+            endDate
+        );
         Console.WriteLine(searchSchedules.Count);
 
         if (searchSchedules.Count > 0)
         {
             FilmTicketKopen();
-
         }
         else
         {
@@ -117,13 +120,18 @@ public class Customer
             Console.ReadLine();
         }
     }
+
     private void Inloggen()
     {
-        var customerName = AnsiConsole.Prompt(new TextPrompt<string>("Voer je gebruikersnaam in: "));
-        var customerPassword = AnsiConsole.Prompt(new TextPrompt<string>("Voer je wachtwoord in: ").Secret());
+        var customerName = AnsiConsole.Prompt(
+            new TextPrompt<string>("Voer je gebruikersnaam in: ")
+        );
+        var customerPassword = AnsiConsole.Prompt(
+            new TextPrompt<string>("Voer je wachtwoord in: ").Secret()
+        );
         User.UserLogin(customerName, customerPassword);
-
     }
+
     private void Uitloggen()
     {
         var choice = AnsiConsole.Prompt(
@@ -136,9 +144,9 @@ public class Customer
             User = new Users();
         }
     }
+
     private void FilmsBekijken()
     {
-
         DateTime startDate = DateTime.Now;
         DateTime endDate = DateTime.Now.AddDays(28);
         ReservationMenuOption selectedReservationOption = ReservationMenuOption.MakeReservation; // Start with MakeReservation option
@@ -161,66 +169,65 @@ public class Customer
         DateTime startDate = DateTime.Now;
         DateTime endDate = DateTime.Now.AddDays(28);
         var schedules = ScheduleController.GetTitlesForScheduledMovies(startDate, endDate);
-        var AllSchedules = ScheduleController.GetAvailableSchedules(startDate,endDate);
+        var AllSchedules = ScheduleController.GetAvailableSchedules(startDate, endDate);
         Film film = new();
-        var choices = schedules
-                .Select(s => $"{s.Film.Title}")
-                .ToList();
+        var choices = schedules.Select(s => $"{s.Film.Title}").ToList();
 
         var selectedMovieIndex = AnsiConsole.Prompt(
             new SelectionPrompt<string>().Title("Kies een film").AddChoices(choices)
         );
 
-            // Get the selected schedule based on the selected movie
-            var selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
-            // start code here
-            var newChoices = AllSchedules.Where(s => s.Film.Title == selectedSchedule.Film.Title)
-                                    .Select(s =>
-                                    {
+        // Get the selected schedule based on the selected movie
+        var selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
+        // start code here
+        var newChoices = AllSchedules
+            .Where(s => s.Film.Title == selectedSchedule.Film.Title)
+            .Select(s =>
+            {
+                if (s.SoldOut)
+                    return $"{s.Film.Title} - {s.StartDate.ToString("dd-MM-yyyy HH:mm")} - uitverkocht";
+                else
+                    return $"{s.Film.Title} - {s.StartDate.ToString("dd-MM-yyyy HH:mm")}";
+            })
+            .ToList();
+        var newSelectedSchedules = AnsiConsole.Prompt(
+            new SelectionPrompt<string>().Title("Kies een datum").AddChoices(newChoices)
+        );
 
-                                        if (s.SoldOut)
-                                            return $"{s.Film.Title} - {s.StartDate.ToString("dd-MM-yyyy HH:mm")} - uitverkocht";
-                                        else
-                                            return $"{s.Film.Title} - {s.StartDate.ToString("dd-MM-yyyy HH:mm")}";
-                                    })
-                                    .ToList();
-            var newSelectedSchedules = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Kies een datum").AddChoices(newChoices));
+        selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
 
-            selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
-
-            film = selectedSchedule.Film;
-            // end code here
-            // Display the details of the selected movie
-            filmController.Display(film);
+        film = selectedSchedule.Film;
+        // end code here
+        // Display the details of the selected movie
+        filmController.Display(film);
 
         // Prompt the user to make a reservation or go back
         selectedReservationOption = AnsiConsole.Prompt(
             new SelectionPrompt<ReservationMenuOption>()
                 .Title("Maak een keuze")
-                .AddChoices(
-                    ReservationMenuOption.MakeReservation,
-                    ReservationMenuOption.Back
-                )
+                .AddChoices(ReservationMenuOption.MakeReservation, ReservationMenuOption.Back)
         );
 
         if (selectedReservationOption == ReservationMenuOption.MakeReservation)
         {
-            var userName = AnsiConsole.Prompt(new TextPrompt<string>("Voer u naam in: "));
+            if (!User.LoggedIn)
+            {
+                var userName = AnsiConsole.Prompt(new TextPrompt<string>("Voer u naam in: "));
+            }
             var age = AnsiConsole.Prompt(new TextPrompt<int>("Voer uw leeftijd in: "));
             var ticketAge = new Ticket();
             ticketAge.CheckAge(film, age); // checks age against age movie
             // AnsiConsole.Write(new Rule("[blue]Stoel Kosten[/]").RuleStyle("blue"));
-            var targetHall = new CinemaHallController(new DataBaseConnection()).GetByID(selectedSchedule.Hall_ID);
-            if (targetHall == null) return;
-            // var availableSeats = ChairController.GetAvailableSeats(
-            //     selectedSchedule.ID,
-            //     selectedSchedule.Hall_ID
-            // );
+            var targetHall = new CinemaHallController(new DataBaseConnection()).GetByID(
+                selectedSchedule.Hall_ID
+            );
+            if (targetHall == null)
+                return;
             while (true)
             {
                 int width = -1;
                 int height = -1;
-                switch(targetHall.Size)
+                switch (targetHall.Size)
                 {
                     case "Small":
                         width = 12;
@@ -239,11 +246,16 @@ public class Customer
 
                 Console.CursorVisible = false; // Hide the cursor
 
-
                 // Draw the canvas
                 Console.Clear();
-                List<Tuple<int,int>> listSelectedChairs = new();
-                canvas.Draw(selectedSchedule.ID, targetHall.Size,width,height, listSelectedChairs);
+                List<Tuple<int, int>> listSelectedChairs = new();
+                canvas.Draw(
+                    selectedSchedule.ID,
+                    targetHall.Size,
+                    width,
+                    height,
+                    listSelectedChairs
+                );
                 var selectedChairs = new List<int>();
                 var isSelectingChair = true;
                 // Main loop to handle cursor movement
@@ -267,10 +279,17 @@ public class Customer
                         case ConsoleKey.Spacebar:
                             using (DataBaseConnection db = new DataBaseConnection())
                             {
-                                var chair = db.Chair.FirstOrDefault(c => c.Row == canvas.cursorY && c.Column == canvas.cursorX && c.CinemaHallID == targetHall.ID);
+                                var chair = db.Chair.FirstOrDefault(c =>
+                                    c.Row == canvas.cursorY
+                                    && c.Column == canvas.cursorX
+                                    && c.CinemaHallID == targetHall.ID
+                                );
                                 if (chair != null)
                                 {
-                                    var getTicket = db.Ticket.FirstOrDefault(t => t.Schedule_ID == selectedSchedule.ID && t.Chair_ID == chair.ID);
+                                    var getTicket = db.Ticket.FirstOrDefault(t =>
+                                        t.Schedule_ID == selectedSchedule.ID
+                                        && t.Chair_ID == chair.ID
+                                    );
                                     if (getTicket != null)
                                     {
                                         break; // Skip to the next iteration
@@ -278,11 +297,15 @@ public class Customer
                                     if (selectedChairs.Contains(chair.ID))
                                     {
                                         selectedChairs.Remove(chair.ID);
-                                        listSelectedChairs.Remove(Tuple.Create(canvas.cursorY, canvas.cursorX));
+                                        listSelectedChairs.Remove(
+                                            Tuple.Create(canvas.cursorY, canvas.cursorX)
+                                        );
                                         break;
                                     }
                                     selectedChairs.Add(chair.ID);
-                                    listSelectedChairs.Add(Tuple.Create(canvas.cursorY, canvas.cursorX));
+                                    listSelectedChairs.Add(
+                                        Tuple.Create(canvas.cursorY, canvas.cursorX)
+                                    );
                                 }
                             }
                             break;
@@ -292,14 +315,24 @@ public class Customer
                             break;
                     }
                     // Redraw canvas with updated cursor position
-                    canvas.Draw(selectedSchedule.ID, targetHall.Size, width, height, listSelectedChairs);
+                    canvas.Draw(
+                        selectedSchedule.ID,
+                        targetHall.Size,
+                        width,
+                        height,
+                        listSelectedChairs
+                    );
                     // AnsiConsole.WriteLine($"Aantal geslecteerde stoelen: {selectedChairs.Count}");
                 }
                 Console.Clear();
                 int seatType = -1;
                 using (DataBaseConnection db = new DataBaseConnection())
                 {
-                    var chairType = db.Chair.FirstOrDefault(c => c.Row == canvas.cursorY && c.Column == canvas.cursorX && c.CinemaHallID == targetHall.ID);
+                    var chairType = db.Chair.FirstOrDefault(c =>
+                        c.Row == canvas.cursorY
+                        && c.Column == canvas.cursorX
+                        && c.CinemaHallID == targetHall.ID
+                    );
                     if (chairType?.SeatType == 0)
                     {
                         seatType = 0;
@@ -326,15 +359,31 @@ public class Customer
                         int chairY = chair.Row;
 
                         // Calculate the seat price using the actual chair coordinates
-                        var seatPrice = ticket.GetSeatPrice(seatType, chairY, chairX, selectedSchedule, qualifyForDiscount);
-                        AnsiConsole.Write(new Rule($"[blue]Prijs: {seatPrice} euro[/]").RuleStyle("blue"));
+                        var seatPrice = ticket.GetSeatPrice(
+                            seatType,
+                            chairY,
+                            chairX,
+                            selectedSchedule,
+                            qualifyForDiscount
+                        );
+                        AnsiConsole.Write(
+                            new Rule($"[blue]Prijs: {seatPrice} euro[/]").RuleStyle("blue")
+                        );
                     }
                 }
                 var confirmPurchase = AnsiConsole.Confirm("Wil je de bestelling bevestigen?");
                 if (confirmPurchase)
                 {
                     var db = new DataBaseConnection();
+                    var currentUser = db.Users.FirstOrDefault(u => u.ID == User.ID);
+                    if (currentUser == null)
+                    {
+                        AnsiConsole.WriteLine("User not found in the database.");
+                        return;
+                    }
                     var totalPrice = 0.0;
+                    currentUser.Visits += 1;
+                    db.SaveChanges();
                     foreach (var chairId in selectedChairs)
                     {
                         // Retrieve chair object by ID from the database
@@ -347,7 +396,19 @@ public class Customer
                             int chairY = chair.Row;
 
                             // Use chairX and chairY in your logic to calculate the final price
-                            var finalPrice = ticket.CreateTicket(selectedSchedule, chairId, film.ID, ticket.GetSeatPrice(seatType, chairY, chairX, selectedSchedule,qualifyForDiscount), User.ID);
+                            var finalPrice = ticket.CreateTicket(
+                                selectedSchedule,
+                                chairId,
+                                film.ID,
+                                ticket.GetSeatPrice(
+                                    seatType,
+                                    chairY,
+                                    chairX,
+                                    selectedSchedule,
+                                    qualifyForDiscount
+                                ),
+                                User.ID
+                            );
 
                             // Increment total price
                             totalPrice += finalPrice;
@@ -360,7 +421,6 @@ public class Customer
                 break;
             }
         }
-
     }
 
     public enum CustomerChoices
@@ -375,5 +435,4 @@ public class Customer
         LogOut,
         Back,
     }
-
 }
