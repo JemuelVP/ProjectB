@@ -164,25 +164,25 @@ private void FilmsOverZicht()
         DateTime date;
         while (true)
         {
-            Console.WriteLine("Voer een datum in ANSI-formaat in (dd-MM-jjjj HH:mm:ss):");
+            Console.WriteLine("Voer een datum in ANSI-formaat in (dd-MM-jjjj HH:mm):");
             string? userInput = Console.ReadLine();
             if (userInput == null)
             {
-                AnsiConsole.Markup("[red]De invoer mag niet leeg zijn. Probeer het opnieuw.[/]");
+                AnsiConsole.Markup("[red]De invoer mag niet leeg zijn. Probeer het opnieuw.[/]\n");
                 continue;
             }
             try
             {
                 date = DateTime.ParseExact(
                     userInput,
-                    "dd-MM-yyyy HH:mm:ss",
+                    "dd-MM-yyyy HH:mm",
                     null,
                     System.Globalization.DateTimeStyles.None
                 );
                 
                 if (date < DateTime.Now)
                 {
-                    AnsiConsole.Markup("[red]De ingevoerde datum ligt in het verleden. Probeer het opnieuw.[/]");
+                    AnsiConsole.Markup("[red]De ingevoerde datum ligt in het verleden. Probeer het opnieuw.[/]\n");
                     continue;
                 }
                 
@@ -190,7 +190,7 @@ private void FilmsOverZicht()
             }
             catch (FormatException)
             {
-                AnsiConsole.Markup("[red]Ongeldig datumformaat. Probeer het opnieuw.[/]");
+                AnsiConsole.Markup("[red]Ongeldig datumformaat. Probeer het opnieuw.[/]\n");
             }
         }
 
@@ -213,7 +213,6 @@ private void FilmsOverZicht()
         schedule.CreateFromFilm(selectedMovie, selectedHall.ID, date);
         AnsiConsole.Markup("[green]Film is succesvol toegevoegd aan de schema.[/]");
         AnsiConsole.WriteLine();
-        Console.ReadKey();
         break;
     }
 }
