@@ -36,27 +36,22 @@ public class Users
 
     public void UserLogin(string? name, string? password)
     {
-        bool LoggedIn = false;
-
-        while (!LoggedIn)
+        using DataBaseConnection db = new();
+        var user = db.Users.FirstOrDefault(user =>
+            user.Name == name && user.Password == password && user.IsAdmin == 1
+        );
+        if (user != null)
         {
-            using DataBaseConnection db = new();
-            var user = db.Users.FirstOrDefault(user =>
-                user.Name == name && user.Password == password && user.IsAdmin == 1
-            );
-            if (user != null)
-            {
-                ID = user.ID;
-                Name = user.Name;
-                Password = user.Password;
-                IsAdmin = user.IsAdmin;
-                LoggedIn = true;
-            }
-            else
-            {
-                AnsiConsole.WriteLine("Verkeerde gegevens ingevuld, probeer het opnieuw");
-                return;
-            }
+            ID = user.ID;
+            Name = user.Name;
+            Password = user.Password;
+            IsAdmin = user.IsAdmin;
+            LoggedIn = true;
+        }
+        else
+        {
+            AnsiConsole.WriteLine("Verkeerde gegevens ingevuld, probeer het opnieuw");
+            return;
         }
     }
 }
