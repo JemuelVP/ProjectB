@@ -36,7 +36,7 @@ public class Customer
             AnsiConsole.Write(new Rule("[blue]Succesvol ingelogd[/]").RuleStyle("blue"));
             choices.Add(CustomerChoices.FilmZoeken);
             choices.Add(CustomerChoices.Films);
-            choices.Add(CustomerChoices.SeeUserStats);
+            choices.Add(CustomerChoices.ToonMijnReserveringen);
             choices.Add(CustomerChoices.LogOut);
             choices.Add(CustomerChoices.Back);
         }
@@ -70,7 +70,7 @@ public class Customer
                 case CustomerChoices.Films:
                     FilmsBekijken();
                     break;
-                case CustomerChoices.SeeUserStats:
+                case CustomerChoices.ToonMijnReserveringen:
                     Ticket.SeeUserStats(User.ID);
                     break;
                 case CustomerChoices.LogOut:
@@ -431,7 +431,7 @@ public class Customer
         Inloggen,
         Films,
 
-        SeeUserStats,
+        ToonMijnReserveringen,
         LogOut,
         Back,
     }
