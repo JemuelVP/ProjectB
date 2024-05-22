@@ -268,10 +268,10 @@ public class ConsoleCanvas
         AnsiConsole.Markup("[DarkOrange3_1]Oranje: Extra Beenruimte[/]\n");
         AnsiConsole.Markup("[DodgerBlue3]Blauw: Standaard[/]\n");
         AnsiConsole.Markup("[Green]Groen: Selected chairs[/]\n");
-        AnsiConsole.Markup("[Blue] Gebruik de ↑ knop om omhoog te gaan[/]\n");
-        AnsiConsole.Markup("[Blue] Gebruik de ↓ knop om omlaag te gaan[/]\n");
-        AnsiConsole.Markup("[Blue] Gebruik de → knop om rechts te gaan[/]\n");
-        AnsiConsole.Markup("[Blue] Gebruik de ← knop om links te gaan[/]\n");
+        // AnsiConsole.Markup("[Blue] Gebruik de ↑ knop om omhoog te gaan[/]\n");
+        // AnsiConsole.Markup("[Blue] Gebruik de ↓ knop om omlaag te gaan[/]\n");
+        // AnsiConsole.Markup("[Blue] Gebruik de → knop om rechts te gaan[/]\n");
+        // AnsiConsole.Markup("[Blue] Gebruik de ← knop om links te gaan[/]\n");
         // var omhoog = $"Gebruik de {Emoji.Known.UpArrow} knop om omhoog te gaan";
         // var omlaag = $"Gebruik de {Emoji.Known.DownArrow} knop om omlaag te gaan";
         // var rechts = $"Gebruik de {Emoji.Known.RightArrow} knop om rechts te gaan";

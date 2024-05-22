@@ -376,15 +376,20 @@ public class Customer
                 if (confirmPurchase)
                 {
                     var db = new DataBaseConnection();
-                    var currentUser = db.Users.FirstOrDefault(u => u.ID == User.ID);
-                    if (currentUser == null)
+                    if(IsLoggedIn)
                     {
-                        AnsiConsole.WriteLine("User not found in the database.");
-                        return;
+                        var currentUser = db.Users.FirstOrDefault(u => u.ID == User.ID);
+                        if (currentUser != null)
+                        {
+                            AnsiConsole.WriteLine("User not found in the database.");
+                            currentUser.Visits += 1;
+                            db.SaveChanges();
+                            return;
+                        }
                     }
+                    
                     var totalPrice = 0.0;
-                    currentUser.Visits += 1;
-                    db.SaveChanges();
+
                     foreach (var chairId in selectedChairs)
                     {
                         // Retrieve chair object by ID from the database
