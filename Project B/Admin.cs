@@ -129,7 +129,8 @@ private void FilmsOverZicht()
 {
     var adminOverview = AdminController.GetAllMovies();
     string[] movieTitle = adminOverview
-    .Select(book => $"Titel: {book.Title}")
+    .Select(book => $"{book.Title}")
+    .OrderBy(title => title)  // Sort titles alphabetically
     .ToArray();
     var overviewMovies = AnsiConsole.Prompt(
         new SelectionPrompt<string>()
