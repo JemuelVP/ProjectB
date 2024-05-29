@@ -33,7 +33,6 @@ public class Customer
             choices.Remove(CustomerChoices.FilmZoeken);
             choices.Remove(CustomerChoices.Films);
             choices.Remove(CustomerChoices.Back);
-            AnsiConsole.Write(new Rule("[blue]Succesvol ingelogd[/]").RuleStyle("blue"));
             choices.Add(CustomerChoices.FilmZoeken);
             choices.Add(CustomerChoices.Films);
             choices.Add(CustomerChoices.ToonMijnReserveringen);
@@ -131,6 +130,7 @@ public class Customer
         );
 
         User.UserLogin(customerName, customerPassword);
+        AnsiConsole.Write(new Rule("[blue]Succesvol ingelogd[/]").RuleStyle("blue"));
     }
 
     private void Uitloggen()
