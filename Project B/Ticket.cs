@@ -218,22 +218,14 @@ public class Ticket
             if (ticketsPerSchedule.Any())
             {
                 Console.ForegroundColor = ConsoleColor.Blue;
-<<<<<<< HEAD
-                Console.WriteLine("Overview of visited movies and total tickets per schedule");
-=======
                 Console.WriteLine("Overzicht van de bezochte films en totale tickets per schema");
->>>>>>> 5c49a5de221ccd506aeea7122656154f71003af7
                 Console.ResetColor();
 
                 foreach (var scheduleInfo in ticketsPerSchedule)
                 {
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine(
-<<<<<<< HEAD
-                        $"Movie: {scheduleInfo.MovieName}, Ticket IDS: {string.Join(", ", scheduleInfo.TicketIDs)} , Tickets bought: {scheduleInfo.TicketCount}, Total Price: {scheduleInfo.TotalPrice}, Date Bought: {scheduleInfo.DateBought}"
-=======
                         $"Film: {scheduleInfo.MovieName}, Ticket IDS: {string.Join(", ", scheduleInfo.TicketIDs)} , Tickets gekocht: {scheduleInfo.TicketCount}, Totale Prijs: {scheduleInfo.TotalPrice}, Datum gekocht: {scheduleInfo.DateBought}"
->>>>>>> 5c49a5de221ccd506aeea7122656154f71003af7
                     );
                     Console.ResetColor();
                 }
@@ -241,21 +233,11 @@ public class Ticket
             else
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-<<<<<<< HEAD
-                Console.WriteLine("No tickets have been purchased on this account yet");
-=======
                 Console.WriteLine("Er zijn nog geen tickets op deze account gekocht");
->>>>>>> 5c49a5de221ccd506aeea7122656154f71003af7
                 Console.ResetColor();
             }
         }
     }
-<<<<<<< HEAD
-
-
-
-=======
->>>>>>> 5c49a5de221ccd506aeea7122656154f71003af7
     public static bool UserTicketDiscount(int userID)
     {
         using DataBaseConnection db = new();

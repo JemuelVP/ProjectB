@@ -50,6 +50,7 @@ public class Customer
     {
         while (true)
         {
+            
             SetSelectedCustomerOption();
             if (SelectedCustomerOption == CustomerChoices.Back)
             {
@@ -81,6 +82,7 @@ public class Customer
 
     private void AccountAanmaken()
     {
+        Console.Clear();
         if (IsLoggedIn)
             return;
         UserController userController = new();
@@ -99,6 +101,7 @@ public class Customer
 
     private void FilmZoeken()
     {
+        Console.Clear();
         DateTime startDate = DateTime.Now;
         DateTime endDate = DateTime.Now.AddDays(28);
         string MovieSearch = AnsiConsole.Prompt(new TextPrompt<string>("Zoek film categorie: "));
@@ -122,6 +125,7 @@ public class Customer
 
     private void Inloggen()
     {
+        Console.Clear();
         var customerName = AnsiConsole.Prompt(
             new TextPrompt<string>("Voer je gebruikersnaam in: ")
         );
@@ -135,6 +139,7 @@ public class Customer
 
     private void Uitloggen()
     {
+        Console.Clear();
         var choice = AnsiConsole.Prompt(
             new SelectionPrompt<Logout>()
                 .Title("[red]Weet je zeker dat je wilt uitloggen?[/]")
@@ -148,6 +153,7 @@ public class Customer
 
     private void FilmsBekijken()
     {
+        Console.Clear();
         DateTime startDate = DateTime.Now;
         DateTime endDate = DateTime.Now.AddDays(28);
         ReservationMenuOption selectedReservationOption = ReservationMenuOption.MakeReservation; // Start with MakeReservation option
