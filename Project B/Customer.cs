@@ -110,7 +110,6 @@ public class Customer
             startDate,
             endDate
         );
-        Console.WriteLine(searchSchedules.Count);
 
         if (searchSchedules.Count > 0)
         {
