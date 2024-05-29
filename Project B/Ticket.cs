@@ -194,7 +194,7 @@ public class Ticket
         Console.WriteLine($"Prijs: {price} euro");
         Console.ResetColor();
     }
-
+    
     public static void SeeUserStats(int userID)
     {
         using (DataBaseConnection db = new DataBaseConnection())
@@ -218,14 +218,22 @@ public class Ticket
             if (ticketsPerSchedule.Any())
             {
                 Console.ForegroundColor = ConsoleColor.Blue;
+<<<<<<< HEAD
                 Console.WriteLine("Overview of visited movies and total tickets per schedule");
+=======
+                Console.WriteLine("Overzicht van de bezochte films en totale tickets per schema");
+>>>>>>> 5c49a5de221ccd506aeea7122656154f71003af7
                 Console.ResetColor();
 
                 foreach (var scheduleInfo in ticketsPerSchedule)
                 {
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine(
+<<<<<<< HEAD
                         $"Movie: {scheduleInfo.MovieName}, Ticket IDS: {string.Join(", ", scheduleInfo.TicketIDs)} , Tickets bought: {scheduleInfo.TicketCount}, Total Price: {scheduleInfo.TotalPrice}, Date Bought: {scheduleInfo.DateBought}"
+=======
+                        $"Film: {scheduleInfo.MovieName}, Ticket IDS: {string.Join(", ", scheduleInfo.TicketIDs)} , Tickets gekocht: {scheduleInfo.TicketCount}, Totale Prijs: {scheduleInfo.TotalPrice}, Datum gekocht: {scheduleInfo.DateBought}"
+>>>>>>> 5c49a5de221ccd506aeea7122656154f71003af7
                     );
                     Console.ResetColor();
                 }
@@ -233,37 +241,38 @@ public class Ticket
             else
             {
                 Console.ForegroundColor = ConsoleColor.Red;
+<<<<<<< HEAD
                 Console.WriteLine("No tickets have been purchased on this account yet");
+=======
+                Console.WriteLine("Er zijn nog geen tickets op deze account gekocht");
+>>>>>>> 5c49a5de221ccd506aeea7122656154f71003af7
                 Console.ResetColor();
             }
         }
     }
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> 5c49a5de221ccd506aeea7122656154f71003af7
     public static bool UserTicketDiscount(int userID)
     {
         using DataBaseConnection db = new();
 
         Users user = db.Users.FirstOrDefault(u => u.ID == userID);
 
-        if (!user.DiscountReceived)
+        if (user != null)
         {
-            List<Ticket> userTickets = db.Ticket.Where(t => t.User_ID == userID).ToList();
             int totalVisits = user.Visits;
             List<int> wantedTotalVisits = new List<int> { 11, 21, 31, 41, 51, 61, 71, 81, 91 };
 
-            foreach (int visit in wantedTotalVisits)
+            if (wantedTotalVisits.Contains(totalVisits))
             {
-                if (totalVisits == visit)
-                {
-                    Console.WriteLine(
-                        "Gefeliciteerd je ontvangt korting op je volgende bestelling!"
-                    );
-                    user.DiscountReceived = true;
-                    db.SaveChanges();
-                    return true;
-                }
+                user.DiscountReceived = true;
+                db.SaveChanges();
+                Console.WriteLine("Gefeliciteerd je ontvangt korting op je bestelling!");
+                return true;
             }
         }
 

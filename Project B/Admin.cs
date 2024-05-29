@@ -125,68 +125,98 @@ public class Admin
         foreach (var movie in movies)
             AnsiConsole.WriteLine(movie);
     }
-    private void FilmsOverZicht()
+private void FilmsOverZicht()
+{
+    var adminOverview = AdminController.GetAllMovies();
+    string[] movieTitle = adminOverview
+    .Select(book => $"{book.Title}")
+    .OrderBy(title => title)  // Sort titles alphabetically
+    .ToArray();
+    var overviewMovies = AnsiConsole.Prompt(
+        new SelectionPrompt<string>()
+            .Title("Kies een film :")
+            .AddChoices(movieTitle)
+    );
+    // Get the total price for the selected movie
+    string titlePart = overviewMovies.Replace("Titel: ", "");
+    var selectedMovie = AdminController.GetMovieByTitle(titlePart);
+    var ScheduleMovie = AnsiConsole.Prompt(
+    new SelectionPrompt<RevenueOrScheduleMovie>()
+        .Title("[green]Wat wilt u nu doen[/]")
+        .AddChoices(
+            RevenueOrScheduleMovie.TotaleOmzet,
+            RevenueOrScheduleMovie.ScheduleMovie
+        )
+    );
+    switch (ScheduleMovie)
     {
-        var adminOverview = AdminController.GetAllMovies();
-        string[] movieTitle = adminOverview
-        .Select(book => $"{book.Title}")
-        .OrderBy(title => title)  // Sort titles alphabetically
-        .ToArray();
-        var overviewMovies = AnsiConsole.Prompt(
-            new SelectionPrompt<string>()
-                .Title("Kies een film :")
-                .AddChoices(movieTitle)
+    case RevenueOrScheduleMovie.TotaleOmzet:
+        Console.ForegroundColor = ConsoleColor.Blue;
+        AnsiConsole.WriteLine(
+            $"Total Tickets: {RevenueStatistics.GetTotalTicketsPerMovie(selectedMovie.ID)}"
         );
-        // Get the total price for the selected movie
-        string titlePart = overviewMovies.Replace("Titel: ", "");
-        var selectedMovie = AdminController.GetMovieByTitle(titlePart);
-        var ScheduleMovie = AnsiConsole.Prompt(
-        new SelectionPrompt<RevenueOrScheduleMovie>()
-            .Title("[green]Wat wilt u nu doen[/]")
-            .AddChoices(
-                RevenueOrScheduleMovie.TotaleOmzet,
-                RevenueOrScheduleMovie.ScheduleMovie
-            )
+        AnsiConsole.WriteLine(
+            $"Totale Omzet: {RevenueStatistics.GetTotalPricePerMovie(selectedMovie.ID)}"
         );
-        switch (ScheduleMovie)
+        break;
+    case RevenueOrScheduleMovie.ScheduleMovie:
+        DateTime date;
+        while (true)
         {
-        case RevenueOrScheduleMovie.TotaleOmzet:
-            Console.ForegroundColor = ConsoleColor.Blue;
-            AnsiConsole.WriteLine(
-                $"Total Tickets: {RevenueStatistics.GetTotalTicketsPerMovie(selectedMovie.ID)}"
-            );
-            AnsiConsole.WriteLine(
-                $"Totale Omzet: {RevenueStatistics.GetTotalPricePerMovie(selectedMovie.ID)}"
-            );
-            break;
-        case RevenueOrScheduleMovie.ScheduleMovie:
-            Console.WriteLine(
-                "Voer een datum in ANSI-formaat in (dd-MM-jjjj HH:mm):"
-            );
+            Console.WriteLine("Voer een datum in ANSI-formaat in (dd-MM-jjjj HH:mm):");
             string? userInput = Console.ReadLine();
             if (userInput == null)
+            {
+                AnsiConsole.Markup("[red]De invoer mag niet leeg zijn. Probeer het opnieuw.[/]\n");
+                continue;
+            }
+            try
+            {
+                date = DateTime.ParseExact(
+                    userInput,
+                    "dd-MM-yyyy HH:mm",
+                    null,
+                    System.Globalization.DateTimeStyles.None
+                );
+                
+                if (date < DateTime.Now)
+                {
+                    AnsiConsole.Markup("[red]De ingevoerde datum ligt in het verleden. Probeer het opnieuw.[/]\n");
+                    continue;
+                }
+                
                 break;
-            var date = DateTime.ParseExact(
-                userInput,
-                "dd-MM-yyyy HH:mm",
-                null,
-                System.Globalization.DateTimeStyles.None
-            );
-            var halls = hallController.GetAllHalls();
-            string[] hallNames = halls.Select(hall => hall.Name).ToArray();
-            var selectedHallName = AnsiConsole.Prompt(
-                new SelectionPrompt<string>().AddChoices(hallNames)
-            );
-            var selectedHall = hallController.GetByName(selectedHallName);
-            if (selectedHall == null)
-                break;
-            var schedule = new Schedule();
-            schedule.CreateFromFilm(selectedMovie, selectedHall.ID, date);
-
-            Console.ReadKey();
-            break;
+            }
+            catch (FormatException)
+            {
+                AnsiConsole.Markup("[red]Ongeldig datumformaat. Probeer het opnieuw.[/]\n");
+            }
+            
         }
+
+        // Check if the entered date is beyond 4 weeks from now
+        var maxScheduleDate = DateTime.Now.AddDays(28);
+        if (date > maxScheduleDate)
+        {
+            AnsiConsole.Markup("[yellow]De ingevoerde datum ligt buiten de 4-weken termijn, maar de film zal worden gepland.[/]");
+        }
+        AnsiConsole.WriteLine();
+        var halls = hallController.GetAllHalls();
+        string[] hallNames = halls.Select(hall => hall.Name).ToArray();
+        var selectedHallName = AnsiConsole.Prompt(
+            new SelectionPrompt<string>().AddChoices(hallNames)
+        );
+        var selectedHall = hallController.GetByName(selectedHallName);
+        if (selectedHall == null)
+            break;
+        var schedule = new Schedule();
+        schedule.CreateFromFilm(selectedMovie, selectedHall.ID, date);
+        AnsiConsole.Markup("[green]Film is succesvol toegevoegd aan de schema.[/]");
+        AnsiConsole.WriteLine();
+        break;
     }
+}
+
     private void Omzet()
     {
         var money = new RevenueStatistics();

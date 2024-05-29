@@ -33,10 +33,9 @@ public class Customer
             choices.Remove(CustomerChoices.FilmZoeken);
             choices.Remove(CustomerChoices.Films);
             choices.Remove(CustomerChoices.Back);
-            AnsiConsole.Write(new Rule("[blue]Succesvol ingelogd[/]").RuleStyle("blue"));
             choices.Add(CustomerChoices.FilmZoeken);
             choices.Add(CustomerChoices.Films);
-            choices.Add(CustomerChoices.SeeUserStats);
+            choices.Add(CustomerChoices.ToonMijnReserveringen);
             choices.Add(CustomerChoices.LogOut);
             choices.Add(CustomerChoices.Back);
         }
@@ -70,7 +69,7 @@ public class Customer
                 case CustomerChoices.Films:
                     FilmsBekijken();
                     break;
-                case CustomerChoices.SeeUserStats:
+                case CustomerChoices.ToonMijnReserveringen:
                     Ticket.SeeUserStats(User.ID);
                     break;
                 case CustomerChoices.LogOut:
@@ -129,7 +128,9 @@ public class Customer
         var customerPassword = AnsiConsole.Prompt(
             new TextPrompt<string>("Voer je wachtwoord in: ").Secret()
         );
+
         User.UserLogin(customerName, customerPassword);
+        AnsiConsole.Write(new Rule("[blue]Succesvol ingelogd[/]").RuleStyle("blue"));
     }
 
     private void Uitloggen()
@@ -375,15 +376,20 @@ public class Customer
                 if (confirmPurchase)
                 {
                     var db = new DataBaseConnection();
-                    var currentUser = db.Users.FirstOrDefault(u => u.ID == User.ID);
-                    if (currentUser == null)
+                    if(IsLoggedIn)
                     {
-                        AnsiConsole.WriteLine("User not found in the database.");
-                        return;
+                        var currentUser = db.Users.FirstOrDefault(u => u.ID == User.ID);
+                        if (currentUser != null)
+                        {
+                            AnsiConsole.WriteLine("User not found in the database.");
+                            currentUser.Visits += 1;
+                            db.SaveChanges();
+                            return;
+                        }
                     }
+                    
                     var totalPrice = 0.0;
-                    currentUser.Visits += 1;
-                    db.SaveChanges();
+
                     foreach (var chairId in selectedChairs)
                     {
                         // Retrieve chair object by ID from the database
@@ -431,7 +437,7 @@ public class Customer
         Inloggen,
         Films,
 
-        SeeUserStats,
+        ToonMijnReserveringen,
         LogOut,
         Back,
     }

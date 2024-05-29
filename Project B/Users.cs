@@ -8,9 +8,12 @@ public class Users
     public int IsAdmin { get; set; }
     public bool LoggedIn = false;
     public bool DiscountReceived { get; set; }
-    public int Visits{get; set; } = 0;
-    public void Login(string? name, string? password)
+    public int Visits { get; set; } = 0;
+
+    public bool Login(string? name, string? password)
     {
+        bool LoggedIn = false;
+
         using DataBaseConnection db = new();
         var admin = db.Users.FirstOrDefault(admin =>
             admin.Name == name && admin.Password == password && admin.IsAdmin == 0
@@ -22,10 +25,12 @@ public class Users
             Password = admin.Password;
             IsAdmin = admin.IsAdmin;
             LoggedIn = true;
+            return true;
         }
         else
         {
             Console.WriteLine("Verkeerde gegevens ingevuld, probeer het opnieuw");
+            return false;
         }
     }
 
@@ -46,6 +51,7 @@ public class Users
         else
         {
             AnsiConsole.WriteLine("Verkeerde gegevens ingevuld, probeer het opnieuw");
+            return;
         }
     }
 }
