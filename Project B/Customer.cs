@@ -33,9 +33,10 @@ public class Customer
             choices.Remove(CustomerChoices.FilmZoeken);
             choices.Remove(CustomerChoices.Films);
             choices.Remove(CustomerChoices.Back);
+            AnsiConsole.Write(new Rule("[blue]Succesvol ingelogd[/]").RuleStyle("blue"));
             choices.Add(CustomerChoices.FilmZoeken);
             choices.Add(CustomerChoices.Films);
-            choices.Add(CustomerChoices.ToonMijnReserveringen);
+            choices.Add(CustomerChoices.SeeUserStats);
             choices.Add(CustomerChoices.LogOut);
             choices.Add(CustomerChoices.Back);
         }
@@ -50,7 +51,6 @@ public class Customer
     {
         while (true)
         {
-            
             SetSelectedCustomerOption();
             if (SelectedCustomerOption == CustomerChoices.Back)
             {
@@ -70,7 +70,7 @@ public class Customer
                 case CustomerChoices.Films:
                     FilmsBekijken();
                     break;
-                case CustomerChoices.ToonMijnReserveringen:
+                case CustomerChoices.SeeUserStats:
                     Ticket.SeeUserStats(User.ID);
                     break;
                 case CustomerChoices.LogOut:
@@ -82,7 +82,6 @@ public class Customer
 
     private void AccountAanmaken()
     {
-        Console.Clear();
         if (IsLoggedIn)
             return;
         UserController userController = new();
@@ -101,7 +100,6 @@ public class Customer
 
     private void FilmZoeken()
     {
-        Console.Clear();
         DateTime startDate = DateTime.Now;
         DateTime endDate = DateTime.Now.AddDays(28);
         string MovieSearch = AnsiConsole.Prompt(new TextPrompt<string>("Zoek film categorie: "));
@@ -110,6 +108,7 @@ public class Customer
             startDate,
             endDate
         );
+        Console.WriteLine(searchSchedules.Count);
 
         if (searchSchedules.Count > 0)
         {
@@ -124,21 +123,17 @@ public class Customer
 
     private void Inloggen()
     {
-        Console.Clear();
         var customerName = AnsiConsole.Prompt(
             new TextPrompt<string>("Voer je gebruikersnaam in: ")
         );
         var customerPassword = AnsiConsole.Prompt(
             new TextPrompt<string>("Voer je wachtwoord in: ").Secret()
         );
-
         User.UserLogin(customerName, customerPassword);
-        AnsiConsole.Write(new Rule("[blue]Succesvol ingelogd[/]").RuleStyle("blue"));
     }
 
     private void Uitloggen()
     {
-        Console.Clear();
         var choice = AnsiConsole.Prompt(
             new SelectionPrompt<Logout>()
                 .Title("[red]Weet je zeker dat je wilt uitloggen?[/]")
@@ -152,7 +147,6 @@ public class Customer
 
     private void FilmsBekijken()
     {
-        Console.Clear();
         DateTime startDate = DateTime.Now;
         DateTime endDate = DateTime.Now.AddDays(28);
         ReservationMenuOption selectedReservationOption = ReservationMenuOption.MakeReservation; // Start with MakeReservation option
@@ -203,7 +197,6 @@ public class Customer
         selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
 
         film = selectedSchedule.Film;
-        // end code here
         // Display the details of the selected movie
         filmController.Display(film);
 
@@ -260,12 +253,13 @@ public class Customer
                     targetHall.Size,
                     width,
                     height,
-                    listSelectedChairs
+                    listSelectedChairs,
+                    film.Title
                 );
                 var selectedChairs = new List<int>();
                 var isSelectingChair = true;
                 // Main loop to handle cursor movement
-                while (isSelectingChair)
+                do
                 {
                     ConsoleKeyInfo keyInfo = Console.ReadKey(true);
                     switch (keyInfo.Key)
@@ -326,10 +320,11 @@ public class Customer
                         targetHall.Size,
                         width,
                         height,
-                        listSelectedChairs
+                        listSelectedChairs,
+                        film.Title
                     );
                     // AnsiConsole.WriteLine($"Aantal geslecteerde stoelen: {selectedChairs.Count}");
-                }
+                } while (isSelectingChair);
                 Console.Clear();
                 int seatType = -1;
                 using (DataBaseConnection db = new DataBaseConnection())
@@ -381,20 +376,15 @@ public class Customer
                 if (confirmPurchase)
                 {
                     var db = new DataBaseConnection();
-                    if(IsLoggedIn)
+                    var currentUser = db.Users.FirstOrDefault(u => u.ID == User.ID);
+                    if (currentUser == null)
                     {
-                        var currentUser = db.Users.FirstOrDefault(u => u.ID == User.ID);
-                        if (currentUser != null)
-                        {
-                            AnsiConsole.WriteLine("User not found in the database.");
-                            currentUser.Visits += 1;
-                            db.SaveChanges();
-                            return;
-                        }
+                        AnsiConsole.WriteLine("User not found in the database.");
+                        return;
                     }
-                    
                     var totalPrice = 0.0;
-
+                    currentUser.Visits += 1;
+                    db.SaveChanges();
                     foreach (var chairId in selectedChairs)
                     {
                         // Retrieve chair object by ID from the database
@@ -442,7 +432,7 @@ public class Customer
         Inloggen,
         Films,
 
-        ToonMijnReserveringen,
+        SeeUserStats,
         LogOut,
         Back,
     }
