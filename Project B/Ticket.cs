@@ -221,12 +221,12 @@ public class Ticket
                 var table = new Table();
 
                 table.Border = TableBorder.Rounded;
-                table.AddColumn("Film");
-                table.AddColumn("Ticket IDS");
-                table.AddColumn("Tickets gekocht");
-                table.AddColumn("Totale Prijs");
-                table.AddColumn("Datum gekocht");
-                table.AddColumn("Datum van vertoning");
+                table.AddColumn("[blue]Film[/]");
+                table.AddColumn("[blue]Ticket IDS[/]");
+                table.AddColumn("[blue]Tickets gekocht[/]");
+                table.AddColumn("[blue]Totale Prijs[/]");
+                table.AddColumn("[blue]Datum gekocht[/]");
+                table.AddColumn("[blue]Datum van vertoning[/]");
 
                 foreach (var scheduleInfo in ticketsPerSchedule)
                 {
@@ -240,7 +240,12 @@ public class Ticket
                     );
                 }
 
-                AnsiConsole.Render(table);
+                // Create a bordered panel with a specific color
+                var panel = new Panel(table)
+                    .Header("[bold blue]Overzicht van de bezochte films en totale tickets per schema[/]")
+                    .BorderColor(Color.Blue);
+
+                AnsiConsole.Render(panel);
             }
             else
             {

@@ -178,6 +178,7 @@ public class Customer
             var AllSchedules = ScheduleController.GetAvailableSchedules(startDate, endDate);
             Film film = new();
             var choices = schedules.Select(s => $"{s.Film.Title}").ToList();
+            
 
             var selectedMovieIndex = AnsiConsole.Prompt(
                 new SelectionPrompt<string>().Title("Kies een film").AddChoices(choices)
