@@ -143,18 +143,14 @@ public class Admin
         DateTime date;
         while (true)
         {
-            Console.WriteLine("Voer een datum in ANSI-formaat in (dd-MM-jjjj HH:mm) of 'q' om te stoppen: ");
+            Console.WriteLine("Voer een datum in ANSI-formaat in (dd-MM-jjjj HH:mm): ");
             string? userInput = Console.ReadLine();
             if (userInput == null)
             {
                 AnsiConsole.Markup("[red]De invoer mag niet leeg zijn. Probeer het opnieuw.[/]\n");
                 continue;
             }
-            if (userInput.ToLower() == "q")
-            {
-                Console.WriteLine("Programma gestopt.");
-                return;
-            }
+
             try
             {
                 date = DateTime.ParseExact(
