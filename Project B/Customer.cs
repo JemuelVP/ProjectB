@@ -399,7 +399,7 @@ public class Customer
                                 // Assuming chair has properties for X and Y coordinates
                                 int chairX = chair.Column;
                                 int chairY = chair.Row;
-
+                                string reservationNumber = Ticket.GenerateReservationNumber();
                                 // Use chairX and chairY in your logic to calculate the final price
                                 var finalPrice = ticket.CreateTicket(
                                     selectedSchedule,
@@ -419,7 +419,7 @@ public class Customer
                                 totalPrice += finalPrice;
 
                                 // Display ticket details for the current chair
-                                Ticket.DisplayTicketDetails(seatType, chairY, chairX, finalPrice);
+                                Ticket.DisplayTicketDetails(seatType, chairY, chairX, finalPrice, reservationNumber);
                             }
                         }
                     }

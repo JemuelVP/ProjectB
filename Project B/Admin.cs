@@ -25,7 +25,7 @@ public class Admin
         {
             AdminChoices.FilmToevoegen,
             AdminChoices.GeplandeFilms,
-            AdminChoices.FilmsOverZicht,
+            AdminChoices.FilmPlannen,
             AdminChoices.Omzet,
             AdminChoices.UitLoggen
         };
@@ -65,8 +65,8 @@ public class Admin
                 case AdminChoices.GeplandeFilms:
                     GeplandeFilms();
                     break;
-                case AdminChoices.FilmsOverZicht:
-                    FilmsOverZicht();
+                case AdminChoices.FilmPlannen:
+                    FilmPlannen();
                     break;
                 case AdminChoices.Omzet:
                     Omzet();
@@ -122,42 +122,24 @@ public class Admin
         foreach (var movie in movies)
             AnsiConsole.WriteLine(movie);
     }
-private void FilmsOverZicht()
-{
-    Console.Clear();
-    var adminOverview = AdminController.GetAllMovies();
-    string[] movieTitle = adminOverview
-    .Select(book => $"{book.Title}")
-    .OrderBy(title => title)  // Sort titles alphabetically
-    .ToArray();
-    var overviewMovies = AnsiConsole.Prompt(
-        new SelectionPrompt<string>()
-            .Title("Kies een film :")
-            .AddChoices(movieTitle)
-    );
-    // Get the total price for the selected movie
-    string titlePart = overviewMovies.Replace("Titel: ", "");
-    var selectedMovie = AdminController.GetMovieByTitle(titlePart);
-    var ScheduleMovie = AnsiConsole.Prompt(
-    new SelectionPrompt<RevenueOrScheduleMovie>()
-        .Title("[green]Wat wilt u nu doen[/]")
-        .AddChoices(
-            RevenueOrScheduleMovie.TotaleOmzet,
-            RevenueOrScheduleMovie.ScheduleMovie
-        )
-    );
-    switch (ScheduleMovie)
+    private void FilmPlannen()
     {
-    case RevenueOrScheduleMovie.TotaleOmzet:
-        Console.ForegroundColor = ConsoleColor.Blue;
-        AnsiConsole.WriteLine(
-            $"Total Tickets: {RevenueStatistics.GetTotalTicketsPerMovie(selectedMovie.ID)}"
+        Console.Clear();
+        var adminOverview = AdminController.GetAllMovies();
+        string[] movieTitle = adminOverview
+        .Select(book => $"{book.Title}")
+        .OrderBy(title => title)  // Sort titles alphabetically
+        .ToArray();
+        var overviewMovies = AnsiConsole.Prompt(
+            new SelectionPrompt<string>()
+                .Title("Kies een film :")
+                .AddChoices(movieTitle)
         );
-        AnsiConsole.WriteLine(
-            $"Totale Omzet: {RevenueStatistics.GetTotalPricePerMovie(selectedMovie.ID)}"
-        );
-        break;
-    case RevenueOrScheduleMovie.ScheduleMovie:
+        // Get the total price for the selected movie
+        string titlePart = overviewMovies.Replace("Titel: ", "");
+        var selectedMovie = AdminController.GetMovieByTitle(titlePart);
+    
+        
         DateTime date;
         while (true)
         {
@@ -203,49 +185,109 @@ private void FilmsOverZicht()
                 AnsiConsole.Markup("[red]Ongeldig datumformaat. Probeer het opnieuw.[/]\n");
             }
             
-        }
+            }
 
-        // Check if the entered date is beyond 4 weeks from now
-        var maxScheduleDate = DateTime.Now.AddDays(28);
-        if (date > maxScheduleDate)
-        {
-            AnsiConsole.Markup("[yellow]De ingevoerde datum ligt buiten de 4-weken termijn, maar de film zal worden gepland.[/]");
-        }
-        AnsiConsole.WriteLine();
-        var halls = hallController.GetAllHalls();
-        string[] hallNames = halls.Select(hall => hall.Name).ToArray();
-        var selectedHallName = AnsiConsole.Prompt(
-            new SelectionPrompt<string>().AddChoices(hallNames)
-        );
-        var selectedHall = hallController.GetByName(selectedHallName);
-        if (selectedHall == null)
-            break;
-        var schedule = new Schedule();
-        schedule.CreateFromFilm(selectedMovie, selectedHall.ID, date);
-        AnsiConsole.Markup("[green]Film is succesvol toegevoegd aan de schema.[/]");
-        AnsiConsole.WriteLine();
-        break;
+            // Check if the entered date is beyond 4 weeks from now
+            var maxScheduleDate = DateTime.Now.AddDays(28);
+            if (date > maxScheduleDate)
+            {
+                AnsiConsole.Markup("[yellow]De ingevoerde datum ligt buiten de 4-weken termijn, maar de film zal worden gepland.[/]");
+            }
+            AnsiConsole.WriteLine();
+            var halls = hallController.GetAllHalls();
+            string[] hallNames = halls.Select(hall => hall.Name).ToArray();
+            var selectedHallName = AnsiConsole.Prompt(
+                new SelectionPrompt<string>().AddChoices(hallNames)
+            );
+            var selectedHall = hallController.GetByName(selectedHallName);
+            if (selectedHall == null)
+                return;
+            var schedule = new Schedule();
+            schedule.CreateFromFilm(selectedMovie, selectedHall.ID, date);
+            AnsiConsole.Markup("[green]Film is succesvol toegevoegd aan de schema.[/]");
+            AnsiConsole.WriteLine();
+            return;
+        
     }
-}
 
     private void Omzet()
     {
         Console.Clear();
-        var money = new RevenueStatistics();
-        money.GetTotalRevenue();
+        var OmzetVanWat = AnsiConsole.Prompt(new SelectionPrompt<RevenueChoices>()
+        .Title("[green]Van wat wilt u de omzet weten?[/]")
+        .AddChoices(RevenueChoices.TotaleOmzet,
+                    RevenueChoices.TotaleOmzetPerFilm,
+                    RevenueChoices.Back));
+        
+        switch (OmzetVanWat)
+        {
+
+            case RevenueChoices.TotaleOmzet:
+            
+            var money = new RevenueStatistics();
+            money.GetTotalRevenue();
+            break; 
+
+            case RevenueChoices.TotaleOmzetPerFilm:
+
+            var adminOverview = AdminController.GetAllMovies();
+            
+            string[] movieTitle = adminOverview
+                                .Select(book => $"{book.Title}")
+                                .OrderBy(title => title)  // Sort titles alphabetically
+                                .ToArray();
+
+            var overviewMovies = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("Kies een film :")
+                    .AddChoices(movieTitle)
+            );
+            // Get the total price for the selected movie
+            string titlePart = overviewMovies.Replace("Titel: ", "");
+            var selectedMovie = AdminController.GetMovieByTitle(titlePart);
+            
+            Console.ForegroundColor = ConsoleColor.Blue;
+            AnsiConsole.WriteLine(
+                $"Total Tickets: {RevenueStatistics.GetTotalTicketsPerMovie(selectedMovie.ID)}"
+            );
+            AnsiConsole.WriteLine(
+                $"Totale Omzet: {RevenueStatistics.GetTotalPricePerMovie(selectedMovie.ID)}"
+            );
+            break;
+
+            case RevenueChoices.Back:
+
+            Console.Clear();
+            break;
+
+
+
+        }
+    ;
+           
+        }
+
+
     }
     public enum AdminChoices
     {
         FilmToevoegen,
         GeplandeFilms,
-        FilmsOverZicht,
+        FilmPlannen,
         Omzet,
         UitLoggen,
         Back
     }
-    public enum RevenueOrScheduleMovie
+    public enum RevenueChoices
     {
+      
         TotaleOmzet,
-        ScheduleMovie
+
+        TotaleOmzetPerFilm,
+
+        Back
+
+
     }
-}
+
+
