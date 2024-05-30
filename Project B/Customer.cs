@@ -170,7 +170,6 @@ public class Customer
     {
         while (true)
         {
-            Console.Clear();
             ReservationMenuOption selectedReservationOption = ReservationMenuOption.MakeReservation; // Start with MakeReservation option
             DateTime startDate = DateTime.Now;
             DateTime endDate = DateTime.Now.AddDays(28);
@@ -384,13 +383,11 @@ public class Customer
                     {
                         var db = new DataBaseConnection();
                         var currentUser = db.Users.FirstOrDefault(u => u.ID == User.ID);
-                        if (currentUser == null)
+                        if (currentUser != null)
                         {
-                            AnsiConsole.WriteLine("User not found in the database.");
-                            return;
+                            currentUser.Visits += 1;
                         }
                         var totalPrice = 0.0;
-                        currentUser.Visits += 1;
                         db.SaveChanges();
                         foreach (var chairId in selectedChairs)
                         {
