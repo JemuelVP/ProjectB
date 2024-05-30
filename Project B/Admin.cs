@@ -27,7 +27,8 @@ public class Admin
             AdminChoices.GeplandeFilms,
             AdminChoices.FilmPlannen,
             AdminChoices.Omzet,
-            AdminChoices.UitLoggen
+            AdminChoices.UitLoggen,
+            AdminChoices.Back
         };
         SelectedAdminOption = AnsiConsole.Prompt(
             new SelectionPrompt<AdminChoices>()
@@ -41,21 +42,25 @@ public class Admin
     {
         var name = AnsiConsole.Prompt(new TextPrompt<string>("Voer je gebruikersnaam in: "));
         var password = AnsiConsole.Prompt(new TextPrompt<string>("Voer je wachtwoord in: ").Secret());
-        bool adminCheck = admin.Login(name, password);
-        while (adminCheck)
+        admin.Login(name, password);
+        while (true)
         {
             SetSelectedAdminOption();
+            if (SelectedAdminOption == AdminChoices.Back)
+            {
+                break;
+            }
             if (SelectedAdminOption == AdminChoices.UitLoggen)
             {
-                var choice = AnsiConsole.Prompt(
-                new SelectionPrompt<Logout>()
-                    .Title("[red]Weet je zeker dat je wilt uitloggen?[/]")
-                    .AddChoices(Logout.Yes, Logout.No)
-                );
-                if (choice == Logout.Yes)
-                {
-                    break;
-                }
+                            var choice = AnsiConsole.Prompt(
+            new SelectionPrompt<Logout>()
+                .Title("[red]Weet je zeker dat je wilt uitloggen?[/]")
+                .AddChoices(Logout.Yes, Logout.No)
+            );
+            if (choice == Logout.Yes)
+            {
+                break;
+            }
             }
             switch (SelectedAdminOption)
             {
@@ -76,7 +81,6 @@ public class Admin
     }
     private void FilmToevoegen()
     {
-        Console.Clear();
         string title = AnsiConsole.Ask<string>("Titel:");
         int year = AnsiConsole.Ask<int>("Jaar: ");
         string description = AnsiConsole.Ask<string>("Beschrijving: ");
@@ -102,7 +106,6 @@ public class Admin
     }
     private void GeplandeFilms()
     {
-        Console.Clear();
         DateTime startDate = DateTime.Now;
         DateTime endDate = DateTime.Now.AddDays(28);
         var schedules = ScheduleController.GetAllSchedules(
@@ -122,7 +125,32 @@ public class Admin
         foreach (var movie in movies)
             AnsiConsole.WriteLine(movie);
     }
+
     private void FilmPlannen()
+{
+    var adminOverview = AdminController.GetAllMovies();
+    string[] movieTitle = adminOverview
+    .Select(book => $"{book.Title}")
+    .OrderBy(title => title)  // Sort titles alphabetically
+    .ToArray();
+    var overviewMovies = AnsiConsole.Prompt(
+        new SelectionPrompt<string>()
+            .Title("Kies een film :")
+            .AddChoices(movieTitle)
+    );
+    // Get the total price for the selected movie
+    string titlePart = overviewMovies.Replace("Titel: ", "");
+    var selectedMovie = AdminController.GetMovieByTitle(titlePart);
+    var ScheduleMovie = AnsiConsole.Prompt(
+    new SelectionPrompt<RevenueOrScheduleMovie>()
+        .Title("[green]Wat wilt u nu doen[/]")
+        .AddChoices(
+            RevenueOrScheduleMovie.TotaleOmzet,
+            RevenueOrScheduleMovie.ScheduleMovie
+        )
+    );
+    switch (ScheduleMovie)
+
     {
         Console.Clear();
         var adminOverview = AdminController.GetAllMovies();
@@ -199,6 +227,7 @@ public class Admin
 
     private void Omzet()
     {
+
         Console.Clear();
         var OmzetVanWat = AnsiConsole.Prompt(new SelectionPrompt<RevenueChoices>()
         .Title("[green]Van wat wilt u de omzet weten?[/]")
@@ -254,7 +283,18 @@ public class Admin
            
         }
 
-
+    }
+    private void UitLoggen()
+    {
+            var choice = AnsiConsole.Prompt(
+            new SelectionPrompt<Logout>()
+                .Title("[red]Weet je zeker dat je wilt uitloggen?[/]")
+                .AddChoices(Logout.Yes, Logout.No)
+        );
+        while (choice == Logout.Yes)
+        {
+            break;
+        }
     }
     public enum AdminChoices
     {
