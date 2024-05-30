@@ -209,7 +209,8 @@ public class Ticket
                     MovieID = scheduleGroup.First().Key.Movie_ID, // Accessing Movie_ID from the key of the first item in the group
                     MovieName = db.Movie.FirstOrDefault(movie => movie.ID == scheduleGroup.First().Key.Movie_ID)?.Title,
                     DateBought = scheduleGroup.First().Key.DateBought.ToString("yyyy-MM-dd HH:mm"),
-                    TicketIDs = scheduleGroup.SelectMany(innerGroup => innerGroup.Select(t => t.ID)), // Collecting all ticket IDs within the group
+                    ScheduleDate = db.Schedule.FirstOrDefault(s => s.ID == scheduleGroup.First().Key.Schedule_ID)?.StartDate.ToString("yyyy-MM-dd HH:mm"), // Include the show date
+                    TicketIDs = string.Join(", ", scheduleGroup.SelectMany(innerGroup => innerGroup.Select(t => t.ID))), // Collecting all ticket IDs within the group
                     TicketCount = scheduleGroup.Sum(innerGroup => innerGroup.Count()), // Sum of counts of inner groups
                     TotalPrice = scheduleGroup.Sum(innerGroup => innerGroup.Sum(t => t.Price)) // Sum of total prices of inner groups
                 })
@@ -217,24 +218,38 @@ public class Ticket
 
             if (ticketsPerSchedule.Any())
             {
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.WriteLine("Overzicht van de bezochte films en totale tickets per schema");
-                Console.ResetColor();
+                var table = new Table();
+
+                table.Border = TableBorder.Rounded;
+                table.AddColumn("[blue]Film[/]");
+                table.AddColumn("[blue]Ticket IDS[/]");
+                table.AddColumn("[blue]Tickets gekocht[/]");
+                table.AddColumn("[blue]Totale Prijs[/]");
+                table.AddColumn("[blue]Datum gekocht[/]");
+                table.AddColumn("[blue]Datum van vertoning[/]");
 
                 foreach (var scheduleInfo in ticketsPerSchedule)
                 {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine(
-                        $"Film: {scheduleInfo.MovieName}, Ticket IDS: {string.Join(", ", scheduleInfo.TicketIDs)} , Tickets gekocht: {scheduleInfo.TicketCount}, Totale Prijs: {scheduleInfo.TotalPrice}, Datum gekocht: {scheduleInfo.DateBought}"
+                    table.AddRow(
+                    new Markup($"[blue]{scheduleInfo.MovieName}[/]"),
+                    new Markup($"[blue]{scheduleInfo.TicketIDs}[/]"),
+                    new Markup($"[blue]{scheduleInfo.TicketCount}[/]"),
+                    new Markup($"[blue]{scheduleInfo.TotalPrice.ToString()} euro[/]"), // Formatting as currency
+                    new Markup($"[blue]{scheduleInfo.DateBought}[/]"),
+                    new Markup($"[blue]{scheduleInfo.ScheduleDate}[/]")
                     );
-                    Console.ResetColor();
                 }
+
+                // Create a bordered panel with a specific color
+                var panel = new Panel(table)
+                    .Header("[bold blue]Overzicht van de bezochte films en totale tickets per schema[/]")
+                    .BorderColor(Color.Blue);
+
+                AnsiConsole.Render(panel);
             }
             else
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Er zijn nog geen tickets op deze account gekocht");
-                Console.ResetColor();
+                AnsiConsole.Markup("[red]Er zijn nog geen tickets op deze account gekocht[/]");
             }
         }
     }

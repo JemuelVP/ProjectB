@@ -35,6 +35,7 @@ public enum MainMenuOptions
 
 public enum ReservationMenuOption
 {
+    
     MakeReservation,
     Back
 }

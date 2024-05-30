@@ -25,7 +25,9 @@ public class Users
             Password = admin.Password;
             IsAdmin = admin.IsAdmin;
             LoggedIn = true;
+            AnsiConsole.Write(new Rule("[blue]Succesvol ingelogd[/]").RuleStyle("blue"));
             return true;
+            
         }
         else
         {
