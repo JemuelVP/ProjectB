@@ -178,22 +178,10 @@ public class Customer
             Film film = new();
             var choices = schedules.Select(s => $"{s.Film.Title}").ToList();
             
-          
-        // Get the selected schedule based on the selected movie
-        var selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
-        var newChoices = AllSchedules
-            .Where(s => s.Film.Title == selectedSchedule.Film.Title)
-            .Select(s =>
-            {
-                if (s.SoldOut)
-                    return $"{s.Film.Title} - {s.StartDate.ToString("dd-MM-yyyy HH:mm")} - uitverkocht";
-                else
-                    return $"{s.Film.Title} - {s.StartDate.ToString("dd-MM-yyyy HH:mm")}";
-            })
-            .ToList();
-        var newSelectedSchedules = AnsiConsole.Prompt(
-            new SelectionPrompt<string>().Title("Kies een datum").AddChoices(newChoices)
-        );
+
+            var selectedMovieIndex = AnsiConsole.Prompt(
+                new SelectionPrompt<string>().Title("Kies een film").AddChoices(choices)
+            );
 
             // Get the selected schedule based on the selected movie
             var selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
@@ -211,7 +199,6 @@ public class Customer
             var newSelectedSchedules = AnsiConsole.Prompt(
                 new SelectionPrompt<string>().Title("Kies een datum").AddChoices(newChoices)
             );
-
 
             selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
 
@@ -232,30 +219,6 @@ public class Customer
                 {
                     var userName = AnsiConsole.Prompt(new TextPrompt<string>("Voer u naam in: "));
                 }
-                ConsoleCanvas canvas = new(width, height);
-
-                Console.CursorVisible = false; // Hide the cursor
-
-                // Draw the canvas
-                Console.Clear();
-                int messageStartX = width + 31;
-                int messageStartY = 0;
-
-                // shows instructions next to the hall placement
-                Console.SetCursorPosition(messageStartX, messageStartY);
-                Console.WriteLine("Druk op de spatiebalk om een stoel te selecteren.");
-                Console.SetCursorPosition(messageStartX, messageStartY + 2);
-                Console.WriteLine("Druk op enter zonder een stoel te selecteren om");
-                Console.SetCursorPosition(messageStartX, messageStartY + 3);
-                Console.WriteLine("de bestelling te annuleren.");
-
-                List<Tuple<int, int>> listSelectedChairs = new();
-                canvas.Draw(
-                    selectedSchedule.ID,
-                    targetHall.Size,
-                    width,
-                    height,
-                    listSelectedChairs
                 var age = AnsiConsole.Prompt(new TextPrompt<int>("Voer uw leeftijd in: "));
                 var ticketAge = new Ticket();
                 ticketAge.CheckAge(film, age); // checks age against age movie
@@ -279,70 +242,6 @@ public class Customer
                             width = 18;
                             height = 19;
                             break;
-                        case ConsoleKey.LeftArrow:
-                            canvas.MoveCursor(-1, 0);
-                            break;
-                        case ConsoleKey.RightArrow:
-                            canvas.MoveCursor(1, 0);
-                            break;
-                        case ConsoleKey.Spacebar:
-                            using (DataBaseConnection db = new DataBaseConnection())
-                            {
-                                var chair = db.Chair.FirstOrDefault(c =>
-                                    c.Row == canvas.cursorY
-                                    && c.Column == canvas.cursorX
-                                    && c.CinemaHallID == targetHall.ID
-                                );
-                                if (chair != null)
-                                {
-                                    var getTicket = db.Ticket.FirstOrDefault(t =>
-                                        t.Schedule_ID == selectedSchedule.ID
-                                        && t.Chair_ID == chair.ID
-                                    );
-                                    if (getTicket != null)
-                                    {
-                                        break; // Skip to the next iteration
-                                    }
-                                    if (selectedChairs.Contains(chair.ID))
-                                    {
-                                        selectedChairs.Remove(chair.ID);
-                                        listSelectedChairs.Remove(
-                                            Tuple.Create(canvas.cursorY, canvas.cursorX)
-                                        );
-                                        break;
-                                    }
-                                    selectedChairs.Add(chair.ID);
-                                    listSelectedChairs.Add(
-                                        Tuple.Create(canvas.cursorY, canvas.cursorX)
-                                    );
-                                }
-                            }
-                            break;
-                        case ConsoleKey.Enter:
-                            if (selectedChairs.Count == 0)
-                            {
-                                // if enter pressed without chair selection. returns true if answer is yes
-                                var confirmCancellation = AnsiConsole.Confirm("U heeft geen stoelen geselecteerd, wilt u de bestelling annuleren?");
-                                if (confirmCancellation)
-                                {
-                                    AnsiConsole.Write(new Rule("[red]Uw bestelling is geannuleerd[/]").RuleStyle("red"));
-                                    return;
-                                }
-                                else
-                                {
-                                    AnsiConsole.Write(new Rule("[blue]Bestelling is niet geannuleerd. U kunt nu verder met het selecteren van uw stoelen[/]").RuleStyle("blue"));
-                                }
-                                break; 
-                            }
-                            else
-                            {
-                                // continue if chairs are selected
-                                isSelectingChair = false;
-                                Console.WriteLine(selectedChairs);
-                                
-                            }
-                            break; 
-                        
                         case "Large":
                             width = 30;
                             height = 20;
@@ -430,13 +329,6 @@ public class Customer
                             listSelectedChairs,
                             film.Title
                         );
-                    }
-                }
-                var confirmPurchase = AnsiConsole.Confirm("Wil je de bestelling bevestigen?");
-                if (confirmPurchase)
-                {
-                    var db = new DataBaseConnection();
-                    if (IsLoggedIn)
                         // AnsiConsole.WriteLine($"Aantal geslecteerde stoelen: {selectedChairs.Count}");
                     } while (isSelectingChair);
                     Console.Clear();
@@ -461,8 +353,6 @@ public class Customer
                             seatType = 2;
                         }
                     }
-                    var totalPrice = 0.0;
-
                     var ticket = new Ticket();
                     // je moet hier of een zaal object meegeven of het aantal stoelen
                     bool qualifyForDiscount = User.LoggedIn && Ticket.UserTicketDiscount(User.ID);
@@ -535,11 +425,6 @@ public class Customer
                     }
                     break;
                 }
-                else
-                {
-                    AnsiConsole.WriteLine("Uw bestelling is geannuleerd.");
-                }
-                break;
             }
             else if (selectedReservationOption == ReservationMenuOption.Back)
             {
