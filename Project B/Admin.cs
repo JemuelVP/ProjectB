@@ -161,12 +161,17 @@ private void FilmsOverZicht()
         DateTime date;
         while (true)
         {
-            Console.WriteLine("Voer een datum in ANSI-formaat in (dd-MM-jjjj HH:mm):");
+            Console.WriteLine("Voer een datum in ANSI-formaat in (dd-MM-jjjj HH:mm) of 'q' om te stoppen: ");
             string? userInput = Console.ReadLine();
             if (userInput == null)
             {
                 AnsiConsole.Markup("[red]De invoer mag niet leeg zijn. Probeer het opnieuw.[/]\n");
                 continue;
+            }
+            if (userInput.ToLower() == "q")
+            {
+                Console.WriteLine("Programma gestopt.");
+                return;
             }
             try
             {
@@ -183,6 +188,14 @@ private void FilmsOverZicht()
                     continue;
                 }
                 
+                // Check if the end time of the movie is before 11
+                var endTime = date.AddMinutes(selectedMovie.DurationInMin);
+                if (endTime.TimeOfDay > new TimeSpan(23, 0, 0) || endTime.Date != date.Date ||
+                date.TimeOfDay  < new TimeSpan(10, 0, 0) || date.TimeOfDay > new TimeSpan(23, 0, 0))
+                {
+                    AnsiConsole.Markup("[red]De eindtijd van de film moet voor 23:00 en op dezelfde dag zijn. Probeer het opnieuw.[/]\n");
+                    continue;
+                }
                 break;
             }
             catch (FormatException)
