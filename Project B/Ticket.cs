@@ -1,3 +1,4 @@
+using System.Text;
 using Spectre.Console;
 
 public class Ticket
@@ -10,12 +11,15 @@ public class Ticket
     public double Price { get; set; }
     public DateTime DateBought { get; set; }
 
+    public string ReservationNumber { get; set; }
+
     public double CreateTicket(
         Schedule schedule,
         int chair_ID,
         int movieId,
         double price,
-        int? userId = null
+        int? userId = null,
+        string? reservationNumber = ""
     )
     {
         Schedule_ID = schedule.ID;
@@ -33,7 +37,8 @@ public class Ticket
                 Movie_ID = movieId,
                 Price = price,
                 User_ID = userId ?? 0,
-                DateBought = DateTime.Now
+                DateBought = DateTime.Now,
+                ReservationNumber = reservationNumber
             }
         );
         db.SaveChanges();
@@ -171,7 +176,13 @@ public class Ticket
         }
     }
 
-    public static void DisplayTicketDetails(int seatType, int row, int col, double price)
+    public static void DisplayTicketDetails(
+        int seatType,
+        int row,
+        int col,
+        double price,
+        string reservationNumber
+    )
     {
         string stoelType;
         switch (seatType)
@@ -192,9 +203,10 @@ public class Ticket
         Console.WriteLine($"Rij: {row}");
         Console.WriteLine($"Nummer: {col}");
         Console.WriteLine($"Prijs: {price} euro");
+        Console.WriteLine($"Reserveringsnummer: {reservationNumber}");
         Console.ResetColor();
     }
-    
+
     public static void SeeUserStats(int userID)
     {
         using (DataBaseConnection db = new DataBaseConnection())
@@ -202,12 +214,21 @@ public class Ticket
             List<Ticket> userTickets = db.Ticket.Where(t => t.User_ID == userID).ToList();
 
             var ticketsPerSchedule = userTickets
-                .GroupBy(t => new { t.Movie_ID, t.Schedule_ID, t.DateBought })
+                .GroupBy(t => new
+                {
+                    t.Movie_ID,
+                    t.Schedule_ID,
+                    t.DateBought
+                })
                 .GroupBy(g => g.Key.Schedule_ID) // Group by Schedule_ID
                 .Select(scheduleGroup => new
                 {
                     MovieID = scheduleGroup.First().Key.Movie_ID, // Accessing Movie_ID from the key of the first item in the group
-                    MovieName = db.Movie.FirstOrDefault(movie => movie.ID == scheduleGroup.First().Key.Movie_ID)?.Title,
+                    MovieName = db
+                        .Movie.FirstOrDefault(movie =>
+                            movie.ID == scheduleGroup.First().Key.Movie_ID
+                        )
+                        ?.Title,
                     DateBought = scheduleGroup.First().Key.DateBought.ToString("yyyy-MM-dd HH:mm"),
                     ScheduleDate = db.Schedule.FirstOrDefault(s => s.ID == scheduleGroup.First().Key.Schedule_ID)?.StartDate.ToString("yyyy-MM-dd HH:mm"), // Include the show date
                     TicketIDs = string.Join(", ", scheduleGroup.SelectMany(innerGroup => innerGroup.Select(t => t.ID))), // Collecting all ticket IDs within the group
@@ -253,6 +274,7 @@ public class Ticket
             }
         }
     }
+
     public static bool UserTicketDiscount(int userID)
     {
         using DataBaseConnection db = new();
@@ -274,5 +296,20 @@ public class Ticket
         }
 
         return false;
+    }
+
+    public static string GenerateReservationNumber()
+    {
+        string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        Random random = new Random();
+        StringBuilder reservationNumber = new StringBuilder(6);
+
+        for (int i = 0; i < 6; i++)
+        {
+            int index = random.Next(characters.Length);
+            reservationNumber.Append(characters[index]);
+        }
+
+        return reservationNumber.ToString();
     }
 }
