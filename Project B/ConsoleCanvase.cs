@@ -227,7 +227,7 @@ public class ConsoleCanvas
         }
     }
 
-    public void Draw(int schedule_id, string size, int width, int height, List<Tuple<int, int>> selectedChairs)
+    public void Draw(int schedule_id, string size, int width, int height, List<Tuple<int, int>> selectedChairs, string movieName)
     {
         // Clear the console
         // Console.Clear();
@@ -260,28 +260,28 @@ public class ConsoleCanvas
         }
         // Render the canvas
         AnsiConsole.Write(canvas);
+
+        // Draw the screen below the seats
+        int screenWidth = width * 2; // Adjust screen width as needed
+        string screenTop = new string('─', screenWidth);
+        string screenBottom = "┌" + screenTop + "┐";
+
+        // Center the movie name
+        int padding = (screenWidth - movieName.Length) / 2;
+        string screenMiddle = "│" + new string(' ', padding) + movieName + new string(' ', screenWidth - padding - movieName.Length) + "│";
+
+        string screen = "└" + new string('─', screenWidth) + "┘";
         // Update the console cursor position to below the canvas
         Console.SetCursorPosition(0, height + 1);
+        Console.WriteLine(screenBottom);
+        Console.WriteLine(screenMiddle);
+        Console.WriteLine(screen);
         // Explain what each color means
         AnsiConsole.Markup("[Grey]Grijs: stoel is verkocht[/]\n");
         AnsiConsole.Markup("[Red3]Rood: Love seats[/]\n");
         AnsiConsole.Markup("[DarkOrange3_1]Oranje: Extra Beenruimte[/]\n");
         AnsiConsole.Markup("[DodgerBlue3]Blauw: Standaard[/]\n");
         AnsiConsole.Markup("[Green]Groen: Selected chairs[/]\n");
-        // AnsiConsole.Markup("[Blue] Gebruik de ↑ knop om omhoog te gaan[/]\n");
-        // AnsiConsole.Markup("[Blue] Gebruik de ↓ knop om omlaag te gaan[/]\n");
-        // AnsiConsole.Markup("[Blue] Gebruik de → knop om rechts te gaan[/]\n");
-        // AnsiConsole.Markup("[Blue] Gebruik de ← knop om links te gaan[/]\n");
-        // var omhoog = $"Gebruik de {Emoji.Known.UpArrow} knop om omhoog te gaan";
-        // var omlaag = $"Gebruik de {Emoji.Known.DownArrow} knop om omlaag te gaan";
-        // var rechts = $"Gebruik de {Emoji.Known.RightArrow} knop om rechts te gaan";
-        // var links = $"Gebruik de {Emoji.Known.LeftArrow} knop om links te gaan";
-        // AnsiConsole.Markup($"[Green]{omhoog}[/]\n");
-        // AnsiConsole.Markup($"[Green]{omlaag}[/]\n");
-        // AnsiConsole.Markup($"[Green]{rechts}[/]\n");
-        // AnsiConsole.Markup($"[Green]{links}[/]\n");
-
-
     }
 
     public void SetPixel(int x, int y, ConsoleColor color)
