@@ -180,7 +180,6 @@ public class Customer
 
         // Get the selected schedule based on the selected movie
         var selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
-        // start code here
         var newChoices = AllSchedules
             .Where(s => s.Film.Title == selectedSchedule.Film.Title)
             .Select(s =>
@@ -198,7 +197,6 @@ public class Customer
         selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
 
         film = selectedSchedule.Film;
-        // end code here
         // Display the details of the selected movie
         filmController.Display(film);
 
@@ -249,6 +247,15 @@ public class Customer
 
                 // Draw the canvas
                 Console.Clear();
+                int messageStartX = width + 20;
+                int messageStartY = 0;
+
+                // shows instructions next to the hall placement
+                Console.SetCursorPosition(messageStartX, messageStartY);
+                Console.WriteLine("Druk op de spatiebalk om een stoel te selecteren.");
+                Console.SetCursorPosition(messageStartX, messageStartY + 1);
+                Console.WriteLine("Druk op enter zonder een stoel te selecteren om de bestelling te annuleren.");
+
                 List<Tuple<int, int>> listSelectedChairs = new();
                 canvas.Draw(
                     selectedSchedule.ID,
@@ -311,9 +318,24 @@ public class Customer
                             }
                             break;
                         case ConsoleKey.Enter:
-                            isSelectingChair = false;
-                            Console.WriteLine(selectedChairs);
-                            break;
+                            if (selectedChairs.Count == 0)
+                            {
+                                // if enter pressed without chair selection. returns true if answer is yes
+                                var confirmCancellation = AnsiConsole.Confirm("U heeft geen stoelen geselecteerd, wilt u de bestelling annuleren?");
+                                if (confirmCancellation)
+                                {
+                                    AnsiConsole.Write(new Rule("[red]Uw bestelling is geannuleerd[/]").RuleStyle("red"));
+                                    return; 
+                                }
+                                break;
+                            }
+                            else
+                            {
+                                // continue if chairs are selected
+                                isSelectingChair = false;
+                                Console.WriteLine(selectedChairs);
+                                break;
+                            }
                     }
                     // Redraw canvas with updated cursor position
                     canvas.Draw(
