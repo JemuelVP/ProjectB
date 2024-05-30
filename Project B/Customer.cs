@@ -247,14 +247,16 @@ public class Customer
 
                 // Draw the canvas
                 Console.Clear();
-                int messageStartX = width + 20;
+                int messageStartX = width + 31;
                 int messageStartY = 0;
 
                 // shows instructions next to the hall placement
                 Console.SetCursorPosition(messageStartX, messageStartY);
                 Console.WriteLine("Druk op de spatiebalk om een stoel te selecteren.");
-                Console.SetCursorPosition(messageStartX, messageStartY + 1);
-                Console.WriteLine("Druk op enter zonder een stoel te selecteren om de bestelling te annuleren.");
+                Console.SetCursorPosition(messageStartX, messageStartY + 2);
+                Console.WriteLine("Druk op enter zonder een stoel te selecteren om");
+                Console.SetCursorPosition(messageStartX, messageStartY + 3);
+                Console.WriteLine("de bestelling te annuleren.");
 
                 List<Tuple<int, int>> listSelectedChairs = new();
                 canvas.Draw(
@@ -325,17 +327,22 @@ public class Customer
                                 if (confirmCancellation)
                                 {
                                     AnsiConsole.Write(new Rule("[red]Uw bestelling is geannuleerd[/]").RuleStyle("red"));
-                                    return; 
+                                    return;
                                 }
-                                break;
+                                else
+                                {
+                                    AnsiConsole.Write(new Rule("[blue]Bestelling is niet geannuleerd. U kunt nu verder met het selecteren van uw stoelen[/]").RuleStyle("blue"));
+                                }
+                                break; 
                             }
                             else
                             {
                                 // continue if chairs are selected
                                 isSelectingChair = false;
                                 Console.WriteLine(selectedChairs);
-                                break;
+                                
                             }
+                            break; 
                     }
                     // Redraw canvas with updated cursor position
                     canvas.Draw(
@@ -398,7 +405,7 @@ public class Customer
                 if (confirmPurchase)
                 {
                     var db = new DataBaseConnection();
-                    if(IsLoggedIn)
+                    if (IsLoggedIn)
                     {
                         var currentUser = db.Users.FirstOrDefault(u => u.ID == User.ID);
                         if (currentUser != null)
@@ -409,7 +416,7 @@ public class Customer
                             return;
                         }
                     }
-                    
+
                     var totalPrice = 0.0;
 
                     foreach (var chairId in selectedChairs)
@@ -445,6 +452,10 @@ public class Customer
                             Ticket.DisplayTicketDetails(seatType, chairY, chairX, finalPrice);
                         }
                     }
+                }
+                else
+                {
+                    AnsiConsole.WriteLine("Uw bestelling is geannuleerd.");
                 }
                 break;
             }
