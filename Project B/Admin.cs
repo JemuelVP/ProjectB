@@ -78,7 +78,19 @@ public class Admin
     {
         Console.Clear();
         string title = AnsiConsole.Ask<string>("Titel:");
-        int year = AnsiConsole.Ask<int>("Jaar: ");
+        int year;
+        while (true)
+        {
+            year = AnsiConsole.Ask<int>("Jaar uitgekomen: ");
+            if (year <= DateTime.Now.Year)
+            {
+                break;
+            }
+            else
+            {
+                AnsiConsole.Markup("[red]Het uitkomst jaar kan niet in de toekomst liggen. Probeer het opnieuw.[/]\n");
+            }
+        }
         string description = AnsiConsole.Ask<string>("Beschrijving: ");
         string authors = AnsiConsole.Ask<string>("Auteurs: ");
         string categories = AnsiConsole.Ask<string>("Categorieën: ");
