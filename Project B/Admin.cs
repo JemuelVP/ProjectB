@@ -153,7 +153,7 @@ public class Admin
 
         var MoviePlanChoices = AnsiConsole.Prompt(new SelectionPrompt<FilmPlannenChoices>().Title("[green]Wat wilt u nu doen[/]")
                                                                                             .AddChoices(
-                                                                                                FilmPlannenChoices.TerugNaarFilmKeuzes,
+                                                                                            FilmPlannenChoices.TerugNaarFilmKeuzes,
                                                                                             FilmPlannenChoices.DoorgaanMetPlannen,
                                                                                             FilmPlannenChoices.Back));
 
@@ -222,11 +222,26 @@ public class Admin
                 var selectedHall = hallController.GetByName(selectedHallName);
                 if (selectedHall == null)
                     return;
-                var schedule = new Schedule();
-                schedule.CreateFromFilm(selectedMovie, selectedHall.ID, date);
-                AnsiConsole.Markup("[green]Film is succesvol toegevoegd aan de schema.[/]");
-                AnsiConsole.WriteLine();
-                return;
+
+                var ScheduleConfirmation = AnsiConsole.Confirm("Weet u zeker dat u dit wilt plannen?");
+                {
+                    if (ScheduleConfirmation)
+                    {
+                        var schedule = new Schedule();
+                            schedule.CreateFromFilm(selectedMovie, selectedHall.ID, date);
+                            AnsiConsole.Markup("[green]Film is succesvol toegevoegd aan de schema.[/]");
+                            AnsiConsole.WriteLine();
+                            return; 
+                    }
+                    else
+                    {   
+                        AnsiConsole.Write(new Rule("[red]Film is niet toegevoegd aan de planning[/]").RuleStyle("red"));
+                        return;
+                    }
+                }
+
+            
+              
             }
         if (MoviePlanChoices == FilmPlannenChoices.Back)
         {
@@ -308,7 +323,8 @@ public class Admin
 
 
     public enum FilmPlannenChoices
-    {
+    {   Ja,
+        Nee,
         TerugNaarFilmKeuzes,
         DoorgaanMetPlannen,
         Back
