@@ -267,7 +267,7 @@ public class ConsoleCanvas
         }
         else
         {
-            canvas.SetPixel(cursorX, cursorY, Color.Red3); // Normal cursor color
+            canvas.SetPixel(cursorX, cursorY, Color.LightCoral); // Normal cursor color
         }
         // Render the canvas
         AnsiConsole.Write(canvas);
