@@ -138,72 +138,91 @@ public class Admin
         // Get the total price for the selected movie
         string titlePart = overviewMovies.Replace("Titel: ", "");
         var selectedMovie = AdminController.GetMovieByTitle(titlePart);
-    
-        
-        DateTime date;
-        while (true)
+
+        var MoviePlanChoices = AnsiConsole.Prompt(new SelectionPrompt<FilmPlannenChoices>().Title("[green]Wat wilt u nu doen[/]")
+                                                                                            .AddChoices(
+                                                                                                FilmPlannenChoices.TerugNaarFilmKeuzes,
+                                                                                            FilmPlannenChoices.DoorgaanMetPlannen,
+                                                                                            FilmPlannenChoices.Back));
+
+        if (MoviePlanChoices == FilmPlannenChoices.TerugNaarFilmKeuzes) 
         {
-            Console.WriteLine("Voer een datum in ANSI-formaat in (dd-MM-jjjj HH:mm): ");
-            string? userInput = Console.ReadLine();
-            if (userInput == null)
+            FilmPlannen();
+        }
+        if (MoviePlanChoices == FilmPlannenChoices.DoorgaanMetPlannen)
+        {
+            DateTime date;
+            while (true)
             {
-                AnsiConsole.Markup("[red]De invoer mag niet leeg zijn. Probeer het opnieuw.[/]\n");
-                continue;
-            }
+                Console.WriteLine("Voer een datum in ANSI-formaat in (dd-MM-jjjj HH:mm): ");
 
-            try
-            {
-                date = DateTime.ParseExact(
-                    userInput,
-                    "dd-MM-yyyy HH:mm",
-                    null,
-                    System.Globalization.DateTimeStyles.None
+                string? userInput = Console.ReadLine();
+                if (userInput == null)
+                {
+                    AnsiConsole.Markup("[red]De invoer mag niet leeg zijn. Probeer het opnieuw.[/]\n");
+                    continue;
+                }
+
+                try
+                {
+                    date = DateTime.ParseExact(
+                        userInput,
+                        "dd-MM-yyyy HH:mm",
+                        null,
+                        System.Globalization.DateTimeStyles.None
+                    );
+                    
+                    if (date < DateTime.Now)
+                    {
+                        AnsiConsole.Markup("[red]De ingevoerde datum ligt in het verleden. Probeer het opnieuw.[/]\n");
+                        continue;
+                    }
+                    
+                    // Check if the end time of the movie is before 11
+                    var endTime = date.AddMinutes(selectedMovie.DurationInMin);
+                    if (endTime.TimeOfDay > new TimeSpan(23, 0, 0) || endTime.Date != date.Date ||
+                    date.TimeOfDay  < new TimeSpan(10, 0, 0) || date.TimeOfDay > new TimeSpan(23, 0, 0))
+                    {
+                        AnsiConsole.Markup("[red]De eindtijd van de film moet voor 23:00 en op dezelfde dag zijn. Probeer het opnieuw.[/]\n");
+                        continue;
+                    }
+                    break;
+                }
+                catch (FormatException)
+                {
+                    AnsiConsole.Markup("[red]Ongeldig datumformaat. Probeer het opnieuw.[/]\n");
+                }
+                
+                }
+
+                // Check if the entered date is beyond 4 weeks from now
+                var maxScheduleDate = DateTime.Now.AddDays(28);
+                if (date > maxScheduleDate)
+                {
+                    AnsiConsole.Markup("[yellow]De ingevoerde datum ligt buiten de 4-weken termijn, maar de film zal worden gepland.[/]");
+                }
+                AnsiConsole.WriteLine();
+                var halls = hallController.GetAllHalls();
+                string[] hallNames = halls.Select(hall => hall.Name).ToArray();
+                var selectedHallName = AnsiConsole.Prompt(
+                    new SelectionPrompt<string>().AddChoices(hallNames)
                 );
-                
-                if (date < DateTime.Now)
-                {
-                    AnsiConsole.Markup("[red]De ingevoerde datum ligt in het verleden. Probeer het opnieuw.[/]\n");
-                    continue;
-                }
-                
-                // Check if the end time of the movie is before 11
-                var endTime = date.AddMinutes(selectedMovie.DurationInMin);
-                if (endTime.TimeOfDay > new TimeSpan(23, 0, 0) || endTime.Date != date.Date ||
-                date.TimeOfDay  < new TimeSpan(10, 0, 0) || date.TimeOfDay > new TimeSpan(23, 0, 0))
-                {
-                    AnsiConsole.Markup("[red]De eindtijd van de film moet voor 23:00 en op dezelfde dag zijn. Probeer het opnieuw.[/]\n");
-                    continue;
-                }
-                break;
-            }
-            catch (FormatException)
-            {
-                AnsiConsole.Markup("[red]Ongeldig datumformaat. Probeer het opnieuw.[/]\n");
-            }
-            
-            }
-
-            // Check if the entered date is beyond 4 weeks from now
-            var maxScheduleDate = DateTime.Now.AddDays(28);
-            if (date > maxScheduleDate)
-            {
-                AnsiConsole.Markup("[yellow]De ingevoerde datum ligt buiten de 4-weken termijn, maar de film zal worden gepland.[/]");
-            }
-            AnsiConsole.WriteLine();
-            var halls = hallController.GetAllHalls();
-            string[] hallNames = halls.Select(hall => hall.Name).ToArray();
-            var selectedHallName = AnsiConsole.Prompt(
-                new SelectionPrompt<string>().AddChoices(hallNames)
-            );
-            var selectedHall = hallController.GetByName(selectedHallName);
-            if (selectedHall == null)
+                var selectedHall = hallController.GetByName(selectedHallName);
+                if (selectedHall == null)
+                    return;
+                var schedule = new Schedule();
+                schedule.CreateFromFilm(selectedMovie, selectedHall.ID, date);
+                AnsiConsole.Markup("[green]Film is succesvol toegevoegd aan de schema.[/]");
+                AnsiConsole.WriteLine();
                 return;
-            var schedule = new Schedule();
-            schedule.CreateFromFilm(selectedMovie, selectedHall.ID, date);
-            AnsiConsole.Markup("[green]Film is succesvol toegevoegd aan de schema.[/]");
-            AnsiConsole.WriteLine();
+            }
+        if (MoviePlanChoices == FilmPlannenChoices.Back)
+        {
+            Console.Clear();
             return;
-        
+        }
+
+
     }
 
     private void Omzet()
@@ -272,6 +291,14 @@ public class Admin
         FilmPlannen,
         Omzet,
         UitLoggen,
+        Back
+    }
+
+
+    public enum FilmPlannenChoices
+    {
+        TerugNaarFilmKeuzes,
+        DoorgaanMetPlannen,
         Back
     }
     public enum RevenueChoices
