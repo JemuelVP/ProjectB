@@ -143,13 +143,14 @@ public class Admin
         DateTime date;
         while (true)
         {
-            Console.WriteLine("Voer een datum in ANSI-formaat in (dd-MM-jjjj HH:mm):");
+            Console.WriteLine("Voer een datum in ANSI-formaat in (dd-MM-jjjj HH:mm): ");
             string? userInput = Console.ReadLine();
             if (userInput == null)
             {
                 AnsiConsole.Markup("[red]De invoer mag niet leeg zijn. Probeer het opnieuw.[/]\n");
                 continue;
             }
+
             try
             {
                 date = DateTime.ParseExact(
@@ -165,6 +166,14 @@ public class Admin
                     continue;
                 }
                 
+                // Check if the end time of the movie is before 11
+                var endTime = date.AddMinutes(selectedMovie.DurationInMin);
+                if (endTime.TimeOfDay > new TimeSpan(23, 0, 0) || endTime.Date != date.Date ||
+                date.TimeOfDay  < new TimeSpan(10, 0, 0) || date.TimeOfDay > new TimeSpan(23, 0, 0))
+                {
+                    AnsiConsole.Markup("[red]De eindtijd van de film moet voor 23:00 en op dezelfde dag zijn. Probeer het opnieuw.[/]\n");
+                    continue;
+                }
                 break;
             }
             catch (FormatException)
