@@ -141,7 +141,7 @@ public class Admin
 
         var MoviePlanChoices = AnsiConsole.Prompt(new SelectionPrompt<FilmPlannenChoices>().Title("[green]Wat wilt u nu doen[/]")
                                                                                             .AddChoices(
-                                                                                            FilmPlannenChoices.TerugNaarFilmKeuzes,
+                                                                                                FilmPlannenChoices.TerugNaarFilmKeuzes,
                                                                                             FilmPlannenChoices.DoorgaanMetPlannen,
                                                                                             FilmPlannenChoices.Back));
 
