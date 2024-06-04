@@ -27,6 +27,7 @@ public class Admin
             AdminChoices.GeplandeFilms,
             AdminChoices.FilmPlannen,
             AdminChoices.Omzet,
+            AdminChoices.ReserveringZoeken,
             AdminChoices.UitLoggen
         };
         SelectedAdminOption = AnsiConsole.Prompt(
@@ -70,6 +71,9 @@ public class Admin
                     break;
                 case AdminChoices.Omzet:
                     Omzet();
+                    break;
+                case AdminChoices.ReserveringZoeken:
+                    ReserveringZoeken();
                     break;
             }
         }
@@ -241,7 +245,6 @@ public class Admin
                 }
 
             
-              
             }
         if (MoviePlanChoices == FilmPlannenChoices.Back)
         {
@@ -306,8 +309,81 @@ public class Admin
 
         }
     ;
-           
         }
+    
+    private void ReserveringZoeken() 
+    {
+        AnsiConsole.WriteLine("Voer een reserveringsnummer in:");
+        string? userInput = Console.ReadLine();
+
+        string reservationNumber = db.Ticket.Select(ticket => ticket.ReservationNumber).FirstOrDefault();
+
+        if (userInput == reservationNumber) 
+        {
+            List<Ticket> userTickets = db.Ticket.Where(t => t.ReservationNumber == reservationNumber).ToList();
+
+            var ticketsPerSchedule = userTickets
+                .GroupBy(t => new
+                {
+                    t.Movie_ID,
+                    t.Schedule_ID,
+                    t.DateBought
+                })
+                .GroupBy(g => g.Key.Schedule_ID) 
+                .Select(scheduleGroup => new
+                {
+                    MovieID = scheduleGroup.First().Key.Movie_ID, 
+                    MovieName = db
+                        .Movie.FirstOrDefault(movie =>
+                            movie.ID == scheduleGroup.First().Key.Movie_ID
+                        )
+                        ?.Title,
+                    DateBought = scheduleGroup.First().Key.DateBought.ToString("yyyy-MM-dd HH:mm"),
+                    ScheduleDate = db.Schedule.FirstOrDefault(s => s.ID == scheduleGroup.First().Key.Schedule_ID)?.StartDate.ToString("yyyy-MM-dd HH:mm"), 
+                    TicketIDs = string.Join(", ", scheduleGroup.SelectMany(innerGroup => innerGroup.Select(t => t.ID))), 
+                    TicketCount = scheduleGroup.Sum(innerGroup => innerGroup.Count()), 
+                    TotalPrice = scheduleGroup.Sum(innerGroup => innerGroup.Sum(t => t.Price)) 
+                })
+                .ToList();
+
+            if (ticketsPerSchedule.Any())
+            {
+                var table = new Table();
+
+                table.Border = TableBorder.Rounded;
+                table.AddColumn("[blue]Film[/]");
+                table.AddColumn("[blue]Reserveringsnummer[/]");
+                table.AddColumn("[blue]Tickets gekocht[/]");
+                table.AddColumn("[blue]Totale Prijs[/]");
+                table.AddColumn("[blue]Datum gekocht[/]");
+                table.AddColumn("[blue]Datum van vertoning[/]");
+
+                foreach (var scheduleInfo in ticketsPerSchedule)
+                {
+                    table.AddRow(
+                    new Markup($"[blue]{scheduleInfo.MovieName}[/]"),
+                    new Markup($"[blue]{reservationNumber}[/]"),
+                    new Markup($"[blue]{scheduleInfo.TicketCount}[/]"),
+                    new Markup($"[blue]{scheduleInfo.TotalPrice.ToString()} euro[/]"), // Formatting as currency
+                    new Markup($"[blue]{scheduleInfo.DateBought}[/]"),
+                    new Markup($"[blue]{scheduleInfo.ScheduleDate}[/]")
+                    );
+                }
+
+                // Create a bordered panel with a specific color
+                var panel = new Panel(table)
+                    .Header($"[bold blue]Reservering van reservingsnummer: {reservationNumber}[/]")
+                    .BorderColor(Color.Blue);
+
+                AnsiConsole.Render(panel);
+            }
+        }
+
+        else 
+        {
+            AnsiConsole.Write(new Rule("[red]Geen reservering gevonden[/]").RuleStyle("red"));
+        }
+    }
 
 
     }
@@ -316,6 +392,7 @@ public class Admin
         FilmToevoegen,
         GeplandeFilms,
         FilmPlannen,
+        ReserveringZoeken,
         Omzet,
         UitLoggen,
         Back
@@ -331,7 +408,7 @@ public class Admin
     }
     public enum RevenueChoices
     {
-      
+
         TotaleOmzet,
 
         TotaleOmzetPerFilm,
