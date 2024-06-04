@@ -36,6 +36,7 @@ public class Customer
             choices.Add(CustomerChoices.FilmZoeken);
             choices.Add(CustomerChoices.Films);
             choices.Add(CustomerChoices.ToonMijnReserveringen);
+            choices.Add(CustomerChoices.FilmSuggesties);
             choices.Add(CustomerChoices.LogOut);
         }
         SelectedCustomerOption = AnsiConsole.Prompt(
@@ -71,6 +72,9 @@ public class Customer
                     break;
                 case CustomerChoices.ToonMijnReserveringen:
                     Ticket.SeeUserStats(User.ID);
+                    break;
+                case CustomerChoices.FilmSuggesties:
+                    Ticket.GetSchedulesForSuggestion(User.ID); // pas later aan
                     break;
                 case CustomerChoices.LogOut:
                     Uitloggen();
@@ -480,7 +484,6 @@ public class Customer
             }
         }
     }
-
     public enum CustomerChoices
     {
         AccountAanmaken,
@@ -488,9 +491,9 @@ public class Customer
 
         Inloggen,
         Films,
-
         ToonMijnReserveringen,
         LogOut,
         Back,
+        FilmSuggesties
     }
 }
