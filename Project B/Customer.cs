@@ -370,6 +370,20 @@ public class Customer
                     var ticket = new Ticket();
                     // je moet hier of een zaal object meegeven of het aantal stoelen
                     bool qualifyForDiscount = User.LoggedIn && Ticket.UserTicketDiscount(User.ID);
+
+
+
+
+                    double totalPriceKassabon = 0;
+
+                    int ClassicSeatsCounter = 0;
+                    int LoveSeatsCounter = 0;
+                    int ExtraLegroomCounter = 0;
+
+
+                    double totalClassicseatPrice = 0;
+                    double totalLoveseatPrice = 0;
+                    double totalExtraLegroomPrice = 0;
                     foreach (var chairId in selectedChairs)
                     {
                         var db = new DataBaseConnection();
@@ -400,11 +414,50 @@ public class Customer
                                 selectedSchedule,
                                 qualifyForDiscount
                             );
-                            AnsiConsole.Write(
-                                new Rule($"[blue]Prijs: {seatPrice} euro[/]").RuleStyle("blue")
-                            );
+
+                            if (seatType == 0)
+                            {
+                                ClassicSeatsCounter++;
+                                totalClassicseatPrice += seatPrice;
+                            }
+                            if (seatType == 1)
+                            {   
+                                
+                                ExtraLegroomCounter++;
+                                totalExtraLegroomPrice += seatPrice;
+                                
+                            }
+                            if (seatType == 2)
+                            {   
+                                LoveSeatsCounter++;
+                                totalLoveseatPrice += seatPrice;
+                                
+                            }
+         
+                            totalPriceKassabon += seatPrice;
+                            
                         }
                     }
+
+                    AnsiConsole.Write(new Rule("[blue]Prijs overzicht[/]\n").LeftJustified());
+                    Ticket.DecideSeatTypeName(ClassicSeatsCounter,LoveSeatsCounter,ExtraLegroomCounter,totalClassicseatPrice,totalLoveseatPrice,totalExtraLegroomPrice);
+
+
+                    //empty line to divide the total price and the seats
+                    var rule = new Rule();
+                    AnsiConsole.Write(rule);
+                   
+                   //chekcs if the user is qualified for discount if true it calculates the discount and decreases the total price
+                    if (qualifyForDiscount)
+                    {
+                        double discountPercentage = 0.10;
+                        double discountAmount = totalPriceKassabon * discountPercentage;
+                        totalPriceKassabon -= discountAmount;
+                        AnsiConsole.Markup($"[blue]Discount:                            [/][white]{discountAmount}[/] [blue]euro[/]\n");
+                    }
+                    AnsiConsole.Markup($"[blue]Totale Prijs:                       [/][white]{totalPriceKassabon}[/] [blue]euro[/]\n");
+
+
                     var confirmPurchase = AnsiConsole.Confirm("Wil je de bestelling bevestigen?");
                     if (confirmPurchase)
                     {

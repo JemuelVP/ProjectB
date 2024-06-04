@@ -316,4 +316,30 @@ public class Ticket
 
         return reservationNumber.ToString();
     }
+
+
+
+    public static void DecideSeatTypeName(int classicSeatsCounter,int loveSeatsCounter,int ExtraLegRoomCounter, double totalClassicseatPrice, double totalLoveseatPrice,double totalExtraLegroomPrice)
+    { 
+        string seatTypeName;
+        if (classicSeatsCounter != 0)
+        {
+            seatTypeName = "Classic Seat";
+            AnsiConsole.Markup($"[blue]StoelType:[/] [white]{seatTypeName,-15} X{classicSeatsCounter}[/] [blue]Prijs:[/] [white]{totalClassicseatPrice}[/][blue] euro[/]\n");
+        }
+        if (ExtraLegRoomCounter != 0)
+        {
+            seatTypeName = "ExtraBeenRuimte";
+            AnsiConsole.Markup($"[blue]StoelType:[/] [white]{seatTypeName} X{ExtraLegRoomCounter}[/] [blue]Prijs:[/] [white]{totalExtraLegroomPrice}[/][blue] euro[/]\n");
+
+        }
+         if (loveSeatsCounter != 0)
+        {
+            seatTypeName = "LoveSeat";
+            AnsiConsole.Markup($"[blue]StoelType:[/] [white]{seatTypeName,-15} X{loveSeatsCounter}[/] [blue]Prijs:[/] [white]{totalLoveseatPrice}[/][blue] euro[/]\n");
+        }
+    }
+
+
+
 }
