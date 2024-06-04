@@ -433,6 +433,7 @@ public class Customer
                     }
                     break;
                 }
+                break;
             }
             else if (selectedReservationOption == ReservationMenuOption.Back)
             {
