@@ -27,6 +27,7 @@ public class Ticket
         Movie_ID = movieId; // Set Movie_ID
         Price = price;
         User_ID = userId ?? 0; // Assign User_ID if it's provided, otherwise use 0 or any other default value
+        ReservationNumber = reservationNumber;
 
         using DataBaseConnection db = new();
         var entry = db.Ticket.Add(
@@ -184,17 +185,20 @@ public class Ticket
         string reservationNumber
     )
     {
-        string stoelType;
+        // seattype = 0 = normal
+        // seattype = 1 = extra beenruimte
+        // seattype  = 2 = loveseat
+        string stoelType = "";
         switch (seatType)
         {
-            case 1:
-                stoelType = "LoveSeat";
+            case 0:
+                stoelType = "Classic";
                 break;
-            case 2:
+            case 1:
                 stoelType = "ExtraBeenRuimte";
                 break;
-            default:
-                stoelType = "Classic";
+            case 2:
+                stoelType = "LoveSeat";
                 break;
         }
         AnsiConsole.Write(new Rule($"[blue]Ticket Informatie [/]").RuleStyle("blue"));
@@ -270,7 +274,7 @@ public class Ticket
             }
             else
             {
-                AnsiConsole.Markup("[red]Er zijn nog geen tickets op deze account gekocht[/]");
+                AnsiConsole.Write("[red]Er zijn nog geen tickets op deze account gekocht. \n[/]");
             }
         }
     }

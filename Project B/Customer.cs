@@ -177,7 +177,7 @@ public class Customer
             var AllSchedules = ScheduleController.GetAvailableSchedules(startDate, endDate);
             Film film = new();
             var choices = schedules.Select(s => $"{s.Film.Title}").ToList();
-            
+
 
             var selectedMovieIndex = AnsiConsole.Prompt(
                 new SelectionPrompt<string>().Title("Kies een film").AddChoices(choices)
@@ -366,27 +366,7 @@ public class Customer
                         // AnsiConsole.WriteLine($"Aantal geslecteerde stoelen: {selectedChairs.Count}");
                     } while (isSelectingChair);
                     Console.Clear();
-                    int seatType = -1;
-                    using (DataBaseConnection db = new DataBaseConnection())
-                    {
-                        var chairType = db.Chair.FirstOrDefault(c =>
-                            c.Row == canvas.cursorY
-                            && c.Column == canvas.cursorX
-                            && c.CinemaHallID == targetHall.ID
-                        );
-                        if (chairType?.SeatType == 0)
-                        {
-                            seatType = 0;
-                        }
-                        else if (chairType?.SeatType == 1)
-                        {
-                            seatType = 1;
-                        }
-                        if (chairType?.SeatType == 2)
-                        {
-                            seatType = 2;
-                        }
-                    }
+
                     var ticket = new Ticket();
                     // je moet hier of een zaal object meegeven of het aantal stoelen
                     bool qualifyForDiscount = User.LoggedIn && Ticket.UserTicketDiscount(User.ID);
@@ -394,6 +374,19 @@ public class Customer
                     {
                         var db = new DataBaseConnection();
                         var chair = db.Chair.FirstOrDefault(c => c.ID == chairId);
+                        int seatType = -1;
+                        if (chair?.SeatType == 0)
+                        {
+                            seatType = 0;
+                        }
+                        else if (chair?.SeatType == 1)
+                        {
+                            seatType = 1;
+                        }
+                        if (chair?.SeatType == 2)
+                        {
+                            seatType = 2;
+                        }
                         if (chair != null)
                         {
                             int chairX = chair.Column;
@@ -422,18 +415,31 @@ public class Customer
                             currentUser.Visits += 1;
                         }
                         var totalPrice = 0.0;
+                        string reservationNumber = Ticket.GenerateReservationNumber();
                         db.SaveChanges();
                         foreach (var chairId in selectedChairs)
                         {
                             // Retrieve chair object by ID from the database
                             var chair = db.Chair.FirstOrDefault(c => c.ID == chairId);
+                            int seatType = -1;
 
+                            if (chair?.SeatType == 0)
+                            {
+                                seatType = 0;
+                            }
+                            else if (chair?.SeatType == 1)
+                            {
+                                seatType = 1;
+                            }
+                            if (chair?.SeatType == 2)
+                            {
+                                seatType = 2;
+                            }
                             if (chair != null)
                             {
                                 // Assuming chair has properties for X and Y coordinates
                                 int chairX = chair.Column;
                                 int chairY = chair.Row;
-                                string reservationNumber = Ticket.GenerateReservationNumber();
                                 // Use chairX and chairY in your logic to calculate the final price
                                 var finalPrice = ticket.CreateTicket(
                                     selectedSchedule,
@@ -445,8 +451,10 @@ public class Customer
                                         chairX,
                                         selectedSchedule,
                                         qualifyForDiscount
+                                        
                                     ),
-                                    User.ID
+                                    User.ID,
+                                    reservationNumber
                                 );
 
                                 // Increment total price
@@ -466,8 +474,8 @@ public class Customer
             }
             else if (selectedReservationOption == ReservationMenuOption.Back)
             {
-                                Console.Clear();
-                    break;
+                Console.Clear();
+                break;
             }
         }
     }
