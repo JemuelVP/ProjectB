@@ -258,6 +258,17 @@ public class ConsoleCanvas
         {
             canvas.SetPixel(chair.Item2, chair.Item1, Color.Green); // Note: chair.Item2 is column (x), chair.Item1 is row (y)
         }
+        var cursorOnSelectedChair = selectedChairs.Any(chair => chair.Item2 == cursorX && chair.Item1 == cursorY);
+
+        // Render the cursor position
+        if (cursorOnSelectedChair)
+        {
+            canvas.SetPixel(cursorX, cursorY, Color.White); // Change cursor to red if it's on a green seat
+        }
+        else
+        {
+            canvas.SetPixel(cursorX, cursorY, Color.LightCoral); // Normal cursor color
+        }
         // Render the canvas
         AnsiConsole.Write(canvas);
 
