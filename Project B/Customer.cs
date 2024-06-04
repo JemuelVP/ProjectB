@@ -35,7 +35,7 @@ public class Customer
             choices.Remove(CustomerChoices.Back);
             choices.Add(CustomerChoices.FilmZoeken);
             choices.Add(CustomerChoices.Films);
-            choices.Add(CustomerChoices.SeeUserStats);
+            choices.Add(CustomerChoices.ToonMijnReserveringen);
             choices.Add(CustomerChoices.LogOut);
         }
         SelectedCustomerOption = AnsiConsole.Prompt(
@@ -69,7 +69,7 @@ public class Customer
                 case CustomerChoices.Films:
                     FilmsBekijken();
                     break;
-                case CustomerChoices.SeeUserStats:
+                case CustomerChoices.ToonMijnReserveringen:
                     Ticket.SeeUserStats(User.ID);
                     break;
                 case CustomerChoices.LogOut:
@@ -489,7 +489,7 @@ public class Customer
         Inloggen,
         Films,
 
-        SeeUserStats,
+        ToonMijnReserveringen,
         LogOut,
         Back,
     }

@@ -235,7 +235,7 @@ public class Ticket
                         ?.Title,
                     DateBought = scheduleGroup.First().Key.DateBought.ToString("yyyy-MM-dd HH:mm"),
                     ScheduleDate = db.Schedule.FirstOrDefault(s => s.ID == scheduleGroup.First().Key.Schedule_ID)?.StartDate.ToString("yyyy-MM-dd HH:mm"), // Include the show date
-                    TicketIDs = string.Join(", ", scheduleGroup.SelectMany(innerGroup => innerGroup.Select(t => t.ID))), // Collecting all ticket IDs within the group
+                    ReservationNumber = scheduleGroup.SelectMany(innerGroup => innerGroup.Select(t => t.ReservationNumber)).FirstOrDefault(), // Get the first reservation number within the group
                     TicketCount = scheduleGroup.Sum(innerGroup => innerGroup.Count()), // Sum of counts of inner groups
                     TotalPrice = scheduleGroup.Sum(innerGroup => innerGroup.Sum(t => t.Price)) // Sum of total prices of inner groups
                 })
@@ -247,7 +247,7 @@ public class Ticket
 
                 table.Border = TableBorder.Rounded;
                 table.AddColumn("[blue]Film[/]");
-                table.AddColumn("[blue]Ticket IDS[/]");
+                table.AddColumn("[blue]Reserveringsnummer[/]");
                 table.AddColumn("[blue]Tickets gekocht[/]");
                 table.AddColumn("[blue]Totale Prijs[/]");
                 table.AddColumn("[blue]Datum gekocht[/]");
@@ -257,7 +257,7 @@ public class Ticket
                 {
                     table.AddRow(
                     new Markup($"[blue]{scheduleInfo.MovieName}[/]"),
-                    new Markup($"[blue]{scheduleInfo.TicketIDs}[/]"),
+                    new Markup($"[blue]{scheduleInfo.ReservationNumber}[/]"),
                     new Markup($"[blue]{scheduleInfo.TicketCount}[/]"),
                     new Markup($"[blue]{scheduleInfo.TotalPrice.ToString()} euro[/]"), // Formatting as currency
                     new Markup($"[blue]{scheduleInfo.DateBought}[/]"),
