@@ -76,29 +76,82 @@ public class Admin
     }
     private void FilmToevoegen()
     {
-        Console.Clear();
-        string title = AnsiConsole.Ask<string>("Titel:");
-        int year = AnsiConsole.Ask<int>("Jaar: ");
-        string description = AnsiConsole.Ask<string>("Beschrijving: ");
-        string authors = AnsiConsole.Ask<string>("Auteurs: ");
-        string categories = AnsiConsole.Ask<string>("Categorieën: ");
-        string directors = AnsiConsole.Ask<string>("Directeuren: ");
-        int age = AnsiConsole.Ask<int>("Minimale leeftijd: ");
-        int durationInMin = AnsiConsole.Ask<int>("Duurt in (minuten): ");
-        AnsiConsole.Write(
-            new Rule("[green]Film is toegevoegd [/]").RuleStyle("green")
-        );
-        // Call the AddMovie method with the input parameters
-        adminController.AddMovie(
-            title,
-            year,
-            description,
-            authors,
-            categories,
-            directors,
-            age,
-            durationInMin
-        );
+        while (true)
+        {
+            Console.Clear();
+
+            string title = AskForInput<string>("Titel:");
+            if (title == null) return;
+
+            int year;
+            while (true)
+            {
+                year = AnsiConsole.Ask<int>("Jaar uitgekomen (Voer'0' om te stoppen): ");
+                if (year <= DateTime.Now.Year)
+                {
+                    if (year == 0) return; // Check for 0 input to stop the terminal
+                    break;
+                }
+                else
+                {
+                    AnsiConsole.Markup("[red]Het uitkomst jaar kan niet in de toekomst liggen. Probeer het opnieuw.[/]\n");
+                }
+            }
+            
+            string description = AskForInput<string>("Beschrijving: ");
+            if (description == null) return;
+
+            string authors = AskForInput<string>("Auteurs: ");
+            if (authors == null) return;
+
+            string categories = AskForInput<string>("Categorieën: ");
+            if (categories == null) return;
+
+            string directors = AskForInput<string>("Directeuren: ");
+            if (directors == null) return;
+
+            int? age = AskForInput<int>("Minimale leeftijd (Voer'0' om te stoppen): ");
+            if (age == null || age == 0) return; // Check for 0 input to stop the terminal
+
+            int? durationInMin = AskForInput<int>("Duurt in (minuten) (Voer'0' om te stoppen): ");
+            if (durationInMin == null || durationInMin == 0) return; // Check for 0 input to stop the terminal
+
+            AnsiConsole.Write(
+                new Rule("[green]Film is toegevoegd [/]").RuleStyle("green")
+            );
+
+            // Call the AddMovie method with the input parameters
+            adminController.AddMovie(
+                title,
+                year,
+                description,
+                authors,
+                categories,
+                directors,
+                age.Value,
+                durationInMin.Value
+            );
+        }
+    }
+
+    private static T? AskForInput<T>(string prompt)
+    {
+        var input = AnsiConsole.Ask<string>($"{prompt} (Voer 'q' om te stoppen):");
+        if (input.ToLower() == "q" || input == "0")
+        {
+            AnsiConsole.Markup("[yellow]Teruggegaan.[/]\n");
+            return default;
+        }
+
+        try
+        {
+            return (T)Convert.ChangeType(input, typeof(T));
+        }
+        catch
+        {
+            AnsiConsole.Markup("[red]Ongeldige invoer. Probeer het opnieuw.[/]\n");
+            return AskForInput<T>(prompt);
+        }
     }
     private void GeplandeFilms()
     {
