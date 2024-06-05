@@ -236,7 +236,7 @@ public class ConsoleCanvas
     public void Draw(int schedule_id, string size, int width, int height, List<Tuple<int, int>> selectedChairs, string movieName)
     {
         // Clear the console
-        // Console.Clear();
+        Console.Clear();
         // Set the cursor position to the top left
         Console.SetCursorPosition(0, 0);
         // Create a new canvas
@@ -297,6 +297,7 @@ public class ConsoleCanvas
         }
 
         // Draw the X-axis ticks and letters
+        Console.Clear();
         var cols = new List<Text>();
         List<string> capitalLetters = new List<string>();
         for (char letter = 'A'; letter <= 'Z'; letter++)
@@ -371,6 +372,10 @@ public class ConsoleCanvas
         AnsiConsole.Markup("[DarkOrange3_1]Oranje: Extra Beenruimte[/]\n");
         AnsiConsole.Markup("[DodgerBlue3]Blauw: Standaard[/]\n");
         AnsiConsole.Markup("[Green]Groen: Selected chairs[/]\n");
+        AnsiConsole.Markup("[White]Druk op de spatiebalk om een stoel te selecteren.[/]\n");
+        AnsiConsole.Markup("[White]Klaar met selecteren? Druk dan op enter.[/]\n");
+        AnsiConsole.Markup("[White]Druk op enter zonder een stoel te selecteren[/]\n");
+        AnsiConsole.Markup("[White]om de bestelling te annuleren.[/]\n");
     }
 
     public void SetPixel(int x, int y, ConsoleColor color)

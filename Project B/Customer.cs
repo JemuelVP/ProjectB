@@ -298,26 +298,25 @@ public class Customer
                             height = 20;
                             break;
                     }
-                    Console.Clear();
                     ConsoleCanvas canvas = new(width, height);
 
                     Console.CursorVisible = false; // Hide the cursor
                     List<Tuple<int, int>> listSelectedChairs = new();
-                    Console.Clear();
                     // Draw the canvas
                     void DrawCanvas()
                     {
+                        Console.Clear();
                         int messageStartX = width + 31;
                         int messageStartY = 0;
 
                         // Shows instructions next to the hall placement
                         Console.SetCursorPosition(messageStartX, messageStartY);
                         Console.WriteLine("Druk op de spatiebalk om een stoel te selecteren.");
-                        Console.SetCursorPosition(messageStartX, messageStartY + 10);
+                        Console.SetCursorPosition(messageStartX, messageStartY + 1);
                         Console.WriteLine("Klaar met selecteren? Druk dan op enter.");
-                        Console.SetCursorPosition(messageStartX, messageStartY + 10);
+                        Console.SetCursorPosition(messageStartX, messageStartY + 3);
                         Console.WriteLine("Druk op enter zonder een stoel te selecteren");
-                        Console.SetCursorPosition(messageStartX, messageStartY + 10);
+                        Console.SetCursorPosition(messageStartX, messageStartY + 4);
                         Console.WriteLine("om de bestelling te annuleren.");
                         canvas.Draw(
                             selectedSchedule.ID,
