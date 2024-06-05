@@ -36,6 +36,7 @@ public class Customer
             choices.Add(CustomerChoices.FilmZoeken);
             choices.Add(CustomerChoices.Films);
             choices.Add(CustomerChoices.ToonMijnReserveringen);
+            choices.Add(CustomerChoices.FilmSuggesties);
             choices.Add(CustomerChoices.LogOut);
         }
         SelectedCustomerOption = AnsiConsole.Prompt(
@@ -72,6 +73,9 @@ public class Customer
                 case CustomerChoices.ToonMijnReserveringen:
                     Ticket.SeeUserStats(User.ID);
                     break;
+                case CustomerChoices.FilmSuggesties:
+                    Ticket.GetSchedulesForSuggestion(User.ID); // pas later aan
+                    break;
                 case CustomerChoices.LogOut:
                     Uitloggen();
                     break;
@@ -96,31 +100,6 @@ public class Customer
             AnsiConsole.Write(new Rule("[blue]Gebruiker is aangemaakt[/]").RuleStyle("blue"));
         }
     }
-
-    private void FilmZoeken()
-    {
-        Console.Clear();
-        DateTime startDate = DateTime.Now;
-        DateTime endDate = DateTime.Now.AddDays(28);
-        string MovieSearch = AnsiConsole.Prompt(new TextPrompt<string>("Zoek film categorie: "));
-        List<Schedule> searchSchedules = FilmController.GetMovieByCategory(
-            MovieSearch,
-            startDate,
-            endDate
-        );
-        Console.WriteLine(searchSchedules.Count);
-
-        if (searchSchedules.Count > 0)
-        {
-            FilmTicketKopen();
-        }
-        else
-        {
-            Console.WriteLine($"Geen films gevonden voor '{MovieSearch}'.");
-            Console.ReadLine();
-        }
-    }
-
     private void Inloggen()
     {
         Console.Clear();
@@ -147,6 +126,56 @@ public class Customer
         }
     }
 
+    // Method to get the list of unique movie categories from the database
+    private List<string> GetScheduledMovieCategories(DateTime startDate, DateTime endDate)
+    {
+        using (var db = new DataBaseConnection()) // Assuming DataBaseConnection is your DbContext
+        {
+            var categories = db.Schedule
+                                .Where(s => s.StartDate >= startDate && s.EndDate <= endDate)
+                                .Select(s => s.Movie_ID) // Select movie IDs
+                                .Distinct() // Get distinct movie IDs
+                                .Select(movieId => db.Movie.Where(m => m.ID == movieId).Select(m => m.Categories).FirstOrDefault()) // Get category for each movie ID
+                                .ToList();
+            return categories;
+        }
+    }
+    // Method to search for films by category
+    private void FilmZoeken()
+    {
+        Console.Clear();
+        DateTime startDate = DateTime.Now;
+        DateTime endDate = DateTime.Now.AddDays(28);
+
+        // Get the list of unique movie categories from the database
+        List<string> categories = GetScheduledMovieCategories(startDate, endDate);
+
+        // Display the list of categories for the user to choose from
+        string selectedCategory = AnsiConsole.Prompt(
+            new SelectionPrompt<string>()
+                .Title("Selecteer film categorie:")
+                .PageSize(10)
+                .MoreChoicesText("[grey](Scroll naar beneden om meer categorieën te zien)[/]")
+                .AddChoices(categories)
+        );
+
+        List<Schedule> searchSchedules = FilmController.GetMovieByCategory(
+            selectedCategory,
+            startDate,
+            endDate
+        );
+
+        if (searchSchedules.Count > 0)
+        {
+            FilmTicketKopen(searchSchedules);
+        }
+        else
+        {
+            Console.WriteLine($"Geen films gevonden voor '{selectedCategory}'.");
+        }
+    }
+
+    // Method to view available films and make reservations
     private void FilmsBekijken()
     {
         Console.Clear();
@@ -161,32 +190,52 @@ public class Customer
                     $"[blue]Beschikbare Films Van {startDate.Date.ToShortDateString()} Tot {endDate.Date.ToShortDateString()}:[/]"
                 ).RuleStyle("blue")
             );
-            FilmTicketKopen();
+
+            // Get all schedules for the given date range
+            var allSchedules = ScheduleController.GetAvailableSchedules(startDate, endDate);
+
+            // Display the titles of available films
+            var filmTitles = allSchedules.Select(s => s.Film.Title).Distinct().ToList();
+            var selectedMovie = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("Kies een film")
+                    .PageSize(10)
+                    .MoreChoicesText("[grey](Scroll naar beneden om meer films te zien)[/]")
+                    .AddChoices(filmTitles)
+            );
+
+            // Filter schedules by the selected movie
+            var selectedMovieSchedules = allSchedules.Where(s => s.Film.Title == selectedMovie).ToList();
+
+            // Proceed to buy tickets for the selected movie
+            if (selectedMovieSchedules.Count > 0)
+            {
+                FilmTicketKopen(selectedMovieSchedules);
+            }
+            else
+            {
+                Console.WriteLine($"Geen beschikbare vertoningen gevonden voor '{selectedMovie}'.");
+            }
+
+            // Break the loop after processing the selected movie
             break;
         }
     }
 
-    private void FilmTicketKopen()
+    // Method to purchase tickets for a selected schedule
+    private void FilmTicketKopen(List<Schedule> schedules)
     {
         while (true)
         {
-            ReservationMenuOption selectedReservationOption = ReservationMenuOption.MakeReservation; // Start with MakeReservation option
-            DateTime startDate = DateTime.Now;
-            DateTime endDate = DateTime.Now.AddDays(28);
-            var schedules = ScheduleController.GetTitlesForScheduledMovies(startDate, endDate);
-            var AllSchedules = ScheduleController.GetAvailableSchedules(startDate, endDate);
-            Film film = new();
-            var choices = schedules.Select(s => $"{s.Film.Title}").ToList();
+            var choices = schedules.Select(s => $"{s.Film.Title}").Distinct().ToList();
 
-
-            var selectedMovieIndex = AnsiConsole.Prompt(
+            var selectedMovieTitle = AnsiConsole.Prompt(
                 new SelectionPrompt<string>().Title("Kies een film").AddChoices(choices)
             );
 
-            // Get the selected schedule based on the selected movie
-            var selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
-            var newChoices = AllSchedules
-                .Where(s => s.Film.Title == selectedSchedule.Film.Title)
+            // Get the schedules for the selected movie
+            var selectedSchedules = schedules.Where(s => s.Film.Title == selectedMovieTitle).ToList();
+            var newChoices = selectedSchedules
                 .Select(s =>
                 {
                     if (s.SoldOut)
@@ -195,18 +244,20 @@ public class Customer
                         return $"{s.Film.Title} - {s.StartDate.ToString("dd-MM-yyyy HH:mm")}";
                 })
                 .ToList();
-            var newSelectedSchedules = AnsiConsole.Prompt(
+
+            var selectedScheduleOption = AnsiConsole.Prompt(
                 new SelectionPrompt<string>().Title("Kies een datum").AddChoices(newChoices)
             );
 
-            selectedSchedule = schedules[choices.IndexOf(selectedMovieIndex)];
+            var selectedSchedule = selectedSchedules[newChoices.IndexOf(selectedScheduleOption)];
+            var film = selectedSchedule.Film;
 
-            film = selectedSchedule.Film;
             // Display the details of the selected movie
+            var filmController = new FilmController();
             filmController.Display(film);
 
             // Prompt the user to make a reservation or go back
-            selectedReservationOption = AnsiConsole.Prompt(
+            var selectedReservationOption = AnsiConsole.Prompt(
                 new SelectionPrompt<ReservationMenuOption>()
                     .Title("Maak een keuze")
                     .AddChoices(ReservationMenuOption.MakeReservation, ReservationMenuOption.Back)
@@ -216,17 +267,18 @@ public class Customer
             {
                 if (!User.LoggedIn)
                 {
-                    var userName = AnsiConsole.Prompt(new TextPrompt<string>("Voer u naam in: "));
+                    var userName = AnsiConsole.Prompt(new TextPrompt<string>("Voer uw naam in: "));
                 }
+
                 var age = AnsiConsole.Prompt(new TextPrompt<int>("Voer uw leeftijd in: "));
                 var ticketAge = new Ticket();
-                ticketAge.CheckAge(film, age); // checks age against age movie
-                // AnsiConsole.Write(new Rule("[blue]Stoel Kosten[/]").RuleStyle("blue"));
+                ticketAge.CheckAge(film, age); // Checks age against age restriction of the movie
+
                 var targetHall = new CinemaHallController(new DataBaseConnection()).GetByID(
                     selectedSchedule.Hall_ID
                 );
-                if (targetHall == null)
-                    return;
+                if (targetHall == null) return;
+
                 while (true)
                 {
                     int width = -1;
@@ -257,7 +309,7 @@ public class Customer
                         int messageStartX = width + 31;
                         int messageStartY = 0;
 
-                        // shows instructions next to the hall placement
+                        // Shows instructions next to the hall placement
                         Console.SetCursorPosition(messageStartX, messageStartY);
                         Console.WriteLine("Druk op de spatiebalk om een stoel te selecteren.");
                         Console.SetCursorPosition(messageStartX, messageStartY + 1);
@@ -332,7 +384,7 @@ public class Customer
                             case ConsoleKey.Enter:
                                 if (selectedChairs.Count == 0)
                                 {
-                                    // if enter pressed without chair selection. returns true if answer is yes
+                                    // If enter is pressed without chair selection, confirm cancellation
                                     var confirmCancellation = AnsiConsole.Confirm("U heeft geen stoelen geselecteerd, wilt u de bestelling annuleren?");
                                     if (confirmCancellation)
                                     {
@@ -342,13 +394,13 @@ public class Customer
                                     else
                                     {
                                         AnsiConsole.Write(new Rule("[blue]Bestelling is niet geannuleerd. U kunt nu verder met het selecteren van uw stoelen[/]").RuleStyle("blue"));
-                                        DrawCanvas(); // redraws canvas if not cancelling
+                                        DrawCanvas(); // Redraw canvas if not cancelling
                                     }
                                     break; 
                                 }
                                 else
                                 {
-                                    // continue if chairs are selected
+                                    // Continue if chairs are selected
                                     isSelectingChair = false;
                                     Console.WriteLine(selectedChairs);
                                 }
@@ -363,12 +415,10 @@ public class Customer
                             listSelectedChairs,
                             film.Title
                         );
-                        // AnsiConsole.WriteLine($"Aantal geslecteerde stoelen: {selectedChairs.Count}");
                     } while (isSelectingChair);
                     Console.Clear();
 
                     var ticket = new Ticket();
-                    // je moet hier of een zaal object meegeven of het aantal stoelen
                     bool qualifyForDiscount = User.LoggedIn && Ticket.UserTicketDiscount(User.ID);
 
 
@@ -533,7 +583,6 @@ public class Customer
             }
         }
     }
-
     public enum CustomerChoices
     {
         AccountAanmaken,
@@ -541,9 +590,9 @@ public class Customer
 
         Inloggen,
         Films,
-
         ToonMijnReserveringen,
         LogOut,
         Back,
+        FilmSuggesties
     }
 }

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 using Spectre.Console;
 
@@ -234,8 +235,12 @@ public class Ticket
                         )
                         ?.Title,
                     DateBought = scheduleGroup.First().Key.DateBought.ToString("yyyy-MM-dd HH:mm"),
-                    ScheduleDate = db.Schedule.FirstOrDefault(s => s.ID == scheduleGroup.First().Key.Schedule_ID)?.StartDate.ToString("yyyy-MM-dd HH:mm"), // Include the show date
-                    ReservationNumber = scheduleGroup.SelectMany(innerGroup => innerGroup.Select(t => t.ReservationNumber)).FirstOrDefault(), // Get the first reservation number within the group
+                    ScheduleDate = db
+                        .Schedule.FirstOrDefault(s => s.ID == scheduleGroup.First().Key.Schedule_ID)
+                        ?.StartDate.ToString("yyyy-MM-dd HH:mm"), // Include the show date
+                    ReservationNumber = scheduleGroup
+                        .SelectMany(innerGroup => innerGroup.Select(t => t.ReservationNumber))
+                        .FirstOrDefault(), // Get the first reservation number within the group
                     TicketCount = scheduleGroup.Sum(innerGroup => innerGroup.Count()), // Sum of counts of inner groups
                     TotalPrice = scheduleGroup.Sum(innerGroup => innerGroup.Sum(t => t.Price)) // Sum of total prices of inner groups
                 })
@@ -256,18 +261,20 @@ public class Ticket
                 foreach (var scheduleInfo in ticketsPerSchedule)
                 {
                     table.AddRow(
-                    new Markup($"[blue]{scheduleInfo.MovieName}[/]"),
-                    new Markup($"[blue]{scheduleInfo.ReservationNumber}[/]"),
-                    new Markup($"[blue]{scheduleInfo.TicketCount}[/]"),
-                    new Markup($"[blue]{scheduleInfo.TotalPrice.ToString()} euro[/]"), // Formatting as currency
-                    new Markup($"[blue]{scheduleInfo.DateBought}[/]"),
-                    new Markup($"[blue]{scheduleInfo.ScheduleDate}[/]")
+                        new Markup($"[blue]{scheduleInfo.MovieName}[/]"),
+                        new Markup($"[blue]{scheduleInfo.ReservationNumber}[/]"),
+                        new Markup($"[blue]{scheduleInfo.TicketCount}[/]"),
+                        new Markup($"[blue]{scheduleInfo.TotalPrice.ToString()} euro[/]"), // Formatting as currency
+                        new Markup($"[blue]{scheduleInfo.DateBought}[/]"),
+                        new Markup($"[blue]{scheduleInfo.ScheduleDate}[/]")
                     );
                 }
 
                 // Create a bordered panel with a specific color
                 var panel = new Panel(table)
-                    .Header("[bold blue]Overzicht van de bezochte films en totale tickets per schema[/]")
+                    .Header(
+                        "[bold blue]Overzicht van de bezochte films en totale tickets per schema[/]"
+                    )
                     .BorderColor(Color.Blue);
 
                 AnsiConsole.Render(panel);
@@ -317,9 +324,7 @@ public class Ticket
         return reservationNumber.ToString();
     }
 
-
-
-    public static void DecideSeatTypeName(int classicSeatsCounter,int loveSeatsCounter,int ExtraLegRoomCounter, double totalClassicseatPrice, double totalLoveseatPrice,double totalExtraLegroomPrice)
+  public static void DecideSeatTypeName(int classicSeatsCounter,int loveSeatsCounter,int ExtraLegRoomCounter, double totalClassicseatPrice, double totalLoveseatPrice,double totalExtraLegroomPrice)
     { 
         string seatTypeName;
         if (classicSeatsCounter != 0)
@@ -340,6 +345,78 @@ public class Ticket
         }
     }
 
+    public static Dictionary<string, int> GetGenreCount(int userID) // dictionary met genre en bijbehorende count
+    {
+        using (DataBaseConnection db = new DataBaseConnection())
+        {
+            List<Ticket> userTickets = db.Ticket.Where(t => t.User_ID == userID).ToList(); // gets all tickets from user
+            List<int> movieIds = userTickets.Select(t => t.Movie_ID).Distinct().ToList(); // gets the movie id's from each ticket
+            List<string> genres = db
+                .Movie.Where(m => movieIds.Contains(m.ID))
+                .Select(m => m.Categories)
+                .Distinct()
+                .ToList(); // gets the genre of each movie
+            Dictionary<string, int> genreCounts = new Dictionary<string, int>();
+            foreach (var genre in genres)
+            {
+                int genreMovieCount = movieIds.Count(m =>
+                    db.Movie.First(mo => mo.ID == m).Categories == genre
+                );
+                genreCounts.Add(genre, genreMovieCount);
+            }
+            return genreCounts;
+        }
+    }
 
+    public static string FiveTicketsGenre(int userID) // gets the genre that has been bought atleast 5 times
+    {
+        var genreCounts = GetGenreCount(userID);
+        var atleast5 = genreCounts.Where(g => g.Value > 5);
+        if (!atleast5.Any())
+            return null;
+        var mostWatchedGenre = atleast5.OrderByDescending(g => g.Value).First();
+        return mostWatchedGenre.Key;
+    }
 
+    public static void GetSchedulesForSuggestion(int userID)
+    {
+        using (DataBaseConnection db = new DataBaseConnection())
+        {
+            string mostWatchedGenre = FiveTicketsGenre(userID);
+            List<int> movieIds = db
+                .Movie.Where(m => m.Categories == mostWatchedGenre)
+                .Select(m => m.ID)
+                .ToList(); // all movies with category
+            List<Schedule> schedules = db
+                .Schedule.Where(s => movieIds.Contains(s.Movie_ID))
+                .ToList(); // all movies with category in schedule
+            List<int> userTickets = db
+                .Ticket.Where(t => t.User_ID == userID)
+                .Select(t => t.Movie_ID)
+                .ToList(); // movies the user has tickets to
+
+            List<int> suggestedMovieIds = movieIds.Except(userTickets).ToList();
+
+            if (suggestedMovieIds.Any())
+            {
+                AnsiConsole.Markup("[blue]Suggesties gebaseerd op uw favoriete genre: [/]\n");
+                foreach (int movieId in suggestedMovieIds)
+                {
+                    var movie = db.Movie.FirstOrDefault(m => m.ID == movieId);
+                    if (movie != null)
+                    {
+                        AnsiConsole.Markup($"[green]Film: {movie.Title}[/]\n");
+                        AnsiConsole.Markup($"[green]Genre: {movie.Categories}[/]\n");
+                    }
+                }
+            }
+            else
+            {
+                AnsiConsole.Markup(
+                    "[red]Helaas hebben wij nog niet genoeg informatie om je suggesties te geven[/] \n"
+                );
+                AnsiConsole.Markup("[red]Probeer het in de toekomst opnieuw[/]\n");
+            }
+        }
+    }
 }

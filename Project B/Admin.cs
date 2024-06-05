@@ -135,6 +135,7 @@ public class Admin
                 age.Value,
                 durationInMin.Value
             );
+            break;
         }
     }
 
@@ -198,10 +199,10 @@ public class Admin
         var selectedMovie = AdminController.GetMovieByTitle(titlePart);
 
         var MoviePlanChoices = AnsiConsole.Prompt(new SelectionPrompt<FilmPlannenChoices>().Title("[green]Wat wilt u nu doen[/]")
-                                                                                            .AddChoices(
-                                                                                            FilmPlannenChoices.TerugNaarFilmKeuzes,
-                                                                                            FilmPlannenChoices.DoorgaanMetPlannen,
-                                                                                            FilmPlannenChoices.Back));
+        .AddChoices(
+        FilmPlannenChoices.TerugNaarFilmKeuzes,
+        FilmPlannenChoices.DoorgaanMetPlannen,
+        FilmPlannenChoices.Back));
 
         if (MoviePlanChoices == FilmPlannenChoices.TerugNaarFilmKeuzes) 
         {

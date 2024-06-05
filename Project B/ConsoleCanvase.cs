@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Spectre.Console;
 
 
@@ -14,6 +15,7 @@ public class ConsoleCanvas
     private CanvasPixel[,] canvas;
     public int cursorX { get; private set; }
     public int cursorY { get; private set; }
+    private Layout layout;
 
     public ConsoleCanvas(int width, int height)
     {
@@ -23,6 +25,11 @@ public class ConsoleCanvas
         ClearCanvas();
         cursorX = 0;
         cursorY = 0;
+        // Render the canvas
+        layout = new Layout("Root").SplitColumns(new Layout("left"), new Layout("right").SplitRows(
+            new Layout("top"),
+            new Layout("main")
+        ));
     }
 
     public void ClearCanvas()
@@ -38,7 +45,6 @@ public class ConsoleCanvas
 
     public void DrawSmallCanvas(Canvas canvas, int schedule_id)
     {
-        
         for (var row = 0; row < canvas.Height; row++)
         {
             for (var col = 0; col < canvas.Width; col++)
@@ -269,8 +275,80 @@ public class ConsoleCanvas
         {
             canvas.SetPixel(cursorX, cursorY, Color.LightCoral); // Normal cursor color
         }
-        // Render the canvas
-        AnsiConsole.Write(canvas);
+
+        var rows = new List<Text>();
+        for (int y = 0; y < height + 2; y++)
+        {
+            if (y <= 1)
+            {
+                rows.Add(new Text(""));
+                continue;
+            };
+            if (y - 2 == cursorY)
+            {
+
+                rows.Add(new Text((y - 1).ToString(), new Style(Color.Red)));
+            }
+            else
+            {
+                rows.Add(new Text((y - 1).ToString()));
+
+            }
+        }
+
+        // Draw the X-axis ticks and letters
+        var cols = new List<Text>();
+        List<string> capitalLetters = new List<string>();
+        for (char letter = 'A'; letter <= 'Z'; letter++)
+        {
+            capitalLetters.Add(letter.ToString());
+        }
+        for (int x = 0; x < width; x++)
+        {
+            Text text;
+            if (x >= capitalLetters.Count)
+            {
+                var firstLetter = capitalLetters[capitalLetters.Count - 1];
+                var secondLetter = capitalLetters[x % capitalLetters.Count];
+                if (x == cursorX)
+                {
+
+                    text = new Text(firstLetter + secondLetter, new Style(Color.Red));
+                }
+                else
+                {
+                    text = new Text(firstLetter + secondLetter);
+                }
+            }
+            else
+            {
+
+                var letter = capitalLetters[x % capitalLetters.Count];
+                if (x == cursorX)
+                {
+                    text = new Text(letter, new Style(Color.Red));
+
+                }
+                else
+                {
+                    text = new Text(letter);
+                }
+            }
+            cols.Add(text);
+        }
+
+        var renderedCols = new Columns(cols);
+        var renderedRows = new Rows(rows);
+        renderedRows.Collapse();
+        renderedCols.Collapse();
+        layout["left"].Size(5);
+        layout["top"].Size(2);
+        layout["left"].Update(renderedRows);
+        layout["top"].Update(renderedCols);
+        layout["main"].Size(50);
+        layout["main"].Update(canvas);
+
+        AnsiConsole.Write(layout);
 
         // Draw the screen below the seats
         int screenWidth = width * 2; // Adjust screen width as needed
@@ -283,7 +361,7 @@ public class ConsoleCanvas
 
         string screen = "└" + new string('─', screenWidth) + "┘";
         // Update the console cursor position to below the canvas
-        Console.SetCursorPosition(0, height + 1);
+        Console.SetCursorPosition(0, height + 5);
         Console.WriteLine(screenBottom);
         Console.WriteLine(screenMiddle);
         Console.WriteLine(screen);
