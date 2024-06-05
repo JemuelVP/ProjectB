@@ -336,7 +336,7 @@ public class ConsoleCanvas
             }
             cols.Add(text);
         }
-
+        Console.Clear();
         var renderedCols = new Columns(cols);
         var renderedRows = new Rows(rows);
         renderedRows.Collapse();
@@ -347,7 +347,7 @@ public class ConsoleCanvas
         layout["top"].Update(renderedCols);
         layout["main"].Size(50);
         layout["main"].Update(canvas);
-
+        Console.Clear();
         AnsiConsole.Write(layout);
 
         // Draw the screen below the seats
