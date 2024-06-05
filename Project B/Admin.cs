@@ -356,14 +356,11 @@ public class Admin
     
     private void ReserveringZoeken() 
     {
+        using (DataBaseConnection db = new DataBaseConnection())
+        {
         AnsiConsole.WriteLine("Voer een reserveringsnummer in:");
         string? userInput = Console.ReadLine();
-
-        string reservationNumber = db.Ticket.Select(ticket => ticket.ReservationNumber).FirstOrDefault();
-
-        if (userInput == reservationNumber) 
-        {
-            List<Ticket> userTickets = db.Ticket.Where(t => t.ReservationNumber == reservationNumber).ToList();
+            List<Ticket> userTickets = db.Ticket.Where(t => t.ReservationNumber == userInput).ToList();
 
             var ticketsPerSchedule = userTickets
                 .GroupBy(t => new
@@ -405,7 +402,7 @@ public class Admin
                 {
                     table.AddRow(
                     new Markup($"[blue]{scheduleInfo.MovieName}[/]"),
-                    new Markup($"[blue]{reservationNumber}[/]"),
+                    new Markup($"[blue]{userInput}[/]"),
                     new Markup($"[blue]{scheduleInfo.TicketCount}[/]"),
                     new Markup($"[blue]{scheduleInfo.TotalPrice.ToString()} euro[/]"), // Formatting as currency
                     new Markup($"[blue]{scheduleInfo.DateBought}[/]"),
@@ -415,11 +412,10 @@ public class Admin
 
                 // Create a bordered panel with a specific color
                 var panel = new Panel(table)
-                    .Header($"[bold blue]Reservering van reservingsnummer: {reservationNumber}[/]")
+                    .Header($"[bold blue]Reservering van reservingsnummer: {userInput}[/]")
                     .BorderColor(Color.Blue);
 
                 AnsiConsole.Render(panel);
-            }
         }
 
         else 
@@ -427,6 +423,7 @@ public class Admin
             AnsiConsole.Write(new Rule("[red]Geen reservering gevonden[/]").RuleStyle("red"));
         }
     }
+}
 
 
     }

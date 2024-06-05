@@ -305,7 +305,6 @@ public class Customer
                     // Draw the canvas
                     void DrawCanvas()
                     {
-                        Console.Clear();
                         int messageStartX = width + 31;
                         int messageStartY = 0;
 

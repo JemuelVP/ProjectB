@@ -375,7 +375,7 @@ public class ConsoleCanvas
         AnsiConsole.Markup("[White]Druk op de spatiebalk om een stoel te selecteren.[/]\n");
         AnsiConsole.Markup("[White]Klaar met selecteren? Druk dan op enter.[/]\n");
         AnsiConsole.Markup("[White]Druk op enter zonder een stoel te selecteren[/]\n");
-        AnsiConsole.Markup("[White]om de bestelling te annuleren.[/]\n");
+        AnsiConsole.Markup("[White]Om de bestelling te annuleren.[/]\n");
     }
 
     public void SetPixel(int x, int y, ConsoleColor color)
