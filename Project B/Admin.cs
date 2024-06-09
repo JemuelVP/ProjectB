@@ -313,6 +313,26 @@ public class Admin
             case RevenueChoices.TotaleOmzet:
             
             var money = new RevenueStatistics();
+            var totalTickets = RevenueStatistics.GetTotalTicketsPerSeatType();
+            Console.ForegroundColor = ConsoleColor.Blue;
+            foreach (var totalTicket in totalTickets)
+            {
+                string stoelType = "";
+                switch (totalTicket.SeatType)
+                {
+                    case 0:
+                        stoelType = "Classic";
+                        break;
+                    case 1:
+                        stoelType = "ExtraBeenRuimte";
+                        break;
+                    case 2:
+                        stoelType = "LoveSeat";
+                        break;
+                }
+                
+                AnsiConsole.WriteLine($"SeatType: {stoelType}, Count: {totalTicket.Count}");
+            }
             money.GetTotalRevenue();
             break; 
 
@@ -334,24 +354,36 @@ public class Admin
             string titlePart = overviewMovies.Replace("Titel: ", "");
             var selectedMovie = AdminController.GetMovieByTitle(titlePart);
             
+            AnsiConsole.Write(new Rule($"{titlePart}").RuleStyle("blue"));
             Console.ForegroundColor = ConsoleColor.Blue;
-            AnsiConsole.WriteLine(
-                $"Total Tickets: {RevenueStatistics.GetTotalTicketsPerMovie(selectedMovie.ID)}"
-            );
-            AnsiConsole.WriteLine(
-                $"Totale Omzet: {RevenueStatistics.GetTotalPricePerMovie(selectedMovie.ID)}"
-            );
+            var results = RevenueStatistics.GetTotalTicketsPerSeatType(selectedMovie.ID);
+            foreach (var result in results)
+            {
+                // seattype = 0 = normal
+                // seattype = 1 = extra beenruimte
+                // seattype  = 2 = loveseat
+                string stoelType = "";
+                switch (result.SeatType)
+                {
+                    case 0:
+                        stoelType = "Classic";
+                        break;
+                    case 1:
+                        stoelType = "ExtraBeenRuimte";
+                        break;
+                    case 2:
+                        stoelType = "LoveSeat";
+                        break;
+                }
+                AnsiConsole.WriteLine($"Stoel Type: {stoelType}, Totale: {result.Count}");
+            }
+            AnsiConsole.WriteLine($"Totale Tickets: {RevenueStatistics.GetTotalTicketsPerMovie(selectedMovie.ID)}");
+            AnsiConsole.WriteLine($"Totale Omzet: {RevenueStatistics.GetTotalPricePerMovie(selectedMovie.ID)}");
             break;
-
             case RevenueChoices.Back:
-
             Console.Clear();
             break;
-
-
-
-        }
-    ;
+        };
         }
     
     private void ReserveringZoeken() 

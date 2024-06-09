@@ -236,12 +236,10 @@ public class ConsoleCanvas
     public void Draw(int schedule_id, string size, int width, int height, List<Tuple<int, int>> selectedChairs, string movieName)
     {
         // Clear the console
-        Console.Clear();
         // Set the cursor position to the top left
         Console.SetCursorPosition(0, 0);
         // Create a new canvas
         var canvas = new Canvas(width, height);
-
         // Draw the cinema hall based on its size
         switch (size)
         {
@@ -275,7 +273,6 @@ public class ConsoleCanvas
         {
             canvas.SetPixel(cursorX, cursorY, Color.LightCoral); // Normal cursor color
         }
-
         var rows = new List<Text>();
         for (int y = 0; y < height + 2; y++)
         {
@@ -295,9 +292,7 @@ public class ConsoleCanvas
 
             }
         }
-
         // Draw the X-axis ticks and letters
-        Console.Clear();
         var cols = new List<Text>();
         List<string> capitalLetters = new List<string>();
         for (char letter = 'A'; letter <= 'Z'; letter++)
@@ -337,7 +332,6 @@ public class ConsoleCanvas
             }
             cols.Add(text);
         }
-        Console.Clear();
         var renderedCols = new Columns(cols);
         var renderedRows = new Rows(rows);
         renderedRows.Collapse();
@@ -348,7 +342,6 @@ public class ConsoleCanvas
         layout["top"].Update(renderedCols);
         layout["main"].Size(50);
         layout["main"].Update(canvas);
-        Console.Clear();
         AnsiConsole.Write(layout);
 
         // Draw the screen below the seats
@@ -359,7 +352,6 @@ public class ConsoleCanvas
         // Center the movie name
         int padding = (screenWidth - movieName.Length) / 2;
         string screenMiddle = "│" + new string(' ', padding) + movieName + new string(' ', screenWidth - padding - movieName.Length) + "│";
-
         string screen = "└" + new string('─', screenWidth) + "┘";
         // Update the console cursor position to below the canvas
         Console.SetCursorPosition(0, height + 5);
@@ -376,6 +368,7 @@ public class ConsoleCanvas
         AnsiConsole.Markup("[White]Klaar met selecteren? Druk dan op enter.[/]\n");
         AnsiConsole.Markup("[White]Druk op enter zonder een stoel te selecteren[/]\n");
         AnsiConsole.Markup("[White]Om de bestelling te annuleren.[/]\n");
+        AnsiConsole.Markup($"[Red]Current Position: Row {cursorY + 1}, Column {capitalLetters[cursorX % capitalLetters.Count]}[/]");
     }
 
     public void SetPixel(int x, int y, ConsoleColor color)
