@@ -304,7 +304,7 @@ public class Ticket
             {
                 user.DiscountReceived = true;
                 db.SaveChanges();
-                Console.WriteLine("Gefeliciteerd je ontvangt korting op je bestelling!");
+                Console.WriteLine("Gefeliciteerd u ontvangt korting op uw reservering!");
                 return true;
             }
         }

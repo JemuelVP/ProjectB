@@ -36,12 +36,12 @@ public enum MainMenuOptions
 public enum ReservationMenuOption
 {
     
-    MakeReservation,
-    Back
+    MaakEenReservatie,
+    Terug
 }
 
 public enum Logout
 {
-    Yes,
-    No
+    Ja,
+    Nee
 }

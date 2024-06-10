@@ -26,7 +26,7 @@ public class Customer
             CustomerChoices.Inloggen,
             CustomerChoices.FilmZoeken,
             CustomerChoices.Films,
-            CustomerChoices.Back
+            CustomerChoices.Terug
         };
         if (User.LoggedIn)
         {
@@ -34,12 +34,12 @@ public class Customer
             choices.Remove(CustomerChoices.Inloggen);
             choices.Remove(CustomerChoices.FilmZoeken);
             choices.Remove(CustomerChoices.Films);
-            choices.Remove(CustomerChoices.Back);
+            choices.Remove(CustomerChoices.Terug);
             choices.Add(CustomerChoices.FilmZoeken);
             choices.Add(CustomerChoices.Films);
             choices.Add(CustomerChoices.ToonMijnReserveringen);
             choices.Add(CustomerChoices.FilmSuggesties);
-            choices.Add(CustomerChoices.LogOut);
+            choices.Add(CustomerChoices.Uitloggen);
         }
         SelectedCustomerOption = AnsiConsole.Prompt(
             new SelectionPrompt<CustomerChoices>()
@@ -53,7 +53,7 @@ public class Customer
         while (true)
         {
             SetSelectedCustomerOption();
-            if (SelectedCustomerOption == CustomerChoices.Back)
+            if (SelectedCustomerOption == CustomerChoices.Terug)
             {
                 Console.Clear();
                 break;
@@ -78,7 +78,7 @@ public class Customer
                 case CustomerChoices.FilmSuggesties:
                     GetSchedulesForSuggestion(User.ID);
                     break;
-                case CustomerChoices.LogOut:
+                case CustomerChoices.Uitloggen:
                     Uitloggen();
                     break;
             }
@@ -106,10 +106,10 @@ public class Customer
     {
         Console.Clear();
         var customerName = AnsiConsole.Prompt(
-            new TextPrompt<string>("Voer je gebruikersnaam in: ")
+            new TextPrompt<string>("Voer uw gebruikersnaam in: ")
         );
         var customerPassword = AnsiConsole.Prompt(
-            new TextPrompt<string>("Voer je wachtwoord in: ").Secret()
+            new TextPrompt<string>("Voer uw wachtwoord in: ").Secret()
         );
         User.UserLogin(customerName, customerPassword);
     }
@@ -119,10 +119,10 @@ public class Customer
         Console.Clear();
         var choice = AnsiConsole.Prompt(
             new SelectionPrompt<Logout>()
-                .Title("[red]Weet je zeker dat je wilt uitloggen?[/]")
-                .AddChoices(Logout.Yes, Logout.No)
+                .Title("[red]Weet u zeker dat u wilt uitloggen?[/]")
+                .AddChoices(Logout.Ja, Logout.Nee)
         );
-        if (choice == Logout.Yes)
+        if (choice == Logout.Nee)
         {
             User = new Users();
         }
@@ -155,7 +155,7 @@ public class Customer
         // Display the list of categories for the user to choose from
         string selectedCategory = AnsiConsole.Prompt(
             new SelectionPrompt<string>()
-                .Title("Selecteer film categorie:")
+                .Title("Selecteer een film categorie:")
                 .PageSize(10)
                 .MoreChoicesText("[grey](Scroll naar beneden om meer categorieën te zien)[/]")
                 .AddChoices(categories)
@@ -183,8 +183,8 @@ public class Customer
         Console.Clear();
         DateTime startDate = DateTime.Now;
         DateTime endDate = DateTime.Now.AddDays(28);
-        ReservationMenuOption selectedReservationOption = ReservationMenuOption.MakeReservation; // Start with MakeReservation option
-        while (selectedReservationOption != ReservationMenuOption.Back)
+        ReservationMenuOption selectedReservationOption = ReservationMenuOption.MaakEenReservatie; // Start with MakeReservation option
+        while (selectedReservationOption != ReservationMenuOption.Terug)
         {
             // Display available films
             AnsiConsole.Write(
@@ -261,11 +261,11 @@ public class Customer
             // Prompt the user to make a reservation or go back
             var selectedReservationOption = AnsiConsole.Prompt(
                 new SelectionPrompt<ReservationMenuOption>()
-                    .Title("Maak een keuze")
-                    .AddChoices(ReservationMenuOption.MakeReservation, ReservationMenuOption.Back)
+                    .Title("Maak een keuze alstublieft")
+                    .AddChoices(ReservationMenuOption.MaakEenReservatie, ReservationMenuOption.Terug)
             );
 
-            if (selectedReservationOption == ReservationMenuOption.MakeReservation)
+            if (selectedReservationOption == ReservationMenuOption.MaakEenReservatie)
             {
                 if (!User.LoggedIn)
                 {
@@ -386,15 +386,15 @@ public class Customer
                                 if (selectedChairs.Count == 0)
                                 {
                                     // If enter is pressed without chair selection, confirm cancellation
-                                    var confirmCancellation = AnsiConsole.Confirm("U heeft geen stoelen geselecteerd, wilt u de bestelling annuleren?");
+                                    var confirmCancellation = AnsiConsole.Confirm("U heeft geen stoelen geselecteerd, wilt u de reservering annuleren?");
                                     if (confirmCancellation)
                                     {
-                                        AnsiConsole.Write(new Rule("[red]Uw bestelling is geannuleerd[/]").RuleStyle("red"));
+                                        AnsiConsole.Write(new Rule("[red]Uw reservering is geannuleerd[/]").RuleStyle("red"));
                                         return; 
                                     }
                                     else
                                     {
-                                        AnsiConsole.Write(new Rule("[blue]Bestelling is niet geannuleerd. U kunt nu verder met het selecteren van uw stoelen[/]").RuleStyle("blue"));
+                                        AnsiConsole.Write(new Rule("[blue]Reservering is niet geannuleerd. U kunt nu verder met het selecteren van uw stoelen[/]").RuleStyle("blue"));
                                         DrawCanvas(); // Redraw canvas if not cancelling
                                     }
                                     break; 
@@ -504,12 +504,12 @@ public class Customer
                         double discountPercentage = 0.10;
                         double discountAmount = totalPriceKassabon * discountPercentage;
                         totalPriceKassabon -= discountAmount;
-                        AnsiConsole.Markup($"[blue]Discount:                            [/][white]{discountAmount}[/] [blue]euro[/]\n");
+                        AnsiConsole.Markup($"[blue]Korting:                              [/][white]{discountAmount}[/] [blue]euro[/]\n");
                     }
                     AnsiConsole.Markup($"[blue]Totale Prijs:                       [/][white]{totalPriceKassabon}[/] [blue]euro[/]\n");
 
 
-                    var confirmPurchase = AnsiConsole.Confirm("Wil je de bestelling bevestigen?");
+                    var confirmPurchase = AnsiConsole.Confirm("Wilt u de reservering bevestigen?");
                     if (confirmPurchase)
                     {
                         var db = new DataBaseConnection();
@@ -577,7 +577,7 @@ public class Customer
                 }
                 break;
             }
-            else if (selectedReservationOption == ReservationMenuOption.Back)
+            else if (selectedReservationOption == ReservationMenuOption.Terug)
             {
                 Console.Clear();
                 break;
@@ -652,8 +652,8 @@ public class Customer
         Inloggen,
         Films,
         ToonMijnReserveringen,
-        LogOut,
-        Back,
+        Uitloggen,
+        Terug,
         FilmSuggesties
     }
 }
