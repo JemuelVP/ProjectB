@@ -1,5 +1,7 @@
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
+using System.Net.NetworkInformation;
 using Spectre.Console;
+using Microsoft.EntityFrameworkCore;
 
 public class Customer
 {
@@ -74,7 +76,7 @@ public class Customer
                     Ticket.SeeUserStats(User.ID);
                     break;
                 case CustomerChoices.FilmSuggesties:
-                    Ticket.GetSchedulesForSuggestion(User.ID); // pas later aan
+                    GetSchedulesForSuggestion(User.ID);
                     break;
                 case CustomerChoices.LogOut:
                     Uitloggen();
@@ -223,7 +225,7 @@ public class Customer
     }
 
     // Method to purchase tickets for a selected schedule
-    private void FilmTicketKopen(List<Schedule> schedules)
+    public void FilmTicketKopen(List<Schedule> schedules)
     {
         while (true)
         {
@@ -582,6 +584,66 @@ public class Customer
             }
         }
     }
+    public void GetSchedulesForSuggestion(int userID)
+    {
+        using (DataBaseConnection db = new DataBaseConnection())
+        {
+            string mostWatchedGenre = Ticket.FiveTicketsGenre(userID);
+            List<int> movieIds = db.Movie
+                .Where(m => m.Categories == mostWatchedGenre)
+                .Select(m => m.ID)
+                .ToList(); // all movies with category
+            
+            List<Schedule> schedules = db.Schedule
+                .Where(s => movieIds.Contains(s.Movie_ID))
+                .Include(s => s.Film)
+                .ToList(); // all movies with category in schedule
+
+            List<int> userTickets = db.Ticket
+                .Where(t => t.User_ID == userID)
+                .Select(t => t.Movie_ID)
+                .ToList(); // movies the user has tickets to
+
+            List<int> suggestedMovieIds = movieIds.Except(userTickets).ToList();
+
+            if (suggestedMovieIds.Any())
+            {
+                AnsiConsole.Markup("[blue]Suggesties gebaseerd op uw favoriete genre: [/]\n");
+                List<string> suggestedMovies = new List<string>();
+                foreach (int movieId in suggestedMovieIds)
+                {
+                    var movie = db.Movie.FirstOrDefault(m => m.ID == movieId);
+                    if (movie != null)
+                    {
+                        suggestedMovies.Add(movie.Title);
+                    }
+                }
+                if (suggestedMovies.Any())
+                {
+                    string selectedMovie = AnsiConsole.Prompt(new SelectionPrompt<string>()
+                        .Title("[blue]U kunt een suggestie selecteren om deze te reserveren [/]\n")
+                        .AddChoices(suggestedMovies));
+
+                    var selectedMovieId = db.Movie.FirstOrDefault(m => m.Title == selectedMovie)?.ID;
+                    var selectSchedule = schedules.Where(s => s.Movie_ID == selectedMovieId).ToList();
+                    if (selectSchedule.Any())
+                    {
+                        this.FilmTicketKopen(selectSchedule);
+                    }
+                    else
+                    {
+                        AnsiConsole.Markup($"[red]Op het moment zijn er geen vertoningen gevonden voor '{selectedMovie}'.[/]");
+                    }
+                }
+            }
+            else
+            {
+                AnsiConsole.Markup("[red]Helaas hebben wij nog niet genoeg informatie om je suggesties te geven[/] \n");
+                AnsiConsole.Markup("[red]Probeer het in de toekomst opnieuw[/]\n");
+            }
+        }
+    }
+
     public enum CustomerChoices
     {
         AccountAanmaken,
