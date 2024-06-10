@@ -301,7 +301,7 @@ public class Ticket
             {
                 user.DiscountReceived = true;
                 db.SaveChanges();
-                Console.WriteLine("Gefeliciteerd je ontvangt korting op je bestelling!");
+                Console.WriteLine("Gefeliciteerd u ontvangt korting op uw reservering!");
                 return true;
             }
         }
@@ -399,7 +399,7 @@ public class Ticket
 
             if (suggestedMovieIds.Any())
             {
-                AnsiConsole.Markup("[blue]Suggesties gebaseerd op uw favoriete genre: [/]\n");
+                AnsiConsole.Markup("[blue]Film suggesties gebaseerd op uw favoriete genre: [/]\n");
                 foreach (int movieId in suggestedMovieIds)
                 {
                     var movie = db.Movie.FirstOrDefault(m => m.ID == movieId);
@@ -413,7 +413,7 @@ public class Ticket
             else
             {
                 AnsiConsole.Markup(
-                    "[red]Helaas hebben wij nog niet genoeg informatie om je suggesties te geven[/] \n"
+                    "[red]Helaas hebben wij nog niet genoeg informatie om uw film suggesties te geven[/] \n"
                 );
                 AnsiConsole.Markup("[red]Probeer het in de toekomst opnieuw[/]\n");
             }
