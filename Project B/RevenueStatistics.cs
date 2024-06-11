@@ -1,4 +1,6 @@
 using Spectre.Console;
+using System.Net;
+using System.Net.Mail;
 class RevenueStatistics
 {
     public void GetTotalRevenue()
@@ -36,6 +38,7 @@ class RevenueStatistics
         var adminOverview = AdminController.GetAllMovies();
         var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
         var projectDirectory = new DirectoryInfo(baseDirectory).Parent?.Parent?.Parent;
+
         if(projectDirectory is null)
         {
             return;
@@ -45,7 +48,7 @@ class RevenueStatistics
         //false overwrites if there is something in the csv file 
         using (var writer = new StreamWriter(CsvFilePath,false))
         {
-            writer.WriteLine("Titel, AantalClassic, AantalExtraBeenRuimte, AantalLoveSeat, Totaleprijs");
+            writer.WriteLine("Titel, Aantal ClassicSeats, Aantal ExtraBeenRuimte, Aantal LoveSeats, Totaleprijs");
 
             foreach (var movie in adminOverview)
             {   
@@ -54,12 +57,15 @@ class RevenueStatistics
                 int countClassicSeats = getCountPerSeatType(movie,0);
                 int countExtraLegRoom = getCountPerSeatType(movie,1);
                 int countLoveSeats = getCountPerSeatType(movie,2);
-                writer.WriteLine($"Titel: {movie.Title}, Classic: {countClassicSeats}, ExtraBeenRuimte: {countExtraLegRoom}, LoveSeats: {countLoveSeats}, TotalePrijs: {totalPricePerMovie} euro");
+                writer.WriteLine($"{movie.Title}, {countClassicSeats}, {countExtraLegRoom}, {countLoveSeats}, {totalPricePerMovie} euro");
                 
             }
             writer.Flush();
         }
-        Console.WriteLine("CSV file created successfully.");
+
+        //SEND EMAIL
+
+        SendEmail(CsvFilePath);
     }
     public static int getCountPerSeatType(Film movie, int seattype)
     {
@@ -70,4 +76,42 @@ class RevenueStatistics
                 select T).Count();
 
     }
+
+
+    public static void SendEmail(string csvPath)
+{
+    try
+    {
+        using (MailMessage mail = new MailMessage())
+        using (SmtpClient smtpServer = new SmtpClient("smtp-mail.outlook.com"))
+        {   
+            
+            mail.From = new MailAddress("youreyesbioscoop@hotmail.com");
+            mail.To.Add("1073976@hr.nl");
+            mail.Subject = "CSV Bestand";
+            
+           // mail.Body = "Beste Marcel,\nHier is uw aangevraagde CSV bestand met de film statistieken";
+
+            Attachment attachment = new Attachment(csvPath);
+            mail.Attachments.Add(attachment);
+
+            smtpServer.Port = 587;
+            smtpServer.Credentials = new NetworkCredential("youreyesbioscoop@hotmail.com", "rkmxzxxugkjsizwm"); 
+            smtpServer.EnableSsl = true;
+
+            smtpServer.Send(mail);
+        }
+        Console.WriteLine($"De csv bestand is succesvol verstuurd, check uw email!");
+    }
+    catch (SmtpException smtpEx)
+    {
+        Console.WriteLine($"SMTP Exception: {smtpEx.Message}");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Exception: {ex.Message}");
+    }
 }
+
+}
+  
