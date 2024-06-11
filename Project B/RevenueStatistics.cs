@@ -34,19 +34,13 @@ class RevenueStatistics
         //getallmovies pakt alle films ookal zijn ze niet gepland
         using DataBaseConnection db = new();
         var adminOverview = AdminController.GetAllMovies();
-        
-            // 0  > classic seat 
-            // 1  > extrabeenruimte
-            // 2  > Loveseat
-
         var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
         var projectDirectory = new DirectoryInfo(baseDirectory).Parent?.Parent?.Parent;
         if(projectDirectory is null)
         {
             return;
         }
-
-        var CsvFilePath = Path.Combine(projectDirectory.FullName, "CsvFiles", "StatsPerMovie.csv");
+        var CsvFilePath = Path.Combine(projectDirectory.FullName,"StatsPerMovie.csv");
 
         //false overwrites if there is something in the csv file 
         using (var writer = new StreamWriter(CsvFilePath,false))
@@ -67,8 +61,6 @@ class RevenueStatistics
         }
         Console.WriteLine("CSV file created successfully.");
     }
-
-    //
     public static int getCountPerSeatType(Film movie, int seattype)
     {
         using DataBaseConnection db = new();
@@ -78,7 +70,4 @@ class RevenueStatistics
                 select T).Count();
 
     }
-
-    
-
 }
