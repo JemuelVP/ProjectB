@@ -79,7 +79,7 @@ class RevenueStatistics
 
 
     public static void SendEmail(string csvPath)
-{
+    {
     try
     {
         using (MailMessage mail = new MailMessage())
@@ -88,7 +88,7 @@ class RevenueStatistics
             
             mail.From = new MailAddress("youreyesbioscoop@hotmail.com");
             mail.To.Add("1073976@hr.nl");
-            mail.Subject = "CSV Bestand";
+            mail.Subject = "CSV Bestand Film Statistieken YourEyes";
             
            // mail.Body = "Beste Marcel,\nHier is uw aangevraagde CSV bestand met de film statistieken";
 
@@ -101,7 +101,7 @@ class RevenueStatistics
 
             smtpServer.Send(mail);
         }
-        Console.WriteLine($"De csv bestand is succesvol verstuurd, check uw email!");
+        Console.WriteLine($"Het csv bestand is succesvol verstuurd, check uw email!");
     }
     catch (SmtpException smtpEx)
     {
@@ -111,7 +111,7 @@ class RevenueStatistics
     {
         Console.WriteLine($"Exception: {ex.Message}");
     }
-}
+    }
 
 }
   
