@@ -22,13 +22,17 @@ public class Admin
     {
         
         var choices = new List<AdminChoices>
-        {
+        {   
+
             AdminChoices.FilmToevoegen,
             AdminChoices.GeplandeFilms,
             AdminChoices.FilmPlannen,
             AdminChoices.Omzet,
+            AdminChoices.CSVFileAanvragen,
             AdminChoices.ReserveringZoeken,
-            AdminChoices.UitLoggen
+            AdminChoices.WachtwoordWijzigen,
+            AdminChoices.GebruikersnaamWijzigen,
+            AdminChoices.Uitloggen
         };
         SelectedAdminOption = AnsiConsole.Prompt(
             new SelectionPrompt<AdminChoices>()
@@ -40,20 +44,20 @@ public class Admin
     }
     public void Run()
     {
-        var name = AnsiConsole.Prompt(new TextPrompt<string>("Voer je gebruikersnaam in: "));
-        var password = AnsiConsole.Prompt(new TextPrompt<string>("Voer je wachtwoord in: ").Secret());
+        var name = AnsiConsole.Prompt(new TextPrompt<string>("Voer uw gebruikersnaam in: "));
+        var password = AnsiConsole.Prompt(new TextPrompt<string>("Voer uw wachtwoord in: ").Secret());
         bool adminCheck = admin.Login(name, password);
         while (adminCheck)
         {
             SetSelectedAdminOption();
-            if (SelectedAdminOption == AdminChoices.UitLoggen)
+            if (SelectedAdminOption == AdminChoices.Uitloggen)
             {
                 var choice = AnsiConsole.Prompt(
                 new SelectionPrompt<Logout>()
-                    .Title("[red]Weet je zeker dat je wilt uitloggen?[/]")
-                    .AddChoices(Logout.Yes, Logout.No)
+                    .Title("[red]Weet u zeker dat u wilt uitloggen?[/]")
+                    .AddChoices(Logout.Ja, Logout.Nee)
                 );
-                if (choice == Logout.Yes)
+                if (choice == Logout.Ja)
                 {
                     break;
                 }
@@ -74,6 +78,15 @@ public class Admin
                     break;
                 case AdminChoices.ReserveringZoeken:
                     ReserveringZoeken();
+                    break;
+                case AdminChoices.CSVFileAanvragen:
+                    RevenueStatistics.GenerateCSVFile();
+                    break;
+                case AdminChoices.WachtwoordWijzigen:
+                    WachtwoordVeranderen();
+                    break;
+                case AdminChoices.GebruikersnaamWijzigen:
+                    GebruikersNaamVeranderen();
                     break;
             }
         }
@@ -105,13 +118,13 @@ public class Admin
             string description = AskForInput<string>("Beschrijving: ");
             if (description == null) return;
 
-            string authors = AskForInput<string>("Auteurs: ");
+            string authors = AskForInput<string>("Acteurs: ");
             if (authors == null) return;
 
             string categories = AskForInput<string>("Categorieën: ");
             if (categories == null) return;
 
-            string directors = AskForInput<string>("Directeuren: ");
+            string directors = AskForInput<string>("Regisseurs: ");
             if (directors == null) return;
 
             int? age = AskForInput<int>("Minimale leeftijd (Voer'0' om te stoppen): ");
@@ -202,7 +215,7 @@ public class Admin
         .AddChoices(
         FilmPlannenChoices.TerugNaarFilmKeuzes,
         FilmPlannenChoices.DoorgaanMetPlannen,
-        FilmPlannenChoices.Back));
+        FilmPlannenChoices.Terug));
 
         if (MoviePlanChoices == FilmPlannenChoices.TerugNaarFilmKeuzes) 
         {
@@ -289,7 +302,7 @@ public class Admin
 
             
             }
-        if (MoviePlanChoices == FilmPlannenChoices.Back)
+        if (MoviePlanChoices == FilmPlannenChoices.Terug)
         {
             Console.Clear();
             return;
@@ -305,7 +318,7 @@ public class Admin
         .Title("[green]Van wat wilt u de omzet weten?[/]")
         .AddChoices(RevenueChoices.TotaleOmzet,
                     RevenueChoices.TotaleOmzetPerFilm,
-                    RevenueChoices.Back));
+                    RevenueChoices.Terug));
         
         switch (OmzetVanWat)
         {
@@ -380,11 +393,16 @@ public class Admin
             AnsiConsole.WriteLine($"Totale Tickets: {RevenueStatistics.GetTotalTicketsPerMovie(selectedMovie.ID)}");
             AnsiConsole.WriteLine($"Totale Omzet: {RevenueStatistics.GetTotalPricePerMovie(selectedMovie.ID)}");
             break;
-            case RevenueChoices.Back:
+
+            case RevenueChoices.Terug:
+
             Console.Clear();
             break;
+
+
+
         };
-        }
+    }
     
     private void ReserveringZoeken() 
     {
@@ -448,46 +466,130 @@ public class Admin
                     .BorderColor(Color.Blue);
 
                 AnsiConsole.Render(panel);
-        }
+            }
 
-        else 
+            else 
+            {
+                AnsiConsole.Write(new Rule("[red]Geen reservering gevonden[/]").RuleStyle("red"));
+            }
+        }
+    }
+    // checks for possibility changing password and errorhandling for the admin.
+    public void WachtwoordVeranderen()
+    {
+        AnsiConsole.Write(new Rule("[blue] Wachtwoord wijzigen [/]"));
+        string currentPassword;
+        string newPassword;
+        string confirmNewPassword;
+        while (true)
         {
-            AnsiConsole.Write(new Rule("[red]Geen reservering gevonden[/]").RuleStyle("red"));
+            currentPassword = AnsiConsole.Prompt(new TextPrompt<string>("Voer uw huidige wachtwoord in: ").Secret());
+            if (currentPassword == admin.Password)
+            {
+                break;
+            }
+            AnsiConsole.Markup("[red]Het huidige wachtwoord dat u heeft ingevoerd is onjuist. Probeer het opnieuw.[/]\n");
+        }
+        Console.Clear();
+        while (true)
+        {
+            newPassword = AnsiConsole.Prompt(new TextPrompt<string>("Voer uw nieuwe wachtwoord in: ").Secret());
+            confirmNewPassword = AnsiConsole.Prompt(new TextPrompt<string>("Herhaal uw nieuwe wachtwoord: ").Secret());
+            if (confirmNewPassword == newPassword)
+            {
+                break;
+            }
+            Console.Clear();
+            AnsiConsole.Write(new Rule("[red] Uw nieuwe wachtwoord komt niet overheen met de herhaling, probeer het opnieuw[/]"));
+        }
+        var answer = AnsiConsole.Confirm("Weet u zeker dat u uw wachtwoord wilt wijzigen?");
+        if (answer)
+        {
+            if (admin.ChangePassword(currentPassword, newPassword))
+            {
+                Console.Clear();
+                AnsiConsole.Markup("[green]Uw wachtwoord is succesvol gewijzigd.[/]\n");
+            }
+        }
+        else
+        {
+            Console.Clear();
+            AnsiConsole.Markup("[yellow]Wachtwoord wijziging geannuleerd.[/]\n");
+        }
+    }
+    // checks for possibility and error handeling of changing admins username
+    public void GebruikersNaamVeranderen()
+    {
+        AnsiConsole.Write(new Rule("[blue] Gebruikersnaam wijzigen [/]"));
+        string currentUsername;
+        string newUsername;
+        string confirmNewUsername;
+        while (true)
+        {
+            currentUsername = AnsiConsole.Prompt(new TextPrompt<string>("Voer uw huidige gebruikersnaam in: "));
+            if (currentUsername == admin.Name)
+            {
+                break;
+            }
+            AnsiConsole.Write(new Rule("[red]De huidige gebruikersnaam die u heeft ingevoerd is onjuist. Probeer het opnieuw.[/]\n"));
+        }
+        Console.Clear();
+        while (true)
+        {
+            newUsername = AnsiConsole.Prompt(new TextPrompt<string>("Voer uw nieuwe gebruikersnaam in: "));
+            confirmNewUsername = AnsiConsole.Prompt(new TextPrompt<string>("Herhaal uw nieuwe gebruikersnaam: "));
+            if (confirmNewUsername == newUsername)
+            {
+                break;
+            }
+            Console.Clear();
+            AnsiConsole.Write(new Rule("[red] Uw nieuwe gebruikersnaam komt niet overheen met de herhaling, probeer het opnieuw[/]\n"));
+        }
+        var answer = AnsiConsole.Confirm("Weet u zeker dat u uw gebruikersnaam wilt wijzigen?");
+        if (answer)
+        {
+            if (admin.ChangeUsername(currentUsername, newUsername))
+            {
+                Console.Clear();
+                AnsiConsole.Markup("[green]Uw gebruikersnaam is succesvol gewijzigd.[/]\n");
+            }
+        }
+        else
+        {
+            Console.Clear();
+            AnsiConsole.Markup("[yellow]Gebruikersnaam wijziging geannuleerd.[/]\n");
         }
     }
 }
+public enum AdminChoices
+{   
+    CSVFileAanvragen,
+    FilmToevoegen,
+    GeplandeFilms,
+    FilmPlannen,
+    ReserveringZoeken,
+    Omzet,
+    WachtwoordWijzigen,
+    GebruikersnaamWijzigen,
+    Uitloggen,
+    Terug
+}
 
 
-    }
-    public enum AdminChoices
-    {
-        FilmToevoegen,
-        GeplandeFilms,
-        FilmPlannen,
-        ReserveringZoeken,
-        Omzet,
-        UitLoggen,
-        Back
-    }
+public enum FilmPlannenChoices
+{   
+    Ja,
+    Nee,
+    TerugNaarFilmKeuzes,
+    DoorgaanMetPlannen,
+    Terug
+}
+public enum RevenueChoices
+{
+    TotaleOmzet,
+    TotaleOmzetPerFilm,
+    Terug
+}
 
-
-    public enum FilmPlannenChoices
-    {   Ja,
-        Nee,
-        TerugNaarFilmKeuzes,
-        DoorgaanMetPlannen,
-        Back
-    }
-    public enum RevenueChoices
-    {
-
-        TotaleOmzet,
-
-        TotaleOmzetPerFilm,
-
-        Back
-
-
-    }
 
 

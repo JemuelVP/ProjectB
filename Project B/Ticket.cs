@@ -1,6 +1,9 @@
+using System.CodeDom;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using Spectre.Console;
+using Microsoft.EntityFrameworkCore;
+
 
 public class Ticket
 {
@@ -301,7 +304,7 @@ public class Ticket
             {
                 user.DiscountReceived = true;
                 db.SaveChanges();
-                Console.WriteLine("Gefeliciteerd je ontvangt korting op je bestelling!");
+                Console.WriteLine("Gefeliciteerd u ontvangt korting op uw reservering!");
                 return true;
             }
         }
@@ -371,52 +374,10 @@ public class Ticket
     public static string FiveTicketsGenre(int userID) // gets the genre that has been bought atleast 5 times
     {
         var genreCounts = GetGenreCount(userID);
-        var atleast5 = genreCounts.Where(g => g.Value > 5);
+        var atleast5 = genreCounts.Where(g => g.Value >= 5);
         if (!atleast5.Any())
             return null;
         var mostWatchedGenre = atleast5.OrderByDescending(g => g.Value).First();
         return mostWatchedGenre.Key;
-    }
-
-    public static void GetSchedulesForSuggestion(int userID)
-    {
-        using (DataBaseConnection db = new DataBaseConnection())
-        {
-            string mostWatchedGenre = FiveTicketsGenre(userID);
-            List<int> movieIds = db
-                .Movie.Where(m => m.Categories == mostWatchedGenre)
-                .Select(m => m.ID)
-                .ToList(); // all movies with category
-            List<Schedule> schedules = db
-                .Schedule.Where(s => movieIds.Contains(s.Movie_ID))
-                .ToList(); // all movies with category in schedule
-            List<int> userTickets = db
-                .Ticket.Where(t => t.User_ID == userID)
-                .Select(t => t.Movie_ID)
-                .ToList(); // movies the user has tickets to
-
-            List<int> suggestedMovieIds = movieIds.Except(userTickets).ToList();
-
-            if (suggestedMovieIds.Any())
-            {
-                AnsiConsole.Markup("[blue]Suggesties gebaseerd op uw favoriete genre: [/]\n");
-                foreach (int movieId in suggestedMovieIds)
-                {
-                    var movie = db.Movie.FirstOrDefault(m => m.ID == movieId);
-                    if (movie != null)
-                    {
-                        AnsiConsole.Markup($"[green]Film: {movie.Title}[/]\n");
-                        AnsiConsole.Markup($"[green]Genre: {movie.Categories}[/]\n");
-                    }
-                }
-            }
-            else
-            {
-                AnsiConsole.Markup(
-                    "[red]Helaas hebben wij nog niet genoeg informatie om je suggesties te geven[/] \n"
-                );
-                AnsiConsole.Markup("[red]Probeer het in de toekomst opnieuw[/]\n");
-            }
-        }
     }
 }

@@ -56,4 +56,34 @@ public class Users
             return;
         }
     }
+    // sets admins password to the new password
+    public bool ChangePassword(string currentPassword, string newPassword)
+    {
+        using DataBaseConnection db = new();
+        var admin = db.Users.FirstOrDefault(u => u.ID == this.ID);
+        {
+            if (admin != null && admin.Password == currentPassword)
+            {
+                admin.Password = newPassword;
+                db.SaveChanges();
+                return true;
+            }
+        return false;
+        }
+    }
+    // sets admins username to the new username
+    public bool ChangeUsername(string currentUsername, string newUsername)
+    {
+        using DataBaseConnection db = new();
+        var admin = db.Users.FirstOrDefault(u => u.ID == this.ID);
+        {
+            if (admin != null && admin.Name == currentUsername)
+            {
+                admin.Name = newUsername;
+                db.SaveChanges();
+                return true;
+            }
+        return false;
+        }
+    }
 }
