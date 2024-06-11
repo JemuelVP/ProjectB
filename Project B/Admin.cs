@@ -31,6 +31,7 @@ public class Admin
             AdminChoices.CSVFileAanvragen,
             AdminChoices.ReserveringZoeken,
             AdminChoices.WachtwoordWijzigen,
+            AdminChoices.GebruikersnaamWijzigen,
             AdminChoices.Uitloggen
         };
         SelectedAdminOption = AnsiConsole.Prompt(
@@ -83,6 +84,9 @@ public class Admin
                     break;
                 case AdminChoices.WachtwoordWijzigen:
                     WachtwoordVeranderen();
+                    break;
+                case AdminChoices.GebruikersnaamWijzigen:
+                    GebruikersNaamVeranderen();
                     break;
             }
         }
@@ -432,6 +436,7 @@ public class Admin
             }
         }
     }
+    // checks for possibility changing password and errorhandling for the admin.
     public void WachtwoordVeranderen()
     {
         AnsiConsole.Write(new Rule("[blue] Wachtwoord wijzigen [/]"));
@@ -445,8 +450,9 @@ public class Admin
             {
                 break;
             }
-            AnsiConsole.Markup("[red]Het huidige wachtwoord is onjuist. Probeer het opnieuw.[/]\n");
+            AnsiConsole.Markup("[red]Het huidige wachtwoord dat u heeft ingevoerd is onjuist. Probeer het opnieuw.[/]\n");
         }
+        Console.Clear();
         while (true)
         {
             newPassword = AnsiConsole.Prompt(new TextPrompt<string>("Voer uw nieuwe wachtwoord in: ").Secret());
@@ -455,11 +461,65 @@ public class Admin
             {
                 break;
             }
+            Console.Clear();
             AnsiConsole.Write(new Rule("[red] Uw nieuwe wachtwoord komt niet overheen met de herhaling, probeer het opnieuw[/]"));
         }
-        if (admin.ChangePassword(currentPassword, newPassword))
+        var answer = AnsiConsole.Confirm("Weet u zeker dat u uw wachtwoord wilt wijzigen?");
+        if (answer)
         {
-            AnsiConsole.Markup("[green]Uw wachtwoord is succesvol gewijzigd.[/]\n");
+            if (admin.ChangePassword(currentPassword, newPassword))
+            {
+                Console.Clear();
+                AnsiConsole.Markup("[green]Uw wachtwoord is succesvol gewijzigd.[/]\n");
+            }
+        }
+        else
+        {
+            Console.Clear();
+            AnsiConsole.Markup("[yellow]Wachtwoord wijziging geannuleerd.[/]\n");
+        }
+    }
+    // checks for possibility and error handeling of changing admins username
+    public void GebruikersNaamVeranderen()
+    {
+        AnsiConsole.Write(new Rule("[blue] Gebruikersnaam wijzigen [/]"));
+        string currentUsername;
+        string newUsername;
+        string confirmNewUsername;
+        while (true)
+        {
+            currentUsername = AnsiConsole.Prompt(new TextPrompt<string>("Voer uw huidige gebruikersnaam in: "));
+            if (currentUsername == admin.Name)
+            {
+                break;
+            }
+            AnsiConsole.Write(new Rule("[red]De huidige gebruikersnaam die u heeft ingevoerd is onjuist. Probeer het opnieuw.[/]\n"));
+        }
+        Console.Clear();
+        while (true)
+        {
+            newUsername = AnsiConsole.Prompt(new TextPrompt<string>("Voer uw nieuwe gebruikersnaam in: "));
+            confirmNewUsername = AnsiConsole.Prompt(new TextPrompt<string>("Herhaal uw nieuwe gebruikersnaam: "));
+            if (confirmNewUsername == newUsername)
+            {
+                break;
+            }
+            Console.Clear();
+            AnsiConsole.Write(new Rule("[red] Uw nieuwe gebruikersnaam komt niet overheen met de herhaling, probeer het opnieuw[/]\n"));
+        }
+        var answer = AnsiConsole.Confirm("Weet u zeker dat u uw gebruikersnaam wilt wijzigen?");
+        if (answer)
+        {
+            if (admin.ChangeUsername(currentUsername, newUsername))
+            {
+                Console.Clear();
+                AnsiConsole.Markup("[green]Uw gebruikersnaam is succesvol gewijzigd.[/]\n");
+            }
+        }
+        else
+        {
+            Console.Clear();
+            AnsiConsole.Markup("[yellow]Gebruikersnaam wijziging geannuleerd.[/]\n");
         }
     }
 }
@@ -472,6 +532,7 @@ public enum AdminChoices
     ReserveringZoeken,
     Omzet,
     WachtwoordWijzigen,
+    GebruikersnaamWijzigen,
     Uitloggen,
     Terug
 }
@@ -487,12 +548,10 @@ public enum FilmPlannenChoices
 }
 public enum RevenueChoices
 {
-
     TotaleOmzet,
     TotaleOmzetPerFilm,
     Terug
-
-
 }
+
 
 
