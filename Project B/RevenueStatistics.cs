@@ -52,7 +52,7 @@ class RevenueStatistics
         //overwrites if there is something in the csv file 
         using (var writer = new StreamWriter(CsvFilePath,false))
         {
-            writer.WriteLine("Titel, Classic, ExtraBeenRuimte, LoveSeat, Totaleprijs");
+            writer.WriteLine("Titel, AantalClassic, AantalExtraBeenRuimte, AantalLoveSeat, Totaleprijs");
 
             foreach (var movie in adminOverview)
             {   
@@ -61,7 +61,7 @@ class RevenueStatistics
                 int countClassicSeats = getCountPerSeatType(movie,0);
                 int countExtraLegRoom = getCountPerSeatType(movie,1);
                 int countLoveSeats = getCountPerSeatType(movie,2);
-                writer.WriteLine($"{movie.Title}, {countClassicSeats}, {countExtraLegRoom}, {countLoveSeats}, {totalPricePerMovie}");
+                writer.WriteLine($"Titel: {movie.Title}, Classic: {countClassicSeats}, ExtraBeenRuimte: {countExtraLegRoom}, LoveSeats: {countLoveSeats}, TotalePrijs: {totalPricePerMovie} euro");
                 
             }
             writer.Flush();
