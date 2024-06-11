@@ -38,3 +38,4 @@ class DataBaseConnection : DbContext
         // options.UseSqlite($"Data source = ../../../DataBase/movie.sqlite");
     }
 }
+    

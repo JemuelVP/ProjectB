@@ -22,13 +22,16 @@ public class Admin
     {
         
         var choices = new List<AdminChoices>
-        {
+        {   
+
             AdminChoices.FilmToevoegen,
             AdminChoices.GeplandeFilms,
             AdminChoices.FilmPlannen,
             AdminChoices.Omzet,
+            AdminChoices.CSVFileAanvragen,
             AdminChoices.ReserveringZoeken,
-            AdminChoices.UitLoggen
+            AdminChoices.UitLoggen,
+            
         };
         SelectedAdminOption = AnsiConsole.Prompt(
             new SelectionPrompt<AdminChoices>()
@@ -74,6 +77,9 @@ public class Admin
                     break;
                 case AdminChoices.ReserveringZoeken:
                     ReserveringZoeken();
+                    break;
+                case AdminChoices.CSVFileAanvragen:
+                    RevenueStatistics.GenerateCSVFile();
                     break;
             }
         }
@@ -428,7 +434,8 @@ public class Admin
 
     }
     public enum AdminChoices
-    {
+    {   
+        CSVFileAanvragen,
         FilmToevoegen,
         GeplandeFilms,
         FilmPlannen,
