@@ -30,8 +30,7 @@ public class Admin
             AdminChoices.Omzet,
             AdminChoices.CSVFileAanvragen,
             AdminChoices.ReserveringZoeken,
-            AdminChoices.UitLoggen,
-            
+            AdminChoices.Uitloggen
         };
         SelectedAdminOption = AnsiConsole.Prompt(
             new SelectionPrompt<AdminChoices>()
@@ -43,20 +42,20 @@ public class Admin
     }
     public void Run()
     {
-        var name = AnsiConsole.Prompt(new TextPrompt<string>("Voer je gebruikersnaam in: "));
-        var password = AnsiConsole.Prompt(new TextPrompt<string>("Voer je wachtwoord in: ").Secret());
+        var name = AnsiConsole.Prompt(new TextPrompt<string>("Voer uw gebruikersnaam in: "));
+        var password = AnsiConsole.Prompt(new TextPrompt<string>("Voer uw wachtwoord in: ").Secret());
         bool adminCheck = admin.Login(name, password);
         while (adminCheck)
         {
             SetSelectedAdminOption();
-            if (SelectedAdminOption == AdminChoices.UitLoggen)
+            if (SelectedAdminOption == AdminChoices.Uitloggen)
             {
                 var choice = AnsiConsole.Prompt(
                 new SelectionPrompt<Logout>()
-                    .Title("[red]Weet je zeker dat je wilt uitloggen?[/]")
-                    .AddChoices(Logout.Yes, Logout.No)
+                    .Title("[red]Weet u zeker dat u wilt uitloggen?[/]")
+                    .AddChoices(Logout.Ja, Logout.Nee)
                 );
-                if (choice == Logout.Yes)
+                if (choice == Logout.Ja)
                 {
                     break;
                 }
@@ -111,13 +110,13 @@ public class Admin
             string description = AskForInput<string>("Beschrijving: ");
             if (description == null) return;
 
-            string authors = AskForInput<string>("Auteurs: ");
+            string authors = AskForInput<string>("Acteurs: ");
             if (authors == null) return;
 
             string categories = AskForInput<string>("Categorieën: ");
             if (categories == null) return;
 
-            string directors = AskForInput<string>("Directeuren: ");
+            string directors = AskForInput<string>("Regisseurs: ");
             if (directors == null) return;
 
             int? age = AskForInput<int>("Minimale leeftijd (Voer'0' om te stoppen): ");
@@ -208,7 +207,7 @@ public class Admin
         .AddChoices(
         FilmPlannenChoices.TerugNaarFilmKeuzes,
         FilmPlannenChoices.DoorgaanMetPlannen,
-        FilmPlannenChoices.Back));
+        FilmPlannenChoices.Terug));
 
         if (MoviePlanChoices == FilmPlannenChoices.TerugNaarFilmKeuzes) 
         {
@@ -295,7 +294,7 @@ public class Admin
 
             
             }
-        if (MoviePlanChoices == FilmPlannenChoices.Back)
+        if (MoviePlanChoices == FilmPlannenChoices.Terug)
         {
             Console.Clear();
             return;
@@ -311,7 +310,7 @@ public class Admin
         .Title("[green]Van wat wilt u de omzet weten?[/]")
         .AddChoices(RevenueChoices.TotaleOmzet,
                     RevenueChoices.TotaleOmzetPerFilm,
-                    RevenueChoices.Back));
+                    RevenueChoices.Terug));
         
         switch (OmzetVanWat)
         {
@@ -349,7 +348,7 @@ public class Admin
             );
             break;
 
-            case RevenueChoices.Back:
+            case RevenueChoices.Terug:
 
             Console.Clear();
             break;
@@ -441,26 +440,25 @@ public class Admin
         FilmPlannen,
         ReserveringZoeken,
         Omzet,
-        UitLoggen,
-        Back
+        Uitloggen,
+        Terug
     }
 
 
     public enum FilmPlannenChoices
-    {   Ja,
+    {   
+        Ja,
         Nee,
         TerugNaarFilmKeuzes,
         DoorgaanMetPlannen,
-        Back
+        Terug
     }
     public enum RevenueChoices
     {
 
         TotaleOmzet,
-
         TotaleOmzetPerFilm,
-
-        Back
+        Terug
 
 
     }

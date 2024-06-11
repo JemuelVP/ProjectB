@@ -30,9 +30,9 @@ public class FilmController
         Console.WriteLine($"Titel: {film.Title}");
         Console.WriteLine($"Jaar: {film.Year}");
         Console.WriteLine($"Beschrijving: {film.Description}");
-        Console.WriteLine($"Auteurs: {film.Authors}");
+        Console.WriteLine($"Acteurs: {film.Authors}");
         Console.WriteLine($"Categorieën: {film.Categories}");
-        Console.WriteLine($"Directeuren: {film.Directors}");
+        Console.WriteLine($"Regisseurs: {film.Directors}");
         Console.WriteLine($"Minimale leeftijd: {film.Age}");
         Console.WriteLine($"Duurt: {film.DurationInMin} minuten");
         Console.ResetColor();
