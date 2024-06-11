@@ -40,13 +40,19 @@ class RevenueStatistics
             // 1  > extrabeenruimte
             // 2  > Loveseat
 
-        string filePath = "C:/Users/Sudeg/Downloads/CSchool/ProjectB/Project B/StatsPerMovie.csv";
+        var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        var projectDirectory = new DirectoryInfo(baseDirectory).Parent?.Parent?.Parent;
+        if(projectDirectory is null)
+        {
+            return;
+        }
 
+        var CsvFilePath = Path.Combine(projectDirectory.FullName, "CsvFiles", "StatsPerMovie.csv");
 
         //overwrites if there is something in the csv file 
-        using (var writer = new StreamWriter(filePath,false))
+        using (var writer = new StreamWriter(CsvFilePath,false))
         {
-            writer.WriteLine("Titel,Classic,ExtraBeenRuimte,LoveSeat,Totaleprijs");
+            writer.WriteLine("Titel, Classic, ExtraBeenRuimte, LoveSeat, Totaleprijs");
 
             foreach (var movie in adminOverview)
             {   
@@ -55,7 +61,7 @@ class RevenueStatistics
                 int countClassicSeats = getCountPerSeatType(movie,0);
                 int countExtraLegRoom = getCountPerSeatType(movie,1);
                 int countLoveSeats = getCountPerSeatType(movie,2);
-                writer.WriteLine($"{movie.Title},{countClassicSeats},{countExtraLegRoom},{countLoveSeats},{totalPricePerMovie}");
+                writer.WriteLine($"{movie.Title}, {countClassicSeats}, {countExtraLegRoom}, {countLoveSeats}, {totalPricePerMovie}");
                 
             }
             writer.Flush();
