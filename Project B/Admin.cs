@@ -30,6 +30,7 @@ public class Admin
             AdminChoices.Omzet,
             AdminChoices.CSVFileAanvragen,
             AdminChoices.ReserveringZoeken,
+            AdminChoices.WachtwoordWijzigen,
             AdminChoices.Uitloggen
         };
         SelectedAdminOption = AnsiConsole.Prompt(
@@ -79,6 +80,9 @@ public class Admin
                     break;
                 case AdminChoices.CSVFileAanvragen:
                     RevenueStatistics.GenerateCSVFile();
+                    break;
+                case AdminChoices.WachtwoordWijzigen:
+                    WachtwoordVeranderen();
                     break;
             }
         }
@@ -355,9 +359,8 @@ public class Admin
 
 
 
-        }
-    ;
-        }
+        };
+    }
     
     private void ReserveringZoeken() 
     {
@@ -421,46 +424,75 @@ public class Admin
                     .BorderColor(Color.Blue);
 
                 AnsiConsole.Render(panel);
-        }
+            }
 
-        else 
+            else 
+            {
+                AnsiConsole.Write(new Rule("[red]Geen reservering gevonden[/]").RuleStyle("red"));
+            }
+        }
+    }
+    public void WachtwoordVeranderen()
+    {
+        AnsiConsole.Write(new Rule("[blue] Wachtwoord wijzigen [/]"));
+        string currentPassword;
+        string newPassword;
+        string confirmNewPassword;
+        while (true)
         {
-            AnsiConsole.Write(new Rule("[red]Geen reservering gevonden[/]").RuleStyle("red"));
+            currentPassword = AnsiConsole.Prompt(new TextPrompt<string>("Voer uw huidige wachtwoord in: ").Secret());
+            if (currentPassword == admin.Password)
+            {
+                break;
+            }
+            AnsiConsole.Markup("[red]Het huidige wachtwoord is onjuist. Probeer het opnieuw.[/]\n");
+        }
+        while (true)
+        {
+            newPassword = AnsiConsole.Prompt(new TextPrompt<string>("Voer uw nieuwe wachtwoord in: ").Secret());
+            confirmNewPassword = AnsiConsole.Prompt(new TextPrompt<string>("Herhaal uw nieuwe wachtwoord: ").Secret());
+            if (confirmNewPassword == newPassword)
+            {
+                break;
+            }
+            AnsiConsole.Write(new Rule("[red] Uw nieuwe wachtwoord komt niet overheen met de herhaling, probeer het opnieuw[/]"));
+        }
+        if (admin.ChangePassword(currentPassword, newPassword))
+        {
+            AnsiConsole.Markup("[green]Uw wachtwoord is succesvol gewijzigd.[/]\n");
         }
     }
 }
+public enum AdminChoices
+{   
+    CSVFileAanvragen,
+    FilmToevoegen,
+    GeplandeFilms,
+    FilmPlannen,
+    ReserveringZoeken,
+    Omzet,
+    WachtwoordWijzigen,
+    Uitloggen,
+    Terug
+}
 
 
-    }
-    public enum AdminChoices
-    {   
-        CSVFileAanvragen,
-        FilmToevoegen,
-        GeplandeFilms,
-        FilmPlannen,
-        ReserveringZoeken,
-        Omzet,
-        Uitloggen,
-        Terug
-    }
+public enum FilmPlannenChoices
+{   
+    Ja,
+    Nee,
+    TerugNaarFilmKeuzes,
+    DoorgaanMetPlannen,
+    Terug
+}
+public enum RevenueChoices
+{
+
+    TotaleOmzet,
+    TotaleOmzetPerFilm,
+    Terug
 
 
-    public enum FilmPlannenChoices
-    {   
-        Ja,
-        Nee,
-        TerugNaarFilmKeuzes,
-        DoorgaanMetPlannen,
-        Terug
-    }
-    public enum RevenueChoices
-    {
-
-        TotaleOmzet,
-        TotaleOmzetPerFilm,
-        Terug
-
-
-    }
+}
 
 

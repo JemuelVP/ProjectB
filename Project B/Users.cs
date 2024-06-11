@@ -56,4 +56,18 @@ public class Users
             return;
         }
     }
+    public bool ChangePassword(string currentPassword, string newPassword)
+    {
+        using DataBaseConnection db = new();
+        var admin = db.Users.FirstOrDefault(u => u.ID == this.ID);
+        {
+            if (admin != null && admin.Password == currentPassword)
+            {
+                admin.Password = newPassword;
+                db.SaveChanges();
+                return true;
+            }
+        return false;
+        }
+    }
 }
