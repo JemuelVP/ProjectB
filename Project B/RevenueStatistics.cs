@@ -1,4 +1,3 @@
-using System.Data.Entity.Core.Common.CommandTrees;
 using Spectre.Console;
 class RevenueStatistics
 {
@@ -49,7 +48,7 @@ class RevenueStatistics
 
         var CsvFilePath = Path.Combine(projectDirectory.FullName, "CsvFiles", "StatsPerMovie.csv");
 
-        //overwrites if there is something in the csv file 
+        //false overwrites if there is something in the csv file 
         using (var writer = new StreamWriter(CsvFilePath,false))
         {
             writer.WriteLine("Titel, AantalClassic, AantalExtraBeenRuimte, AantalLoveSeat, Totaleprijs");
