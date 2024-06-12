@@ -73,7 +73,7 @@ class RevenueStatistics
                 Count = g.Count()
             }).ToList<dynamic>();
         return seatTypeCounts;
-
+    }
     public static void GenerateCSVFile(string inputEmail)
     {   
         //getallmovies pakt alle films ookal zijn ze niet gepland
