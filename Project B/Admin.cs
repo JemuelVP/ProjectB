@@ -28,7 +28,6 @@ public class Admin
             AdminChoices.GeplandeFilms,
             AdminChoices.FilmPlannen,
             AdminChoices.Omzet,
-            AdminChoices.CSVFileAanvragen,
             AdminChoices.ReserveringZoeken,
             AdminChoices.WachtwoordWijzigen,
             AdminChoices.GebruikersnaamWijzigen,
@@ -78,9 +77,6 @@ public class Admin
                     break;
                 case AdminChoices.ReserveringZoeken:
                     ReserveringZoeken();
-                    break;
-                case AdminChoices.CSVFileAanvragen:
-                    RevenueStatistics.GenerateCSVFile();
                     break;
                 case AdminChoices.WachtwoordWijzigen:
                     WachtwoordVeranderen();
@@ -255,9 +251,9 @@ public class Admin
                     if (endTime.TimeOfDay > new TimeSpan(23, 0, 0) || endTime.Date != date.Date ||
                     date.TimeOfDay  < new TimeSpan(10, 0, 0) || date.TimeOfDay > new TimeSpan(23, 0, 0))
                     {
-                        AnsiConsole.Markup("[red]De eindtijd van de film moet voor 23:00 en op dezelfde dag zijn. Probeer het opnieuw.[/]\n");
+                        AnsiConsole.Markup("[red]De film kan na 10:00 worden ingeplanned, en moet voor 23:00 eindigen. Probeer het opnieuw.[/]\n");
                         continue;
-                    }
+                    }   
                     break;
                 }
                 catch (FormatException)
@@ -318,6 +314,7 @@ public class Admin
         .Title("[green]Van wat wilt u de omzet weten?[/]")
         .AddChoices(RevenueChoices.TotaleOmzet,
                     RevenueChoices.TotaleOmzetPerFilm,
+                    RevenueChoices.CSVFileAanvragenVanOmzet,
                     RevenueChoices.Terug));
         
         switch (OmzetVanWat)
@@ -393,16 +390,59 @@ public class Admin
             AnsiConsole.WriteLine($"Totale Tickets: {RevenueStatistics.GetTotalTicketsPerMovie(selectedMovie.ID)}");
             AnsiConsole.WriteLine($"Totale Omzet: {RevenueStatistics.GetTotalPricePerMovie(selectedMovie.ID)}");
             break;
+            case RevenueChoices.CSVFileAanvragenVanOmzet:
+                CSVFileAanvragen();
+                break;
+
 
             case RevenueChoices.Terug:
-
-            Console.Clear();
-            break;
+                Console.Clear();
+                break;
 
 
 
         };
     }
+
+
+    private void CSVFileAanvragen()
+    {
+        using (db)
+        {   AnsiConsole.Write("Voer uw emailadres in:");
+            string email = Console.ReadLine();
+            AnsiConsole.Clear();
+            while (!RevenueStatistics.EmailValidation(email))
+            {
+                AnsiConsole.WriteLine("email adres is ongeldig probeer het opnieuw");
+                AnsiConsole.Write("Voer uw emailadres in:");
+                email = Console.ReadLine();
+                AnsiConsole.Clear();
+            
+            }
+            
+          
+            var choice = AnsiConsole.Prompt(
+                new SelectionPrompt<AdminChoices>()
+                    .Title($"[red]Weet u zeker dat dit de juiste email adres is: {email}[/]")
+                    .AddChoices(AdminChoices.Ja, AdminChoices.Nee, AdminChoices.Terug)
+                );
+
+
+                switch (choice)
+                {
+                    case AdminChoices.Ja:
+                        RevenueStatistics.GenerateCSVFile(email);
+                        break;
+                    case AdminChoices.Nee:
+                        CSVFileAanvragen();
+                        break;
+                    case AdminChoices.Terug:
+                        break;
+                }
+     
+            
+            }
+        }
     
     private void ReserveringZoeken() 
     {
@@ -562,8 +602,8 @@ public class Admin
     }
 }
 public enum AdminChoices
-{   
-    CSVFileAanvragen,
+{   Ja,
+    Nee,
     FilmToevoegen,
     GeplandeFilms,
     FilmPlannen,
@@ -588,6 +628,7 @@ public enum RevenueChoices
 {
     TotaleOmzet,
     TotaleOmzetPerFilm,
+    CSVFileAanvragenVanOmzet,
     Terug
 }
 
