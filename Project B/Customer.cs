@@ -122,7 +122,7 @@ public class Customer
                 .Title("[red]Weet u zeker dat u wilt uitloggen?[/]")
                 .AddChoices(Logout.Ja, Logout.Nee)
         );
-        if (choice == Logout.Nee)
+        if (choice == Logout.Ja)
         {
             User = new Users();
         }
