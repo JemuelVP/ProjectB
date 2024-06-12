@@ -304,31 +304,12 @@ public class Customer
 
                     Console.CursorVisible = false; // Hide the cursor
                     List<Tuple<int, int>> listSelectedChairs = new();
-                    // Draw the canvas
-                    void DrawCanvas()
-                    {
-                        int messageStartX = width + 31;
-                        int messageStartY = 0;
-
-                        // Shows instructions next to the hall placement
-                        Console.SetCursorPosition(messageStartX, messageStartY);
-                        Console.WriteLine("Druk op de spatiebalk om een stoel te selecteren.");
-                        Console.SetCursorPosition(messageStartX, messageStartY + 1);
-                        Console.WriteLine("Klaar met selecteren? Druk dan op enter.");
-                        Console.SetCursorPosition(messageStartX, messageStartY + 3);
-                        Console.WriteLine("Druk op enter zonder een stoel te selecteren");
-                        Console.SetCursorPosition(messageStartX, messageStartY + 4);
-                        Console.WriteLine("om de bestelling te annuleren.");
-                        canvas.Draw(
-                            selectedSchedule.ID,
+                    canvas.Draw( selectedSchedule.ID,
                             targetHall.Size,
                             width,
                             height,
                             listSelectedChairs,
-                            film.Title
-                        );
-                    }
-                    DrawCanvas();
+                            film.Title);
                     var selectedChairs = new List<int>();
                     var isSelectingChair = true;
                     // Main loop to handle cursor movement
@@ -394,8 +375,13 @@ public class Customer
                                     }
                                     else
                                     {
-                                        AnsiConsole.Write(new Rule("[blue]Reservering is niet geannuleerd. U kunt nu verder met het selecteren van uw stoelen[/]").RuleStyle("blue"));
-                                        DrawCanvas(); // Redraw canvas if not cancelling
+                                        AnsiConsole.Write(new Rule("[blue]Bestelling is niet geannuleerd. U kunt nu verder met het selecteren van uw stoelen[/]").RuleStyle("blue"));
+                                        canvas.Draw( selectedSchedule.ID,
+                                        targetHall.Size,
+                                        width,
+                                        height,
+                                        listSelectedChairs,
+                                        film.Title);
                                     }
                                     break; 
                                 }
@@ -504,9 +490,9 @@ public class Customer
                         double discountPercentage = 0.10;
                         double discountAmount = totalPriceKassabon * discountPercentage;
                         totalPriceKassabon -= discountAmount;
-                        AnsiConsole.Markup($"[blue]Korting:                              [/][white]{discountAmount}[/] [blue]euro[/]\n");
+                        AnsiConsole.Markup($"[blue]Korting:[/][white]{discountAmount}[/] [blue]euro[/]\n");
                     }
-                    AnsiConsole.Markup($"[blue]Totale Prijs:                       [/][white]{totalPriceKassabon}[/] [blue]euro[/]\n");
+                    AnsiConsole.Markup($"[blue]Totale Prijs:[/][white]{totalPriceKassabon}[/] [blue]euro[/]\n");
 
 
                     var confirmPurchase = AnsiConsole.Confirm("Wilt u de reservering bevestigen?");
