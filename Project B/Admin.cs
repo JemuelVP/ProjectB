@@ -432,6 +432,7 @@ public class Admin
                 {
                     case AdminChoices.Ja:
                         RevenueStatistics.GenerateCSVFile(email);
+                        AnsiConsole.WriteLine("CSV bestand is succesvol aangemaakt en naar uw email gestuurd");
                         break;
                     case AdminChoices.Nee:
                         CSVFileAanvragen();

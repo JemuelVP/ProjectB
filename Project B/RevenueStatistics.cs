@@ -121,7 +121,7 @@ class RevenueStatistics
             mail.From = new MailAddress("youreyesbioscoop@hotmail.com");
             mail.To.Add(inputEmail);
             mail.Subject = "CSV Bestand Film Statistieken YourEyes";
-            mail.Body = "Beste,\nHier is uw aangevraagde CSV bestand met de film statistieken";
+            mail.Body = "Beste heer/mevrouw,\nHier is uw aangevraagde CSV bestand met de film statistieken";
 
             Attachment attachment = new Attachment(csvPath);
             mail.Attachments.Add(attachment);
