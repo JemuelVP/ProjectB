@@ -1,6 +1,8 @@
 using Spectre.Console;
 using System.Net;
 using System.Net.Mail;
+using System.Text.RegularExpressions;
+
 class RevenueStatistics
 {
     public void GetTotalRevenue()
@@ -29,9 +31,19 @@ class RevenueStatistics
         return totalTicket;
     }
 
+
+    public static int getCountPerSeatType(Film movie, int seattype)
+    {
+        using DataBaseConnection db = new();
+        return (from T in db.Ticket
+                join C in db.Chair on T.Chair_ID equals C.ID
+                where T.Movie_ID == movie.ID && C.SeatType == seattype
+                select T).Count();
+
+    }
     
 
-    public static void GenerateCSVFile()
+    public static void GenerateCSVFile(string inputEmail)
     {   
         //getallmovies pakt alle films ookal zijn ze niet gepland
         using DataBaseConnection db = new();
@@ -64,33 +76,21 @@ class RevenueStatistics
         }
 
         //SEND EMAIL
-
-        SendEmail(CsvFilePath);
-    }
-    public static int getCountPerSeatType(Film movie, int seattype)
-    {
-        using DataBaseConnection db = new();
-        return (from T in db.Ticket
-                join C in db.Chair on T.Chair_ID equals C.ID
-                where T.Movie_ID == movie.ID && C.SeatType == seattype
-                select T).Count();
-
+        SendEmail(CsvFilePath,inputEmail);
     }
 
-
-    public static void SendEmail(string csvPath)
+    public static void SendEmail(string csvPath,string inputEmail)
     {
     try
-    {
+    {   
         using (MailMessage mail = new MailMessage())
         using (SmtpClient smtpServer = new SmtpClient("smtp-mail.outlook.com"))
         {   
-            
+    
             mail.From = new MailAddress("youreyesbioscoop@hotmail.com");
-            mail.To.Add("1073976@hr.nl");
+            mail.To.Add(inputEmail);
             mail.Subject = "CSV Bestand Film Statistieken YourEyes";
-            
-           // mail.Body = "Beste Marcel,\nHier is uw aangevraagde CSV bestand met de film statistieken";
+            mail.Body = "Beste,\nHier is uw aangevraagde CSV bestand met de film statistieken";
 
             Attachment attachment = new Attachment(csvPath);
             mail.Attachments.Add(attachment);
@@ -101,7 +101,9 @@ class RevenueStatistics
 
             smtpServer.Send(mail);
         }
-        Console.WriteLine($"Het csv bestand is succesvol verstuurd, check uw email!");
+       
+          
+        
     }
     catch (SmtpException smtpEx)
     {
@@ -113,5 +115,15 @@ class RevenueStatistics
     }
     }
 
+    public static bool EmailValidation(string email)
+    {
+        var validFormat = @"^[a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]+$";
+                
+        var regex = new Regex(validFormat);
+
+        return regex.IsMatch(email);
+    }
+
 }
+
   
