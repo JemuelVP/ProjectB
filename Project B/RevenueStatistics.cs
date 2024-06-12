@@ -6,7 +6,7 @@ class RevenueStatistics
         using DataBaseConnection db = new();
         var seatTypeCounts = db.Ticket
             .Join(db.Chair,
-                t => t.Chair_ID, // Adjust this to match the actual foreign key property in your Ticket class
+                t => t.Chair_ID, 
                 c => c.ID,
                 (t, c) => new { t, c })
             .GroupBy(tc => tc.c.SeatType)
@@ -48,7 +48,7 @@ class RevenueStatistics
         var seatTypeCounts = db.Ticket
             .Where(t => t.Movie_ID == movieID)
             .Join(db.Chair, 
-                t => t.Chair_ID, // Adjust this to match the actual foreign key property in your Ticket class
+                t => t.Chair_ID,
                 c => c.ID,
                 (t, c) => new { t, c })
             .GroupBy(tc => tc.c.SeatType)
@@ -58,7 +58,7 @@ class RevenueStatistics
                 Count = g.Count()
             }).ToList<dynamic>();
         return seatTypeCounts;
-
+    }
     public static void GenerateCSVFile()
     {   
         //getallmovies pakt alle films ookal zijn ze niet gepland

@@ -367,9 +367,9 @@ public class Admin
             string titlePart = overviewMovies.Replace("Titel: ", "");
             var selectedMovie = AdminController.GetMovieByTitle(titlePart);
             
-            AnsiConsole.Write(new Rule($"{titlePart}").RuleStyle("blue"));
             Console.ForegroundColor = ConsoleColor.Blue;
             var results = RevenueStatistics.GetTotalTicketsPerSeatType(selectedMovie.ID);
+            AnsiConsole.WriteLine($"Titel: {titlePart}");
             foreach (var result in results)
             {
                 // seattype = 0 = normal
