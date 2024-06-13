@@ -5,12 +5,12 @@ DataBaseConnection db = new();
 
 var hallsController = new CinemaHallController(db);
 
-// AnsiConsole.Write(new Rule($"Welkom bij YourEyes").RuleStyle("blue"));
 var CustomerMenu = new Customer();
 var AdminMenu = new Admin();
 while (active)
 {
-    var font = FigletFont.Load("3d.flf");
+    string fontPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "3d.flf");
+    var font = FigletFont.Load(fontPath);
     Console.Clear();
     AnsiConsole.Write(new FigletText(font, "Welkom bij").Centered().Color(Color.Blue));
     AnsiConsole.Write(new FigletText(font, "Your Eyes\n").Centered().Color(Color.Blue));

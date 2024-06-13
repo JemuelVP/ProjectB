@@ -277,7 +277,11 @@ public class Ticket
             }
             else
             {
-                AnsiConsole.Write("[red]Er zijn nog geen tickets op deze account gekocht. \n[/]");
+                AnsiConsole.Write(
+                    new Rule($"[red]Er zijn nog geen tickets gekocht op dit account[/]").RuleStyle(
+                        "red"
+                    )
+                );
             }
         }
     }
