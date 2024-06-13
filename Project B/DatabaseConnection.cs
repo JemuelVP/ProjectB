@@ -1,6 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.IO;
+using Microsoft.EntityFrameworkCore;
 
 class DataBaseConnection : DbContext
 {
@@ -26,7 +26,7 @@ class DataBaseConnection : DbContext
     {
         var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
         var projectDirectory = new DirectoryInfo(baseDirectory).Parent?.Parent?.Parent;
-        if(projectDirectory is null)
+        if (projectDirectory is null)
         {
             return;
         }
@@ -34,8 +34,5 @@ class DataBaseConnection : DbContext
         var databasePath = Path.Combine(projectDirectory.FullName, "DataBase", "movie.sqlite");
         optionsBuilder.UseSqlite($"Data Source={databasePath}");
         optionsBuilder.EnableSensitiveDataLogging();
-
-        // options.UseSqlite($"Data source = ../../../DataBase/movie.sqlite");
     }
 }
-    

@@ -1,10 +1,8 @@
 ﻿using Spectre.Console;
+
 bool active = true;
 DataBaseConnection db = new();
 
-// ChairController chairController = new ChairController();
-// chairController.AddChairs();
-// Console.WriteLine("Chairs added to the database.");
 var hallsController = new CinemaHallController(db);
 AnsiConsole.Write(new Rule($"Welkom bij YourEyes").RuleStyle("blue"));
 var CustomerMenu = new Customer();
@@ -35,7 +33,6 @@ public enum MainMenuOptions
 
 public enum ReservationMenuOption
 {
-    
     MaakEenReservatie,
     Terug
 }
