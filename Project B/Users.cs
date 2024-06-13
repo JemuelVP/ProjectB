@@ -30,7 +30,11 @@ public class Users
         }
         else
         {
-            Console.WriteLine("Verkeerde gegevens ingevuld, probeer het opnieuw");
+            AnsiConsole.Write(
+                new Rule("[red]Verkeerde gegevens ingevuld, probeer het opnieuw[/]").RuleStyle(
+                    "red"
+                )
+            );
             return false;
         }
     }
@@ -51,7 +55,11 @@ public class Users
         }
         else
         {
-            AnsiConsole.WriteLine("Verkeerde gegevens ingevuld, probeer het opnieuw");
+            AnsiConsole.Write(
+                new Rule("[red]Verkeerde gegevens ingevuld, probeer het opnieuw[/]").RuleStyle(
+                    "red"
+                )
+            );
             return;
         }
     }

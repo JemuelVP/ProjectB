@@ -192,7 +192,10 @@ public class Admin
                 $"[blue]Beschikbare Films Van {startDate.Date.ToShortDateString()} Tot {endDate.Date.ToShortDateString()}:[/]"
             ).RuleStyle("blue")
         );
-        var movies = schedules.Select(s => $"{s.Film.Title} - {s.StartDate}").ToList();
+        var movies = schedules
+            .Select(s => $"{s.Film.Title} - {s.StartDate}")
+            .OrderBy(title => title)
+            .ToList();
         foreach (var movie in movies)
             AnsiConsole.WriteLine(movie);
     }

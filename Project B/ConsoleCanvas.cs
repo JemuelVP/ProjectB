@@ -360,12 +360,7 @@ public class ConsoleCanvas
 
         // Center the movie name
         int padding = (screenWidth - movieName.Length) / 2;
-        string screenMiddle =
-            "│"
-            + new string(' ', padding)
-            + movieName
-            + new string(' ', screenWidth - padding - movieName.Length)
-            + "│";
+        string screenMiddle = "│" + new string(' ', padding) + movieName + new string(' ', screenWidth - padding - movieName.Length) + "│";
         string screen = "└" + new string('─', screenWidth) + "┘";
         // Update the console cursor position to below the canvas
         Console.SetCursorPosition(0, height + 5);
@@ -383,7 +378,7 @@ public class ConsoleCanvas
         AnsiConsole.Markup("[White]Druk op enter zonder een stoel te selecteren[/]\n");
         AnsiConsole.Markup("[White]Om de bestelling te annuleren.[/]\n");
         AnsiConsole.Markup(
-            $"[Red]Huidige positie: Rij {cursorY + 1}, Kolom {capitalLetters[cursorX % capitalLetters.Count]}[/]"
+            $"[Red]Huidige positie: Rij {cursorY + 1}, Kolom {capitalLetters[cursorX % capitalLetters.Count]}\n[/]"
         );
     }
 
