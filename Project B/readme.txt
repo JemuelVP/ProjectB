@@ -5,7 +5,7 @@ Rol Admin <Gebruikersnaam> / <Password> || <admin> / <123>
 // Let op: U kunt uw gebruikersnaam en wachtwoord zelf aanpassen door in de loggen
     als admin en vervolgens de optie om je wachtwoord of gebruikersnaam te veranderen te selecteren.
 
-Rol Test User <Gebruikersnaam> / <Password> || <testUser> / <123>
+Rol Test User <Gebruikersnaam> / <Password> || <mo> / <123>
 
 
 Met vriendelijke groet, 
