@@ -59,8 +59,6 @@ public class Ticket
         bool qualifyForDiscount
     )
     {
-        // Here you can implement your pricing logic based on seat type, seat number, and schedule
-        // For demonstration purposes, let's say you have a simple pricing logic
         double basePrice = 30.0; // Base price for all seats
         double priceMultiplier = 1.0; // Multiplier for seat types
 
@@ -153,18 +151,16 @@ public class Ticket
 
     private bool IsPeakTime(DateTime startTime)
     {
-        // Example implementation: Check if the startTime falls within peak hours
-        // You can adjust this based on your business logic
+        // Check if the startTime falls within peak hours
         int hour = startTime.Hour;
-        return hour >= 18 && hour <= 22; // Assuming peak hours are from 6 PM to 10 PM
+        return hour >= 18 && hour <= 22; // Assuming peak hours are from 18 PM to 200 PM
     }
 
     private bool IsEarlyTime(DateTime startTime)
     {
-        // Example implementation: Check if the startTime falls within peak hours
-        // You can adjust this based on your business logic
+        // Check if the startTime falls within peak hours
         int hour = startTime.Hour;
-        return hour >= 10 && hour <= 14; // Assuming peak hours are from 6 PM to 10 PM
+        return hour >= 10 && hour <= 14; // Assuming peak hours are from 10 AM to 14 PM
     }
 
     public void CheckAge(Film film, int age)
@@ -228,10 +224,10 @@ public class Ticket
                     t.Schedule_ID,
                     t.DateBought
                 })
-                .GroupBy(g => g.Key.Schedule_ID) // Group by Schedule_ID
+                .GroupBy(g => g.Key.Schedule_ID)
                 .Select(scheduleGroup => new
                 {
-                    MovieID = scheduleGroup.First().Key.Movie_ID, // Accessing Movie_ID from the key of the first item in the group
+                    MovieID = scheduleGroup.First().Key.Movie_ID, 
                     MovieName = db
                         .Movie.FirstOrDefault(movie =>
                             movie.ID == scheduleGroup.First().Key.Movie_ID
@@ -241,11 +237,12 @@ public class Ticket
                     ScheduleDate = db
                         .Schedule.FirstOrDefault(s => s.ID == scheduleGroup.First().Key.Schedule_ID)
                         ?.StartDate.ToString("yyyy-MM-dd HH:mm"), // Include the show date
-                    ReservationNumber = scheduleGroup
+                    ReservationNumbers = scheduleGroup
                         .SelectMany(innerGroup => innerGroup.Select(t => t.ReservationNumber))
-                        .FirstOrDefault(), // Get the first reservation number within the group
-                    TicketCount = scheduleGroup.Sum(innerGroup => innerGroup.Count()), // Sum of counts of inner groups
-                    TotalPrice = scheduleGroup.Sum(innerGroup => innerGroup.Sum(t => t.Price)) // Sum of total prices of inner groups
+                        .Distinct()
+                        .ToList(),
+                    TicketCount = scheduleGroup.Sum(innerGroup => innerGroup.Count()),
+                    TotalPrice = scheduleGroup.Sum(innerGroup => innerGroup.Sum(t => t.Price))
                 })
                 .ToList();
 
@@ -255,7 +252,7 @@ public class Ticket
 
                 table.Border = TableBorder.Rounded;
                 table.AddColumn("[blue]Film[/]");
-                table.AddColumn("[blue]Reserveringsnummer[/]");
+                table.AddColumn("[blue]Reserveringsnummers[/]"); // Changed column header
                 table.AddColumn("[blue]Tickets gekocht[/]");
                 table.AddColumn("[blue]Totale Prijs[/]");
                 table.AddColumn("[blue]Datum gekocht[/]");
@@ -263,9 +260,12 @@ public class Ticket
 
                 foreach (var scheduleInfo in ticketsPerSchedule)
                 {
+                    // Combine all reservation numbers into a single string
+                    string reservationNumbers = string.Join(", ", scheduleInfo.ReservationNumbers);
+
                     table.AddRow(
                         new Markup($"[blue]{scheduleInfo.MovieName}[/]"),
-                        new Markup($"[blue]{scheduleInfo.ReservationNumber}[/]"),
+                        new Markup($"[blue]{reservationNumbers}[/]"), // Show all reservation numbers
                         new Markup($"[blue]{scheduleInfo.TicketCount}[/]"),
                         new Markup($"[blue]{scheduleInfo.TotalPrice.ToString()} euro[/]"), // Formatting as currency
                         new Markup($"[blue]{scheduleInfo.DateBought}[/]"),
