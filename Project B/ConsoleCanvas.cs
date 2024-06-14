@@ -1,7 +1,6 @@
 using System.Runtime.CompilerServices;
 using Spectre.Console;
 
-
 public class ConsoleCanvas
 {
     private struct CanvasPixel
@@ -26,10 +25,10 @@ public class ConsoleCanvas
         cursorX = 0;
         cursorY = 0;
         // Render the canvas
-        layout = new Layout("Root").SplitColumns(new Layout("left"), new Layout("right").SplitRows(
-            new Layout("top"),
-            new Layout("main")
-        ));
+        layout = new Layout("Root").SplitColumns(
+            new Layout("left"),
+            new Layout("right").SplitRows(new Layout("top"), new Layout("main"))
+        );
     }
 
     public void ClearCanvas()
@@ -51,10 +50,14 @@ public class ConsoleCanvas
             {
                 using (DataBaseConnection db = new DataBaseConnection())
                 {
-                    var chair = db.Chair.FirstOrDefault(c => c.Row == row && c.Column == col && c.CinemaHallID == 1);
+                    var chair = db.Chair.FirstOrDefault(c =>
+                        c.Row == row && c.Column == col && c.CinemaHallID == 1
+                    );
                     if (chair != null)
                     {
-                        var ticket = db.Ticket.FirstOrDefault(t => t.Schedule_ID == schedule_id && t.Chair_ID == chair.ID);
+                        var ticket = db.Ticket.FirstOrDefault(t =>
+                            t.Schedule_ID == schedule_id && t.Chair_ID == chair.ID
+                        );
                         if (ticket != null)
                         {
                             canvas.SetPixel(col, row, Color.Grey); // Chair is not available, color it gray
@@ -68,26 +71,24 @@ public class ConsoleCanvas
                 {
                     canvas.SetPixel(col, row, Color.Red3);
                 }
-                else if 
-                (
-                    (row >= 3 && row <= 4 && col >= 5 && col <= 6) ||
-                    (row >= 9 && row <= 10 && col >= 5 && col <= 6 ) ||
-                    (row >= 4 && row <= 9 && col >= 4 && col <= 7 ) ||
-                    (row >= 5 && row <= 8 && col >= 3 && col <= 8 )
+                else if (
+                    (row >= 3 && row <= 4 && col >= 5 && col <= 6)
+                    || (row >= 9 && row <= 10 && col >= 5 && col <= 6)
+                    || (row >= 4 && row <= 9 && col >= 4 && col <= 7)
+                    || (row >= 5 && row <= 8 && col >= 3 && col <= 8)
                 )
                 {
                     canvas.SetPixel(col, row, Color.DarkOrange3_1);
                 }
-                else if 
-                (
-                    (row >= 0 && row <= 2 && col == 0) ||
-                    (row >= 0 && row <= 2 && col == 11) ||
-                    (row == 0 && col >= 0 && col <= 1) ||
-                    (row == 0 && col >= 10 && col <= 11) ||
-                    (row >= 11 && row <= 13 && col == 0) ||
-                    (row >= 12 && row <= 13 && col == 1) ||
-                    (row >= 11 && row <= 13 && col == 11)||
-                    (row >= 12 && row <= 13 && col == 10)
+                else if (
+                    (row >= 0 && row <= 2 && col == 0)
+                    || (row >= 0 && row <= 2 && col == 11)
+                    || (row == 0 && col >= 0 && col <= 1)
+                    || (row == 0 && col >= 10 && col <= 11)
+                    || (row >= 11 && row <= 13 && col == 0)
+                    || (row >= 12 && row <= 13 && col == 1)
+                    || (row >= 11 && row <= 13 && col == 11)
+                    || (row >= 12 && row <= 13 && col == 10)
                 )
                 {
                     canvas.SetPixel(col, row, Color.Black);
@@ -108,10 +109,14 @@ public class ConsoleCanvas
             {
                 using (DataBaseConnection db = new DataBaseConnection())
                 {
-                    var chair = db.Chair.FirstOrDefault(c => c.Row == row && c.Column == col && c.CinemaHallID == 2);
+                    var chair = db.Chair.FirstOrDefault(c =>
+                        c.Row == row && c.Column == col && c.CinemaHallID == 2
+                    );
                     if (chair != null)
                     {
-                        var ticket = db.Ticket.FirstOrDefault(t => t.Schedule_ID == schedule_id && t.Chair_ID == chair.ID);
+                        var ticket = db.Ticket.FirstOrDefault(t =>
+                            t.Schedule_ID == schedule_id && t.Chair_ID == chair.ID
+                        );
                         if (ticket != null)
                         {
                             canvas.SetPixel(col, row, Color.Grey); // Chair is not available, color it gray
@@ -120,33 +125,32 @@ public class ConsoleCanvas
                     }
                 }
                 if (
-                    (row >= 5 && row <= 12 && col >= 8 && col <= 9) ||
-                    (row >= 6 && row <= 11 && col >= 7 && col <= 10) ||
-                    (row >= 7 && row <= 10 && col >= 6 && col <= 11))
+                    (row >= 5 && row <= 12 && col >= 8 && col <= 9)
+                    || (row >= 6 && row <= 11 && col >= 7 && col <= 10)
+                    || (row >= 7 && row <= 10 && col >= 6 && col <= 11)
+                )
                 {
                     canvas.SetPixel(col, row, Color.Red3);
                 }
-                else if
-                (
-                    (row >= 1 && row <= 15 && col >= 6 && col <= 11) ||
-                    (row >= 2 && row <= 13 && col >= 5 && col <= 12) ||
-                    (row >= 4 && row <= 12 && col >= 4 && col <= 13) ||
-                    (row >= 6 && row <= 11 && col >= 3 && col <= 14) ||
-                    (row >= 8 && row <= 10 && col >= 2 && col <= 15)
+                else if (
+                    (row >= 1 && row <= 15 && col >= 6 && col <= 11)
+                    || (row >= 2 && row <= 13 && col >= 5 && col <= 12)
+                    || (row >= 4 && row <= 12 && col >= 4 && col <= 13)
+                    || (row >= 6 && row <= 11 && col >= 3 && col <= 14)
+                    || (row >= 8 && row <= 10 && col >= 2 && col <= 15)
                 )
                 {
                     canvas.SetPixel(col, row, Color.DarkOrange3_1);
                 }
-                else if
-                (
-                    (row >= 0 && row <= 5 && col == 0) ||
-                    (row >= 0 && row <= 5 && col == 17) ||
-                    (row >= 11 && row <= 18 && col == 0) ||
-                    (row >= 11 && row <= 18 && col == 17) ||
-                    (row >= 14 && row <= 18 && col == 1) ||
-                    (row >= 14 && row <= 18 && col == 16) ||
-                    (row >= 17 && row <= 18 && col == 2) ||
-                    (row >= 17 && row <= 18 && col == 15)
+                else if (
+                    (row >= 0 && row <= 5 && col == 0)
+                    || (row >= 0 && row <= 5 && col == 17)
+                    || (row >= 11 && row <= 18 && col == 0)
+                    || (row >= 11 && row <= 18 && col == 17)
+                    || (row >= 14 && row <= 18 && col == 1)
+                    || (row >= 14 && row <= 18 && col == 16)
+                    || (row >= 17 && row <= 18 && col == 2)
+                    || (row >= 17 && row <= 18 && col == 15)
                 )
                 {
                     canvas.SetPixel(col, row, Color.Black);
@@ -167,10 +171,14 @@ public class ConsoleCanvas
             {
                 using (DataBaseConnection db = new DataBaseConnection())
                 {
-                    var chair = db.Chair.FirstOrDefault(c => c.Row == row && c.Column == col && c.CinemaHallID == 3);
+                    var chair = db.Chair.FirstOrDefault(c =>
+                        c.Row == row && c.Column == col && c.CinemaHallID == 3
+                    );
                     if (chair != null)
                     {
-                        var ticket = db.Ticket.FirstOrDefault(t => t.Schedule_ID == schedule_id && t.Chair_ID == chair.ID);
+                        var ticket = db.Ticket.FirstOrDefault(t =>
+                            t.Schedule_ID == schedule_id && t.Chair_ID == chair.ID
+                        );
                         if (ticket != null)
                         {
                             canvas.SetPixel(col, row, Color.Grey); // Chair is not available, color it gray
@@ -178,49 +186,46 @@ public class ConsoleCanvas
                         }
                     }
                 }
-                if 
-                (
-                    (row >= 4 && row <= 12 && col >= 13 && col <= 16) ||
-                    (row >= 5 && row <= 11 && col >= 12 && col <= 17) ||
-                    (row >= 6 && row <= 11 && col >= 11 && col <= 18)
+                if (
+                    (row >= 4 && row <= 12 && col >= 13 && col <= 16)
+                    || (row >= 5 && row <= 11 && col >= 12 && col <= 17)
+                    || (row >= 6 && row <= 11 && col >= 11 && col <= 18)
                 )
                 {
                     canvas.SetPixel(col, row, Color.Red3);
                 }
-                else if
-                (
-                    (row >= 1 && row <= 16 && col >= 12 && col <= 17) ||
-                    (row >= 1 && row <= 15 && col >= 9 && col <= 20) ||
-                    (row >= 2 && row <= 13 && col >= 8 && col <= 21) ||
-                    (row >= 4 && row <= 11 && col >= 7 && col <= 22) ||
-                    (row >= 6 && row <= 10 && col >= 6 && col <= 23) ||
-                    (row >= 8 && row <= 9 && col >= 5 && col <= 24)
+                else if (
+                    (row >= 1 && row <= 16 && col >= 12 && col <= 17)
+                    || (row >= 1 && row <= 15 && col >= 9 && col <= 20)
+                    || (row >= 2 && row <= 13 && col >= 8 && col <= 21)
+                    || (row >= 4 && row <= 11 && col >= 7 && col <= 22)
+                    || (row >= 6 && row <= 10 && col >= 6 && col <= 23)
+                    || (row >= 8 && row <= 9 && col >= 5 && col <= 24)
                 )
                 {
                     canvas.SetPixel(col, row, Color.DarkOrange3_1);
                 }
-                else if
-                (
-                    (row >= 0 && row <= 6 && col == 0) ||
-                    (row >= 0 && row <= 5 && col == 1) ||
-                    (row >= 0 && row <= 4 && col == 2) ||
-                    (row == 0 && col == 3) ||
-                    (row >= 0 && row <= 6 && col == 29) ||
-                    (row >= 0 && row <= 5 && col == 28) ||
-                    (row >= 0 && row <= 4 && col == 27) ||
-                    (row == 0 && col == 26) ||
-                    (row >= 12 && row <= 19 && col == 0) ||
-                    (row >= 13 && row <= 19 && col == 1) ||
-                    (row >= 15 && row <= 19 && col == 2) ||
-                    (row >= 17 && row <= 19 && col >= 3 && col <= 4) ||
-                    (row >= 18 && row <= 19 && col >= 5 && col <= 6) ||
-                    (row == 19 && col == 7) ||
-                    (row >= 12 && row <= 19 && col == 29) ||
-                    (row >= 13 && row <= 19 && col == 28) ||
-                    (row >= 15 && row <= 19 && col == 27) ||
-                    (row >= 17 && row <= 19 && col >= 25 && col <= 26) ||
-                    (row >= 18 && row <= 19 && col >= 23 && col <= 24) ||
-                    (row == 19 && col == 22)
+                else if (
+                    (row >= 0 && row <= 6 && col == 0)
+                    || (row >= 0 && row <= 5 && col == 1)
+                    || (row >= 0 && row <= 4 && col == 2)
+                    || (row == 0 && col == 3)
+                    || (row >= 0 && row <= 6 && col == 29)
+                    || (row >= 0 && row <= 5 && col == 28)
+                    || (row >= 0 && row <= 4 && col == 27)
+                    || (row == 0 && col == 26)
+                    || (row >= 12 && row <= 19 && col == 0)
+                    || (row >= 13 && row <= 19 && col == 1)
+                    || (row >= 15 && row <= 19 && col == 2)
+                    || (row >= 17 && row <= 19 && col >= 3 && col <= 4)
+                    || (row >= 18 && row <= 19 && col >= 5 && col <= 6)
+                    || (row == 19 && col == 7)
+                    || (row >= 12 && row <= 19 && col == 29)
+                    || (row >= 13 && row <= 19 && col == 28)
+                    || (row >= 15 && row <= 19 && col == 27)
+                    || (row >= 17 && row <= 19 && col >= 25 && col <= 26)
+                    || (row >= 18 && row <= 19 && col >= 23 && col <= 24)
+                    || (row == 19 && col == 22)
                 )
                 {
                     canvas.SetPixel(col, row, Color.Black);
@@ -233,9 +238,15 @@ public class ConsoleCanvas
         }
     }
 
-    public void Draw(int schedule_id, string size, int width, int height, List<Tuple<int, int>> selectedChairs, string movieName)
+    public void Draw(
+        int schedule_id,
+        string size,
+        int width,
+        int height,
+        List<Tuple<int, int>> selectedChairs,
+        string movieName
+    )
     {
-        // Clear the console
         // Set the cursor position to the top left
         Console.SetCursorPosition(0, 0);
         // Create a new canvas
@@ -256,13 +267,15 @@ public class ConsoleCanvas
                 throw new ArgumentOutOfRangeException("size");
         }
         // Render the cursor position
-        canvas.SetPixel(cursorX, cursorY, 'X'); // For example, 'X' represents the cursor position
+        canvas.SetPixel(cursorX, cursorY, 'X');
         // Render the selected chairs
         foreach (var chair in selectedChairs)
         {
-            canvas.SetPixel(chair.Item2, chair.Item1, Color.Green); // Note: chair.Item2 is column (x), chair.Item1 is row (y)
+            canvas.SetPixel(chair.Item2, chair.Item1, Color.Green);
         }
-        var cursorOnSelectedChair = selectedChairs.Any(chair => chair.Item2 == cursorX && chair.Item1 == cursorY);
+        var cursorOnSelectedChair = selectedChairs.Any(chair =>
+            chair.Item2 == cursorX && chair.Item1 == cursorY
+        );
 
         // Render the cursor position
         if (cursorOnSelectedChair)
@@ -280,16 +293,15 @@ public class ConsoleCanvas
             {
                 rows.Add(new Text(""));
                 continue;
-            };
+            }
+            ;
             if (y - 2 == cursorY)
             {
-
                 rows.Add(new Text((y - 1).ToString(), new Style(Color.Red)));
             }
             else
             {
                 rows.Add(new Text((y - 1).ToString()));
-
             }
         }
         // Draw the X-axis ticks and letters
@@ -308,7 +320,6 @@ public class ConsoleCanvas
                 var secondLetter = capitalLetters[x % capitalLetters.Count];
                 if (x == cursorX)
                 {
-
                     text = new Text(firstLetter + secondLetter, new Style(Color.Red));
                 }
                 else
@@ -318,12 +329,10 @@ public class ConsoleCanvas
             }
             else
             {
-
                 var letter = capitalLetters[x % capitalLetters.Count];
                 if (x == cursorX)
                 {
                     text = new Text(letter, new Style(Color.Red));
-
                 }
                 else
                 {
@@ -363,12 +372,14 @@ public class ConsoleCanvas
         AnsiConsole.Markup("[Red3]Rood: Love seats[/]\n");
         AnsiConsole.Markup("[DarkOrange3_1]Oranje: Extra Beenruimte[/]\n");
         AnsiConsole.Markup("[DodgerBlue3]Blauw: Standaard[/]\n");
-        AnsiConsole.Markup("[Green]Groen: Selected chairs[/]\n");
+        AnsiConsole.Markup("[Green]Groen: Geselecteerde stoelen[/]\n");
         AnsiConsole.Markup("[White]Druk op de spatiebalk om een stoel te selecteren.[/]\n");
         AnsiConsole.Markup("[White]Klaar met selecteren? Druk dan op enter.[/]\n");
         AnsiConsole.Markup("[White]Druk op enter zonder een stoel te selecteren[/]\n");
         AnsiConsole.Markup("[White]Om de bestelling te annuleren.[/]\n");
-        AnsiConsole.Markup($"[Red]Current Position: Row {cursorY + 1}, Column {capitalLetters[cursorX % capitalLetters.Count]}[/]");
+        AnsiConsole.Markup(
+            $"[Red]Huidige positie: Rij {cursorY + 1}, Kolom {capitalLetters[cursorX % capitalLetters.Count]}\n[/]"
+        );
     }
 
     public void SetPixel(int x, int y, ConsoleColor color)

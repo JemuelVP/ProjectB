@@ -1,9 +1,8 @@
 using System.CodeDom;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
-using Spectre.Console;
 using Microsoft.EntityFrameworkCore;
-
+using Spectre.Console;
 
 public class Ticket
 {
@@ -62,7 +61,6 @@ public class Ticket
         double basePrice = 30.0; // Base price for all seats
         double priceMultiplier = 1.0; // Multiplier for seat types
 
-        // Adjust price based on seat type
         // This is for the red area
         if (
             schedule.Hall_ID == 1
@@ -87,7 +85,7 @@ public class Ticket
             || seatrow >= 6 && seatrow <= 11 && seatcol >= 11 && seatcol <= 18
         )
         {
-            priceMultiplier *= 2.0; // Multiply the price by 1.5
+            priceMultiplier *= 2.0;
         }
         // This is for the orange area
         if (
@@ -126,10 +124,10 @@ public class Ticket
             priceMultiplier *= 1.5;
         }
 
-        // Calculate final price based on base price, multiplier, or any other factors
+        // Calculate final price based on base price, multiplier
         double Price = basePrice * priceMultiplier;
 
-        // Example: If the movie is shown during a peak time, increase the price
+        // If the movie is shown during a peak time, increase the price
         if (IsPeakTime(schedule.StartDate))
         {
             Price += 5.0;
@@ -151,7 +149,6 @@ public class Ticket
 
     private bool IsPeakTime(DateTime startTime)
     {
-        // Check if the startTime falls within peak hours
         int hour = startTime.Hour;
         return hour >= 18 && hour <= 22; // Assuming peak hours are from 18 PM to 200 PM
     }
@@ -185,9 +182,6 @@ public class Ticket
         string reservationNumber
     )
     {
-        // seattype = 0 = normal
-        // seattype = 1 = extra beenruimte
-        // seattype  = 2 = loveseat
         string stoelType = "";
         switch (seatType)
         {
@@ -227,7 +221,6 @@ public class Ticket
                 .GroupBy(g => g.Key.Schedule_ID)
                 .Select(scheduleGroup => new
                 {
-                    MovieID = scheduleGroup.First().Key.Movie_ID, 
                     MovieName = db
                         .Movie.FirstOrDefault(movie =>
                             movie.ID == scheduleGroup.First().Key.Movie_ID
@@ -284,7 +277,11 @@ public class Ticket
             }
             else
             {
-                AnsiConsole.Write("[red]Er zijn nog geen tickets op deze account gekocht. \n[/]");
+                AnsiConsole.Write(
+                    new Rule($"[red]Er zijn nog geen tickets gekocht op dit account[/]").RuleStyle(
+                        "red"
+                    )
+                );
             }
         }
     }
@@ -327,24 +324,36 @@ public class Ticket
         return reservationNumber.ToString();
     }
 
-  public static void DecideSeatTypeName(int classicSeatsCounter,int loveSeatsCounter,int ExtraLegRoomCounter, double totalClassicseatPrice, double totalLoveseatPrice,double totalExtraLegroomPrice)
-    { 
+    public static void DecideSeatTypeName(
+        int classicSeatsCounter,
+        int loveSeatsCounter,
+        int ExtraLegRoomCounter,
+        double totalClassicseatPrice,
+        double totalLoveseatPrice,
+        double totalExtraLegroomPrice
+    )
+    {
         string seatTypeName;
         if (classicSeatsCounter != 0)
         {
             seatTypeName = "Classic Seat";
-            AnsiConsole.Markup($"[blue]StoelType:[/] [white]{seatTypeName,-15} X{classicSeatsCounter}[/] [blue]Prijs:[/] [white]{totalClassicseatPrice}[/][blue] euro[/]\n");
+            AnsiConsole.Markup(
+                $"[blue]StoelType:[/] [white]{seatTypeName, -15} X{classicSeatsCounter}[/] [blue]Prijs:[/] [white]{totalClassicseatPrice}[/][blue] euro[/]\n"
+            );
         }
         if (ExtraLegRoomCounter != 0)
         {
             seatTypeName = "ExtraBeenRuimte";
-            AnsiConsole.Markup($"[blue]StoelType:[/] [white]{seatTypeName} X{ExtraLegRoomCounter}[/] [blue]Prijs:[/] [white]{totalExtraLegroomPrice}[/][blue] euro[/]\n");
-
+            AnsiConsole.Markup(
+                $"[blue]StoelType:[/] [white]{seatTypeName} X{ExtraLegRoomCounter}[/] [blue]Prijs:[/] [white]{totalExtraLegroomPrice}[/][blue] euro[/]\n"
+            );
         }
-         if (loveSeatsCounter != 0)
+        if (loveSeatsCounter != 0)
         {
             seatTypeName = "LoveSeat";
-            AnsiConsole.Markup($"[blue]StoelType:[/] [white]{seatTypeName,-15} X{loveSeatsCounter}[/] [blue]Prijs:[/] [white]{totalLoveseatPrice}[/][blue] euro[/]\n");
+            AnsiConsole.Markup(
+                $"[blue]StoelType:[/] [white]{seatTypeName, -15} X{loveSeatsCounter}[/] [blue]Prijs:[/] [white]{totalLoveseatPrice}[/][blue] euro[/]\n"
+            );
         }
     }
 

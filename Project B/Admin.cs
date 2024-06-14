@@ -18,12 +18,11 @@ public class Admin
         admin = new Users();
         hallController = new CinemaHallController(db);
     }
+
     private void SetSelectedAdminOption()
     {
-        
         var choices = new List<AdminChoices>
-        {   
-
+        {
             AdminChoices.FilmToevoegen,
             AdminChoices.GeplandeFilms,
             AdminChoices.FilmPlannen,
@@ -36,15 +35,18 @@ public class Admin
         SelectedAdminOption = AnsiConsole.Prompt(
             new SelectionPrompt<AdminChoices>()
                 .Title($"[blue]Welkom {admin.Name} wat wilt u doen?[/]")
-                .AddChoices(
-                    choices
-                )
+                .AddChoices(choices)
         );
     }
+
     public void Run()
     {
-        var name = AnsiConsole.Prompt(new TextPrompt<string>("Voer uw gebruikersnaam in: "));
-        var password = AnsiConsole.Prompt(new TextPrompt<string>("Voer uw wachtwoord in: ").Secret());
+        var name = AnsiConsole.Prompt(
+            new TextPrompt<string>("Voer uw [blue]gebruikersnaam[/] in: ")
+        );
+        var password = AnsiConsole.Prompt(
+            new TextPrompt<string>("Voer uw [blue]wachtwoord[/] in: ").Secret()
+        );
         bool adminCheck = admin.Login(name, password);
         while (adminCheck)
         {
@@ -52,9 +54,9 @@ public class Admin
             if (SelectedAdminOption == AdminChoices.Uitloggen)
             {
                 var choice = AnsiConsole.Prompt(
-                new SelectionPrompt<Logout>()
-                    .Title("[red]Weet u zeker dat u wilt uitloggen?[/]")
-                    .AddChoices(Logout.Ja, Logout.Nee)
+                    new SelectionPrompt<Logout>()
+                        .Title("[red]Weet u zeker dat u wilt uitloggen?[/]")
+                        .AddChoices(Logout.Ja, Logout.Nee)
                 );
                 if (choice == Logout.Ja)
                 {
@@ -87,6 +89,7 @@ public class Admin
             }
         }
     }
+
     private void FilmToevoegen()
     {
         while (true)
@@ -94,44 +97,52 @@ public class Admin
             Console.Clear();
 
             string title = AskForInput<string>("Titel:");
-            if (title == null) return;
+            if (title == null)
+                return;
 
             int year;
             while (true)
             {
-                year = AnsiConsole.Ask<int>("Jaar uitgekomen (Voer'0' om te stoppen): ");
+                year = AnsiConsole.Ask<int>("Jaar uitgekomen (Voer '0' om te stoppen): ");
                 if (year <= DateTime.Now.Year)
                 {
-                    if (year == 0) return; // Check for 0 input to stop the terminal
+                    if (year == 0)
+                        return; // Check for 0 input to stop the terminal
                     break;
                 }
                 else
                 {
-                    AnsiConsole.Markup("[red]Het uitkomst jaar kan niet in de toekomst liggen. Probeer het opnieuw.[/]\n");
+                    AnsiConsole.Markup(
+                        "[red]Het uitkomst jaar kan niet in de toekomst liggen. Probeer het opnieuw.[/]\n"
+                    );
                 }
             }
-            
+
             string description = AskForInput<string>("Beschrijving: ");
-            if (description == null) return;
+            if (description == null)
+                return;
 
             string authors = AskForInput<string>("Acteurs: ");
-            if (authors == null) return;
+            if (authors == null)
+                return;
 
             string categories = AskForInput<string>("Categorieën: ");
-            if (categories == null) return;
+            if (categories == null)
+                return;
 
             string directors = AskForInput<string>("Regisseurs: ");
-            if (directors == null) return;
+            if (directors == null)
+                return;
 
-            int? age = AskForInput<int>("Minimale leeftijd (Voer'0' om te stoppen): ");
-            if (age == null || age == 0) return; // Check for 0 input to stop the terminal
+            int? age = AskForInput<int>("Minimale leeftijd (Voer '0' om te stoppen): ");
+            if (age == null || age == 0)
+                return; // Check for 0 input to stop the terminal
 
-            int? durationInMin = AskForInput<int>("Duurt in (minuten) (Voer'0' om te stoppen): ");
-            if (durationInMin == null || durationInMin == 0) return; // Check for 0 input to stop the terminal
+            int? durationInMin = AskForInput<int>("Duurt in (minuten) (Voer '0' om te stoppen): ");
+            if (durationInMin == null || durationInMin == 0)
+                return; // Check for 0 input to stop the terminal
 
-            AnsiConsole.Write(
-                new Rule("[green]Film is toegevoegd [/]").RuleStyle("green")
-            );
+            AnsiConsole.Write(new Rule("[green]Film is toegevoegd [/]").RuleStyle("green"));
 
             // Call the AddMovie method with the input parameters
             adminController.AddMovie(
@@ -166,17 +177,14 @@ public class Admin
             AnsiConsole.Markup("[red]Ongeldige invoer. Probeer het opnieuw.[/]\n");
             return AskForInput<T>(prompt);
         }
-        
     }
+
     private void GeplandeFilms()
     {
         Console.Clear();
         DateTime startDate = DateTime.Now;
         DateTime endDate = DateTime.Now.AddDays(28);
-        var schedules = ScheduleController.GetAllSchedules(
-        startDate,
-        endDate
-        );
+        var schedules = ScheduleController.GetAllSchedules(startDate, endDate);
 
         // Display available films
         AnsiConsole.Write(
@@ -186,34 +194,38 @@ public class Admin
         );
         var movies = schedules
             .Select(s => $"{s.Film.Title} - {s.StartDate}")
+            .OrderBy(title => title)
             .ToList();
         foreach (var movie in movies)
             AnsiConsole.WriteLine(movie);
     }
+
     private void FilmPlannen()
     {
         Console.Clear();
         var adminOverview = AdminController.GetAllMovies();
         string[] movieTitle = adminOverview
-        .Select(book => $"{book.Title}")
-        .OrderBy(title => title)  // Sort titles alphabetically
-        .ToArray();
+            .Select(book => $"{book.Title}")
+            .OrderBy(title => title) // Sort titles alphabetically
+            .ToArray();
         var overviewMovies = AnsiConsole.Prompt(
-            new SelectionPrompt<string>()
-                .Title("Kies een film :")
-                .AddChoices(movieTitle)
+            new SelectionPrompt<string>().Title("Kies een film :").AddChoices(movieTitle)
         );
         // Get the total price for the selected movie
         string titlePart = overviewMovies.Replace("Titel: ", "");
         var selectedMovie = AdminController.GetMovieByTitle(titlePart);
 
-        var MoviePlanChoices = AnsiConsole.Prompt(new SelectionPrompt<FilmPlannenChoices>().Title("[green]Wat wilt u nu doen[/]")
-        .AddChoices(
-        FilmPlannenChoices.TerugNaarFilmKeuzes,
-        FilmPlannenChoices.DoorgaanMetPlannen,
-        FilmPlannenChoices.Terug));
+        var MoviePlanChoices = AnsiConsole.Prompt(
+            new SelectionPrompt<FilmPlannenChoices>()
+                .Title("[green]Wat wilt u nu doen[/]")
+                .AddChoices(
+                    FilmPlannenChoices.TerugNaarFilmKeuzes,
+                    FilmPlannenChoices.DoorgaanMetPlannen,
+                    FilmPlannenChoices.Terug
+                )
+        );
 
-        if (MoviePlanChoices == FilmPlannenChoices.TerugNaarFilmKeuzes) 
+        if (MoviePlanChoices == FilmPlannenChoices.TerugNaarFilmKeuzes)
         {
             FilmPlannen();
         }
@@ -227,7 +239,9 @@ public class Admin
                 string? userInput = Console.ReadLine();
                 if (userInput == null)
                 {
-                    AnsiConsole.Markup("[red]De invoer mag niet leeg zijn. Probeer het opnieuw.[/]\n");
+                    AnsiConsole.Markup(
+                        "[red]De invoer mag niet leeg zijn. Probeer het opnieuw.[/]\n"
+                    );
                     continue;
                 }
 
@@ -239,219 +253,224 @@ public class Admin
                         null,
                         System.Globalization.DateTimeStyles.None
                     );
-                    
+
                     if (date < DateTime.Now)
                     {
-                        AnsiConsole.Markup("[red]De ingevoerde datum ligt in het verleden. Probeer het opnieuw.[/]\n");
+                        AnsiConsole.Markup(
+                            "[red]De ingevoerde datum ligt in het verleden. Probeer het opnieuw.[/]\n"
+                        );
                         continue;
                     }
-                    
+
                     // Check if the end time of the movie is before 11
                     var endTime = date.AddMinutes(selectedMovie.DurationInMin);
-                    if (endTime.TimeOfDay > new TimeSpan(23, 0, 0) || endTime.Date != date.Date ||
-                    date.TimeOfDay  < new TimeSpan(10, 0, 0) || date.TimeOfDay > new TimeSpan(23, 0, 0))
+                    if (
+                        endTime.TimeOfDay > new TimeSpan(23, 0, 0)
+                        || endTime.Date != date.Date
+                        || date.TimeOfDay < new TimeSpan(10, 0, 0)
+                        || date.TimeOfDay > new TimeSpan(23, 0, 0)
+                    )
                     {
-                        AnsiConsole.Markup("[red]De film kan na 10:00 worden ingeplanned, en moet voor 23:00 eindigen. Probeer het opnieuw.[/]\n");
+                        AnsiConsole.Markup(
+                            "[red]De film kan na 10:00 worden ingeplanned, en moet voor 23:00 eindigen. Probeer het opnieuw.[/]\n"
+                        );
                         continue;
-                    }   
+                    }
                     break;
                 }
                 catch (FormatException)
                 {
                     AnsiConsole.Markup("[red]Ongeldig datumformaat. Probeer het opnieuw.[/]\n");
                 }
-                
-                }
-
-                // Check if the entered date is beyond 4 weeks from now
-                var maxScheduleDate = DateTime.Now.AddDays(28);
-                if (date > maxScheduleDate)
-                {
-                    AnsiConsole.Markup("[yellow]De ingevoerde datum ligt buiten de 4-weken termijn, maar de film zal worden gepland.[/]");
-                }
-                AnsiConsole.WriteLine();
-                var halls = hallController.GetAllHalls();
-                string[] hallNames = halls.Select(hall => hall.Name).ToArray();
-                var selectedHallName = AnsiConsole.Prompt(
-                    new SelectionPrompt<string>().AddChoices(hallNames)
-                );
-                var selectedHall = hallController.GetByName(selectedHallName);
-                if (selectedHall == null)
-                    return;
-
-                var ScheduleConfirmation = AnsiConsole.Confirm("Weet u zeker dat u dit wilt plannen?");
-                {
-                    if (ScheduleConfirmation)
-                    {
-                        var schedule = new Schedule();
-                            schedule.CreateFromFilm(selectedMovie, selectedHall.ID, date);
-                            AnsiConsole.Markup("[green]Film is succesvol toegevoegd aan de schema.[/]");
-                            AnsiConsole.WriteLine();
-                            return; 
-                    }
-                    else
-                    {   
-                        AnsiConsole.Write(new Rule("[red]Film is niet toegevoegd aan de planning[/]").RuleStyle("red"));
-                        return;
-                    }
-                }
-
-            
             }
+
+            // Check if the entered date is beyond 4 weeks from now
+            var maxScheduleDate = DateTime.Now.AddDays(28);
+            if (date > maxScheduleDate)
+            {
+                AnsiConsole.Markup(
+                    "[yellow]De ingevoerde datum ligt buiten de 4-weken termijn, maar de film zal worden gepland.[/]"
+                );
+            }
+            AnsiConsole.WriteLine();
+            var halls = hallController.GetAllHalls();
+            string[] hallNames = halls.Select(hall => hall.Name).ToArray();
+            var selectedHallName = AnsiConsole.Prompt(
+                new SelectionPrompt<string>().AddChoices(hallNames)
+            );
+            var selectedHall = hallController.GetByName(selectedHallName);
+            if (selectedHall == null)
+                return;
+
+            var ScheduleConfirmation = AnsiConsole.Confirm("Weet u zeker dat u dit wilt plannen?");
+            {
+                if (ScheduleConfirmation)
+                {
+                    var schedule = new Schedule();
+                    schedule.CreateFromFilm(selectedMovie, selectedHall.ID, date);
+                    AnsiConsole.Markup("[green]Film is succesvol toegevoegd aan de schema.[/]");
+                    AnsiConsole.WriteLine();
+                    return;
+                }
+                else
+                {
+                    AnsiConsole.Write(
+                        new Rule("[red]Film is niet toegevoegd aan de planning[/]").RuleStyle("red")
+                    );
+                    return;
+                }
+            }
+        }
         if (MoviePlanChoices == FilmPlannenChoices.Terug)
         {
             Console.Clear();
             return;
         }
-
-
     }
 
     private void Omzet()
     {
         Console.Clear();
-        var OmzetVanWat = AnsiConsole.Prompt(new SelectionPrompt<RevenueChoices>()
-        .Title("[green]Van wat wilt u de omzet weten?[/]")
-        .AddChoices(RevenueChoices.TotaleOmzet,
+        var OmzetVanWat = AnsiConsole.Prompt(
+            new SelectionPrompt<RevenueChoices>()
+                .Title("[green]Van wat wilt u de omzet weten?[/]")
+                .AddChoices(
+                    RevenueChoices.TotaleOmzet,
                     RevenueChoices.TotaleOmzetPerFilm,
                     RevenueChoices.CSVFileAanvragenVanOmzet,
-                    RevenueChoices.Terug));
-        
+                    RevenueChoices.Terug
+                )
+        );
+
         switch (OmzetVanWat)
         {
-
             case RevenueChoices.TotaleOmzet:
-            
-            var money = new RevenueStatistics();
-            var totalTickets = RevenueStatistics.GetTotalTicketsPerSeatType();
-            Console.ForegroundColor = ConsoleColor.Blue;
-            foreach (var totalTicket in totalTickets)
-            {
-                string stoelType = "";
-                switch (totalTicket.SeatType)
+
+                var money = new RevenueStatistics();
+                var totalTickets = RevenueStatistics.GetTotalTicketsPerSeatType();
+                Console.ForegroundColor = ConsoleColor.Blue;
+                foreach (var totalTicket in totalTickets)
                 {
-                    case 0:
-                        stoelType = "Classic";
-                        break;
-                    case 1:
-                        stoelType = "ExtraBeenRuimte";
-                        break;
-                    case 2:
-                        stoelType = "LoveSeat";
-                        break;
+                    string stoelType = "";
+                    switch (totalTicket.SeatType)
+                    {
+                        case 0:
+                            stoelType = "Classic";
+                            break;
+                        case 1:
+                            stoelType = "ExtraBeenRuimte";
+                            break;
+                        case 2:
+                            stoelType = "LoveSeat";
+                            break;
+                    }
+
+                    AnsiConsole.WriteLine($"SeatType: {stoelType}, Count: {totalTicket.Count}");
                 }
-                
-                AnsiConsole.WriteLine($"SeatType: {stoelType}, Count: {totalTicket.Count}");
-            }
-            money.GetTotalRevenue();
-            break; 
+                money.GetTotalRevenue();
+                break;
 
             case RevenueChoices.TotaleOmzetPerFilm:
 
-            var adminOverview = AdminController.GetAllMovies();
-            
-            string[] movieTitle = adminOverview
-                                .Select(book => $"{book.Title}")
-                                .OrderBy(title => title)  // Sort titles alphabetically
-                                .ToArray();
+                var adminOverview = AdminController.GetAllMovies();
 
-            var overviewMovies = AnsiConsole.Prompt(
-                new SelectionPrompt<string>()
-                    .Title("Kies een film :")
-                    .AddChoices(movieTitle)
-            );
-            // Get the total price for the selected movie
-            string titlePart = overviewMovies.Replace("Titel: ", "");
-            var selectedMovie = AdminController.GetMovieByTitle(titlePart);
-            
-            Console.ForegroundColor = ConsoleColor.Blue;
-            var results = RevenueStatistics.GetTotalTicketsPerSeatType(selectedMovie.ID);
-            AnsiConsole.WriteLine($"Titel: {titlePart}");
-            foreach (var result in results)
-            {
-                // seattype = 0 = normal
-                // seattype = 1 = extra beenruimte
-                // seattype  = 2 = loveseat
-                string stoelType = "";
-                switch (result.SeatType)
+                string[] movieTitle = adminOverview
+                    .Select(book => $"{book.Title}")
+                    .OrderBy(title => title) // Sort titles alphabetically
+                    .ToArray();
+
+                var overviewMovies = AnsiConsole.Prompt(
+                    new SelectionPrompt<string>().Title("Kies een film :").AddChoices(movieTitle)
+                );
+                // Get the total price for the selected movie
+                string titlePart = overviewMovies.Replace("Titel: ", "");
+                var selectedMovie = AdminController.GetMovieByTitle(titlePart);
+
+                AnsiConsole.Write(new Rule($"{titlePart}").RuleStyle("blue"));
+                Console.ForegroundColor = ConsoleColor.Blue;
+                var results = RevenueStatistics.GetTotalTicketsPerSeatType(selectedMovie.ID);
+                foreach (var result in results)
                 {
-                    case 0:
-                        stoelType = "Classic";
-                        break;
-                    case 1:
-                        stoelType = "ExtraBeenRuimte";
-                        break;
-                    case 2:
-                        stoelType = "LoveSeat";
-                        break;
+                    string stoelType = "";
+                    switch (result.SeatType)
+                    {
+                        case 0:
+                            stoelType = "Classic";
+                            break;
+                        case 1:
+                            stoelType = "ExtraBeenRuimte";
+                            break;
+                        case 2:
+                            stoelType = "LoveSeat";
+                            break;
+                    }
+                    AnsiConsole.WriteLine($"Stoel Type: {stoelType}, Totale: {result.Count}");
                 }
-                AnsiConsole.WriteLine($"Stoel Type: {stoelType}, Totale: {result.Count}");
-            }
-            AnsiConsole.WriteLine($"Totale Tickets: {RevenueStatistics.GetTotalTicketsPerMovie(selectedMovie.ID)}");
-            AnsiConsole.WriteLine($"Totale Omzet: {RevenueStatistics.GetTotalPricePerMovie(selectedMovie.ID)}");
-            break;
+                AnsiConsole.WriteLine(
+                    $"Totale Tickets: {RevenueStatistics.GetTotalTicketsPerMovie(selectedMovie.ID)}"
+                );
+                AnsiConsole.WriteLine(
+                    $"Totale Omzet: {RevenueStatistics.GetTotalPricePerMovie(selectedMovie.ID)}"
+                );
+                break;
             case RevenueChoices.CSVFileAanvragenVanOmzet:
                 CSVFileAanvragen();
                 break;
 
-
             case RevenueChoices.Terug:
                 Console.Clear();
                 break;
-
-
-
-        };
+        }
+        ;
     }
-
 
     private void CSVFileAanvragen()
     {
         using (db)
-        {   AnsiConsole.Write("Voer uw emailadres in:");
+        {
+            AnsiConsole.Write("Voer uw emailadres in:");
             string email = Console.ReadLine();
             AnsiConsole.Clear();
             while (!RevenueStatistics.EmailValidation(email))
             {
-                AnsiConsole.WriteLine("email adres is ongeldig probeer het opnieuw");
+                AnsiConsole.WriteLine("Email adres is ongeldig probeer het opnieuw");
                 AnsiConsole.Write("Voer uw emailadres in:");
                 email = Console.ReadLine();
                 AnsiConsole.Clear();
-            
             }
-            
-          
+
             var choice = AnsiConsole.Prompt(
                 new SelectionPrompt<AdminChoices>()
-                    .Title($"[red]Weet u zeker dat dit de juiste email adres is: {email}[/]")
+                    .Title($"[red]Weet u zeker dat dit het juiste email adres is: {email}[/]")
                     .AddChoices(AdminChoices.Ja, AdminChoices.Nee, AdminChoices.Terug)
-                );
+            );
 
-
-                switch (choice)
-                {
-                    case AdminChoices.Ja:
-                        RevenueStatistics.GenerateCSVFile(email);
-                        AnsiConsole.WriteLine("CSV bestand is succesvol aangemaakt en naar uw email gestuurd");
-                        break;
-                    case AdminChoices.Nee:
-                        CSVFileAanvragen();
-                        break;
-                    case AdminChoices.Terug:
-                        break;
-                }
-     
-            
+            switch (choice)
+            {
+                case AdminChoices.Ja:
+                    RevenueStatistics.GenerateCSVFile(email);
+                    AnsiConsole.WriteLine(
+                        "CSV bestand is succesvol aangemaakt en naar uw email gestuurd"
+                    );
+                    break;
+                case AdminChoices.Nee:
+                    CSVFileAanvragen();
+                    break;
+                case AdminChoices.Terug:
+                    break;
             }
         }
-    
-    private void ReserveringZoeken() 
+    }
+
+    private void ReserveringZoeken()
     {
         using (DataBaseConnection db = new DataBaseConnection())
         {
-        AnsiConsole.WriteLine("Voer een reserveringsnummer in:");
-        string? userInput = Console.ReadLine();
-            List<Ticket> userTickets = db.Ticket.Where(t => t.ReservationNumber == userInput).ToList();
+            AnsiConsole.WriteLine("Voer een reserveringsnummer in:");
+            string? userInput = Console.ReadLine();
+            List<Ticket> userTickets = db
+                .Ticket.Where(t => t.ReservationNumber == userInput)
+                .ToList();
 
             var ticketsPerSchedule = userTickets
                 .GroupBy(t => new
@@ -460,20 +479,21 @@ public class Admin
                     t.Schedule_ID,
                     t.DateBought
                 })
-                .GroupBy(g => g.Key.Schedule_ID) 
+                .GroupBy(g => g.Key.Schedule_ID)
                 .Select(scheduleGroup => new
                 {
-                    MovieID = scheduleGroup.First().Key.Movie_ID, 
+                    MovieID = scheduleGroup.First().Key.Movie_ID,
                     MovieName = db
                         .Movie.FirstOrDefault(movie =>
                             movie.ID == scheduleGroup.First().Key.Movie_ID
                         )
                         ?.Title,
                     DateBought = scheduleGroup.First().Key.DateBought.ToString("yyyy-MM-dd HH:mm"),
-                    ScheduleDate = db.Schedule.FirstOrDefault(s => s.ID == scheduleGroup.First().Key.Schedule_ID)?.StartDate.ToString("yyyy-MM-dd HH:mm"), 
-                    TicketIDs = string.Join(", ", scheduleGroup.SelectMany(innerGroup => innerGroup.Select(t => t.ID))), 
-                    TicketCount = scheduleGroup.Sum(innerGroup => innerGroup.Count()), 
-                    TotalPrice = scheduleGroup.Sum(innerGroup => innerGroup.Sum(t => t.Price)) 
+                    ScheduleDate = db
+                        .Schedule.FirstOrDefault(s => s.ID == scheduleGroup.First().Key.Schedule_ID)
+                        ?.StartDate.ToString("yyyy-MM-dd HH:mm"),
+                    TicketCount = scheduleGroup.Sum(innerGroup => innerGroup.Count()),
+                    TotalPrice = scheduleGroup.Sum(innerGroup => innerGroup.Sum(t => t.Price))
                 })
                 .ToList();
 
@@ -492,29 +512,29 @@ public class Admin
                 foreach (var scheduleInfo in ticketsPerSchedule)
                 {
                     table.AddRow(
-                    new Markup($"[blue]{scheduleInfo.MovieName}[/]"),
-                    new Markup($"[blue]{userInput}[/]"),
-                    new Markup($"[blue]{scheduleInfo.TicketCount}[/]"),
-                    new Markup($"[blue]{scheduleInfo.TotalPrice.ToString()} euro[/]"), // Formatting as currency
-                    new Markup($"[blue]{scheduleInfo.DateBought}[/]"),
-                    new Markup($"[blue]{scheduleInfo.ScheduleDate}[/]")
+                        new Markup($"[blue]{scheduleInfo.MovieName}[/]"),
+                        new Markup($"[blue]{userInput}[/]"),
+                        new Markup($"[blue]{scheduleInfo.TicketCount}[/]"),
+                        new Markup($"[blue]{scheduleInfo.TotalPrice.ToString()} euro[/]"), // Formatting as currency
+                        new Markup($"[blue]{scheduleInfo.DateBought}[/]"),
+                        new Markup($"[blue]{scheduleInfo.ScheduleDate}[/]")
                     );
                 }
 
                 // Create a bordered panel with a specific color
                 var panel = new Panel(table)
-                    .Header($"[bold blue]Reservering van reservingsnummer: {userInput}[/]")
+                    .Header($"[bold blue]Reservering van reserveringsnummer: {userInput}[/]")
                     .BorderColor(Color.Blue);
 
                 AnsiConsole.Render(panel);
             }
-
-            else 
+            else
             {
                 AnsiConsole.Write(new Rule("[red]Geen reservering gevonden[/]").RuleStyle("red"));
             }
         }
     }
+
     // checks for possibility changing password and errorhandling for the admin.
     public void WachtwoordVeranderen()
     {
@@ -524,24 +544,36 @@ public class Admin
         string confirmNewPassword;
         while (true)
         {
-            currentPassword = AnsiConsole.Prompt(new TextPrompt<string>("Voer uw huidige wachtwoord in: ").Secret());
+            currentPassword = AnsiConsole.Prompt(
+                new TextPrompt<string>("Voer uw [blue]huidige wachtwoord[/] in: ").Secret()
+            );
             if (currentPassword == admin.Password)
             {
                 break;
             }
-            AnsiConsole.Markup("[red]Het huidige wachtwoord dat u heeft ingevoerd is onjuist. Probeer het opnieuw.[/]\n");
+            AnsiConsole.Markup(
+                "[red]Het huidige wachtwoord dat u heeft ingevoerd is onjuist. Probeer het opnieuw.[/]\n"
+            );
         }
         Console.Clear();
         while (true)
         {
-            newPassword = AnsiConsole.Prompt(new TextPrompt<string>("Voer uw nieuwe wachtwoord in: ").Secret());
-            confirmNewPassword = AnsiConsole.Prompt(new TextPrompt<string>("Herhaal uw nieuwe wachtwoord: ").Secret());
+            newPassword = AnsiConsole.Prompt(
+                new TextPrompt<string>("Voer uw [blue]nieuwe wachtwoord[/] in: ").Secret()
+            );
+            confirmNewPassword = AnsiConsole.Prompt(
+                new TextPrompt<string>("Herhaal uw [blue]nieuwe wachtwoord[/]: ").Secret()
+            );
             if (confirmNewPassword == newPassword)
             {
                 break;
             }
             Console.Clear();
-            AnsiConsole.Write(new Rule("[red] Uw nieuwe wachtwoord komt niet overheen met de herhaling, probeer het opnieuw[/]"));
+            AnsiConsole.Write(
+                new Rule(
+                    "[red] Uw nieuwe wachtwoord komt niet overheen met de herhaling, probeer het opnieuw[/]"
+                )
+            );
         }
         var answer = AnsiConsole.Confirm("Weet u zeker dat u uw wachtwoord wilt wijzigen?");
         if (answer)
@@ -558,7 +590,8 @@ public class Admin
             AnsiConsole.Markup("[yellow]Wachtwoord wijziging geannuleerd.[/]\n");
         }
     }
-    // checks for possibility and error handeling of changing admins username
+
+    // checks for possibility and error handling of changing admins username
     public void GebruikersNaamVeranderen()
     {
         AnsiConsole.Write(new Rule("[blue] Gebruikersnaam wijzigen [/]"));
@@ -567,24 +600,38 @@ public class Admin
         string confirmNewUsername;
         while (true)
         {
-            currentUsername = AnsiConsole.Prompt(new TextPrompt<string>("Voer uw huidige gebruikersnaam in: "));
+            currentUsername = AnsiConsole.Prompt(
+                new TextPrompt<string>("Voer uw [blue]huidige gebruikersnaam[/] in: ")
+            );
             if (currentUsername == admin.Name)
             {
                 break;
             }
-            AnsiConsole.Write(new Rule("[red]De huidige gebruikersnaam die u heeft ingevoerd is onjuist. Probeer het opnieuw.[/]\n"));
+            AnsiConsole.Write(
+                new Rule(
+                    "[red]De huidige gebruikersnaam die u heeft ingevoerd is onjuist. Probeer het opnieuw.[/]\n"
+                )
+            );
         }
         Console.Clear();
         while (true)
         {
-            newUsername = AnsiConsole.Prompt(new TextPrompt<string>("Voer uw nieuwe gebruikersnaam in: "));
-            confirmNewUsername = AnsiConsole.Prompt(new TextPrompt<string>("Herhaal uw nieuwe gebruikersnaam: "));
+            newUsername = AnsiConsole.Prompt(
+                new TextPrompt<string>("Voer uw [blue]nieuwe gebruikersnaam[/] in: ")
+            );
+            confirmNewUsername = AnsiConsole.Prompt(
+                new TextPrompt<string>("Herhaal uw [blue]nieuwe gebruikersnaam[/]: ")
+            );
             if (confirmNewUsername == newUsername)
             {
                 break;
             }
             Console.Clear();
-            AnsiConsole.Write(new Rule("[red] Uw nieuwe gebruikersnaam komt niet overheen met de herhaling, probeer het opnieuw[/]\n"));
+            AnsiConsole.Write(
+                new Rule(
+                    "[red] Uw nieuwe gebruikersnaam komt niet overheen met de herhaling, probeer het opnieuw[/]\n"
+                )
+            );
         }
         var answer = AnsiConsole.Confirm("Weet u zeker dat u uw gebruikersnaam wilt wijzigen?");
         if (answer)
@@ -602,8 +649,10 @@ public class Admin
         }
     }
 }
+
 public enum AdminChoices
-{   Ja,
+{
+    Ja,
     Nee,
     FilmToevoegen,
     GeplandeFilms,
@@ -616,15 +665,15 @@ public enum AdminChoices
     Terug
 }
 
-
 public enum FilmPlannenChoices
-{   
+{
     Ja,
     Nee,
     TerugNaarFilmKeuzes,
     DoorgaanMetPlannen,
     Terug
 }
+
 public enum RevenueChoices
 {
     TotaleOmzet,
@@ -632,6 +681,3 @@ public enum RevenueChoices
     CSVFileAanvragenVanOmzet,
     Terug
 }
-
-
-

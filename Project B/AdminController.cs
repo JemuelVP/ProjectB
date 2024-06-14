@@ -42,5 +42,4 @@ public class AdminController
         db.Movie.Add(newMovie);
         db.SaveChanges();
     }
-    
 }
