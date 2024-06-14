@@ -207,6 +207,7 @@ public class Ticket
 
     public static void SeeUserStats(int userID)
     {
+        Console.Clear();
         using (DataBaseConnection db = new DataBaseConnection())
         {
             List<Ticket> userTickets = db.Ticket.Where(t => t.User_ID == userID).ToList();
