@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Microsoft.EntityFrameworkCore;
 
-class DataBaseConnection : DbContext
+public class DataBaseConnection : DbContext
 {
     public DbSet<Film> Movie { get; set; }
     public DbSet<Users> Users { get; set; }

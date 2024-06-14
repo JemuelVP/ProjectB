@@ -3,7 +3,7 @@ using System.Net.Mail;
 using System.Text.RegularExpressions;
 using Spectre.Console;
 
-class RevenueStatistics
+public class RevenueStatistics
 {
     public static List<dynamic> GetTotalTicketsPerSeatType()
     {
@@ -11,7 +11,7 @@ class RevenueStatistics
         var seatTypeCounts = db
             .Ticket.Join(
                 db.Chair,
-                t => t.Chair_ID, // Adjust this to match the actual foreign key property in your Ticket class
+                t => t.Chair_ID,
                 c => c.ID,
                 (t, c) => new { t, c }
             )

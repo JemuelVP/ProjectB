@@ -561,6 +561,7 @@ public class Customer
                                 int chairY = chair.Row;
                                 // Use chairX and chairY in your logic to calculate the final price
                                 var finalPrice = ticket.CreateTicket(
+                                    db,
                                     selectedSchedule,
                                     chairId,
                                     film.ID,
