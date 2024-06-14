@@ -354,7 +354,7 @@ public class Ticket
         {
             List<Ticket> userTickets = db.Ticket.Where(t => t.User_ID == userID).ToList(); // gets all tickets from user
             List<int> movieIds = userTickets.Select(t => t.Movie_ID).Distinct().ToList(); // gets the movie id's from each ticket
-            List<string> genres = db
+            List<string?> genres = db
                 .Movie.Where(m => movieIds.Contains(m.ID))
                 .Select(m => m.Categories)
                 .Distinct()
