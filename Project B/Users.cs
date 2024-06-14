@@ -27,11 +27,14 @@ public class Users
             LoggedIn = true;
             AnsiConsole.Write(new Rule("[blue]Succesvol ingelogd[/]").RuleStyle("blue"));
             return true;
-            
         }
         else
         {
-            Console.WriteLine("Verkeerde gegevens ingevuld, probeer het opnieuw");
+            AnsiConsole.Write(
+                new Rule("[red]Verkeerde gegevens ingevuld, probeer het opnieuw[/]").RuleStyle(
+                    "red"
+                )
+            );
             return false;
         }
     }
@@ -52,10 +55,15 @@ public class Users
         }
         else
         {
-            AnsiConsole.WriteLine("Verkeerde gegevens ingevuld, probeer het opnieuw");
+            AnsiConsole.Write(
+                new Rule("[red]Verkeerde gegevens ingevuld, probeer het opnieuw[/]").RuleStyle(
+                    "red"
+                )
+            );
             return;
         }
     }
+
     // sets admins password to the new password
     public bool ChangePassword(string currentPassword, string newPassword)
     {
@@ -68,9 +76,10 @@ public class Users
                 db.SaveChanges();
                 return true;
             }
-        return false;
+            return false;
         }
     }
+
     // sets admins username to the new username
     public bool ChangeUsername(string currentUsername, string newUsername)
     {
@@ -83,7 +92,7 @@ public class Users
                 db.SaveChanges();
                 return true;
             }
-        return false;
+            return false;
         }
     }
 }

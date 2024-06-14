@@ -10,6 +10,5 @@ public class Film
     public int Age { get; set; }
     public int DurationInMin { get; set; }
 
-    public List<Schedule> Schedules { get; set;}
-
+    public List<Schedule> Schedules { get; set; }
 }

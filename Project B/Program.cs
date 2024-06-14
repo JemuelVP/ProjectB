@@ -1,16 +1,23 @@
 ﻿using Spectre.Console;
+
 bool active = true;
 DataBaseConnection db = new();
 
-// ChairController chairController = new ChairController();
-// chairController.AddChairs();
-// Console.WriteLine("Chairs added to the database.");
 var hallsController = new CinemaHallController(db);
-AnsiConsole.Write(new Rule($"Welkom bij YourEyes").RuleStyle("blue"));
+
 var CustomerMenu = new Customer();
 var AdminMenu = new Admin();
 while (active)
 {
+    string fontPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "3d.flf");
+    var font = FigletFont.Load(fontPath);
+    Console.Clear();
+    AnsiConsole.Write(new FigletText(font, "Welkom bij").Centered().Color(Color.Blue));
+    AnsiConsole.Write(new FigletText(font, "Your Eyes\n").Centered().Color(Color.Blue));
+
+    AnsiConsole.Write(new Rule("[blue]Druk op enter om door te gaan[/]").RuleStyle("blue"));
+    Console.ReadLine();
+    Console.Clear();
     var MainMenuOption = AnsiConsole.Prompt(
         new SelectionPrompt<MainMenuOptions>()
             .Title("[blue]Bent u een admin of een klant[/]")
@@ -35,7 +42,6 @@ public enum MainMenuOptions
 
 public enum ReservationMenuOption
 {
-    
     MaakEenReservatie,
     Terug
 }
