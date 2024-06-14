@@ -16,7 +16,9 @@ public class Ticket
 
     public string ReservationNumber { get; set; }
 
+
     public double CreateTicket(
+        DataBaseConnection db,
         Schedule schedule,
         int chair_ID,
         int movieId,
@@ -32,7 +34,6 @@ public class Ticket
         User_ID = userId ?? 0; // Assign User_ID if it's provided, otherwise use 0 or any other default value
         ReservationNumber = reservationNumber;
 
-        using DataBaseConnection db = new();
         var entry = db.Ticket.Add(
             new Ticket
             {
@@ -147,13 +148,13 @@ public class Ticket
         return Price;
     }
 
-    private bool IsPeakTime(DateTime startTime)
+    public bool IsPeakTime(DateTime startTime)
     {
         int hour = startTime.Hour;
         return hour >= 18 && hour <= 22; // Assuming peak hours are from 18 PM to 200 PM
     }
 
-    private bool IsEarlyTime(DateTime startTime)
+    public bool IsEarlyTime(DateTime startTime)
     {
         // Check if the startTime falls within peak hours
         int hour = startTime.Hour;
@@ -339,7 +340,7 @@ public class Ticket
         {
             seatTypeName = "Classic Seat";
             AnsiConsole.Markup(
-                $"[blue]StoelType:[/] [white]{seatTypeName, -15} X{classicSeatsCounter}[/] [blue]Prijs:[/] [white]{totalClassicseatPrice}[/][blue] euro[/]\n"
+                $"[blue]StoelType:[/] [white]{seatTypeName,-15} X{classicSeatsCounter}[/] [blue]Prijs:[/] [white]{totalClassicseatPrice}[/][blue] euro[/]\n"
             );
         }
         if (ExtraLegRoomCounter != 0)
@@ -353,7 +354,7 @@ public class Ticket
         {
             seatTypeName = "LoveSeat";
             AnsiConsole.Markup(
-                $"[blue]StoelType:[/] [white]{seatTypeName, -15} X{loveSeatsCounter}[/] [blue]Prijs:[/] [white]{totalLoveseatPrice}[/][blue] euro[/]\n"
+                $"[blue]StoelType:[/] [white]{seatTypeName,-15} X{loveSeatsCounter}[/] [blue]Prijs:[/] [white]{totalLoveseatPrice}[/][blue] euro[/]\n"
             );
         }
     }
